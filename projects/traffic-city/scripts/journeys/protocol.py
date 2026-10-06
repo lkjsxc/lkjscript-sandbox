@@ -29,3 +29,11 @@ TYPES['RailView'].update({'path':'(list I64)','stops':'(list I64)','direction':'
 
 TYPES['RailPlatform']={k:'I64' for k in 'station forward reverse'.split()}
 TYPES['RailView']['platforms']='(list RailPlatform)'
+
+# Session-only counterfactuals. Saved/City stay format 7; no lab data is persisted.
+TYPES['LabMeasure']={k:'I64' for k in 'visits arrived duration waitCycles disconnectedCycles outstanding cancelled population netFunds operating boardings wealthError'.split()}
+TYPES['Lab']={'phase':'I64','horizon':'I64','step':'I64','disconnect':'I64','plan':'City','trial':'City','control':'LabMeasure','changed':'LabMeasure','quote':'EditQuote','confirmation':'I64'}
+TYPES['LabChange']={'lab':'Lab','notice':'Text'}
+TYPES['LabView']={**{k:'I64' for k in 'phase horizon step realTick planCost newResidents moveouts cancelled confirmation'.split()},'control':'LabMeasure','changed':'LabMeasure'}
+TYPES['State']['lab']='Lab'
+TYPES['Frame']['lab']='LabView'

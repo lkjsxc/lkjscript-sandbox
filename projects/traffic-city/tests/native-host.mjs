@@ -1,7 +1,7 @@
 import fs from 'node:fs';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
 import {startNative,connect,WS,root} from './native.mjs';
 const base=process.env.HTTP_URL||'http://127.0.0.1:19140';
-const assets=[['/','index.html','text/html'],['/app.js','app.js','text/javascript'],['/style.css','style.css','text/css'],['/favicon.svg','favicon.svg','image/svg+xml'],['/favicon.ico','favicon.svg','image/svg+xml']];
+const assets=[['/','index.html','text/html'],['/app.js','app.js','text/javascript'],['/lab.js','lab.js','text/javascript'],['/style.css','style.css','text/css'],['/favicon.svg','favicon.svg','image/svg+xml'],['/favicon.ico','favicon.svg','image/svg+xml']];
 const report={artifact_sha256:JSON.parse(fs.readFileSync(process.env.CITY_SELECTION||root+'/.build/selection.json')).artifact_sha256,assets:[],checks:[]};
 for(const [url,file,mime]of assets){const response=await fetch(base+url),bytes=Buffer.from(await response.arrayBuffer()),expected=fs.readFileSync(root+'/web/'+file);assert.equal(response.status,200);assert(response.headers.get('content-type').startsWith(mime));assert.equal(response.headers.get('x-content-type-options'),'nosniff');assert.equal(response.headers.get('cache-control'),'no-store');assert.deepEqual(bytes,expected);report.assets.push({url,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});}
 assert.equal(await (await fetch(base+'/healthz')).text(),'Traffic City native HTTP ready\n');

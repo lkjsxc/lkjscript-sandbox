@@ -5,14 +5,24 @@ component=next(d for d in D if d.startswith('(component create service '))
 bootstrap=FN('transition',[('state','(option State)'),('event','std::SessionEvent')],'Decision',C('view::finish'),effect='(task (requirement service::data) (requirement service::streams) (requirement service::config))')
 write_source('session-capabilities','live',[bootstrap,component])
 sets={
- 'persist':{'invalid-save','hex-loop','token-valid','claim','checkpoint','claim-retry','checkpoint-retry','owned','has-undo','replace-saved','replace-retry'},
- 'management':{'save-state','clear-review','review-remove','apply-remove','review-city','manage-city','review-scenario','active-input'},
+ 'persist':{'invalid-save','hex-loop','token-valid','claim','claim-retry','has-undo'},
+ 'checkpoint':{'checkpoint','checkpoint-retry','owned'},
+ 'replacement':{'replace-saved','replace-retry'},
+ 'saving':{'save-state','clear-review'},
+ 'removals':{'review-remove','apply-remove'},
+ 'reviews':{'review-city','review-scenario'},
+ 'management':{'manage-city','active-input'},
+ 'labstore':{'lab-start','lab-commit'},
+ 'laboratory':{'lab-input','lab-active'},
+ 'origin':{'find-header','origin-allowed','test-header','reject','invalid'},
+ 'reconnect':{'resume','open'},
+ 'heartbeat':{'tick','close'},
 }
 owners={}
 for d in D:
  m=re.search(r'\(function create ([^ ]+)',d)
  if m:owners[m.group(1)]=next((module for module,names in sets.items() if m.group(1) in names),'live')
-for source,module in [('persistence','persist'),('management','management'),('session','live')]:
+for source,module in [('persistence','persist'),('checkpoint','checkpoint'),('replacement','replacement'),('saving','saving'),('removals','removals'),('reviews','reviews'),('management','management'),('labstore','labstore'),('laboratory','laboratory'),('session-origin','origin'),('session-reconnect','reconnect'),('session-heartbeat','heartbeat'),('session','live')]:
  defs=[]
  for d in D:
   if d.startswith('(component create service '):continue
@@ -21,8 +31,8 @@ for source,module in [('persistence','persist'),('management','management'),('se
   if owner!=module:continue
   def qualify(match):
    name=match.group(1);owner=owners.get(name)
-   return '(call '+(owner+'::'+name if owner and owner!=module else name)+' '
-  d=re.sub(r'\(call ([^ :()]+) ',qualify,d).replace('service::','live::service::')
+   return '(call '+(owner+'::'+name if owner and owner!=module else name)
+  d=re.sub(r'\(call ([^ :()]+)(?=[ )])',qualify,d).replace('service::','live::service::')
   if module=='live':
    if m and m.group(1)=='transition':
     d=d.replace('(function create transition ','(function edit __TRANSITION_OWNER__ transition ')
