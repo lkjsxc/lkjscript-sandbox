@@ -49,7 +49,10 @@
     "test:throughput-live": "node tests/throughput-live.mjs",
     "test:save-compatibility": "node tests/save-compatibility.mjs",
     "test:hotpath-equivalence": "node tests/hotpath-equivalence.mjs",
-    "test:source-reproduction": "node tests/source-reproduction.mjs"
+    "test:source-reproduction": "node tests/source-reproduction.mjs",
+    "test:city-lab": "node tests/city-lab.mjs",
+    "test:city-lab-ui": "node tests/with-preview.mjs tests/city-lab-ui.mjs",
+    "test:city-lab-metro": "node tests/city-lab-metro.mjs"
   },
   "engines": {
     "node": ">=22"
