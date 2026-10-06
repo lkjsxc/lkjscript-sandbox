@@ -1,0 +1,24 @@
+# Generated, downloaded, or private: never publication inputs.
+**/node_modules/
+**/.build/
+/projects/*/runtime/
+/projects/*/evidence/
+/projects/*/tools/
+**/.transfer/
+**/dist/
+**/target/
+**/__pycache__/
+*.py[cod]
+*.log
+*.jsonl
+*.lkja
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store

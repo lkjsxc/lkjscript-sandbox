@@ -1,0 +1,10 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';import {runCase,selection} from './run-case.mjs';
+const checks=[];
+function verify(name,city,ticks){city=structuredClone(city);city.originX??=0;city.originY??=0;city.sim.cancelled??=0;city.sim.transit??={lines:[],ids:[],nextId:0,plans:[],choices:[],boardings:0,completed:0,spent:0};const {result:r,wall_ms}=runCase({city,ticks,commands:[],after:[]},name,'continuation');assert.equal(r.conservation,0);assert.equal(r.city.sim.population,city.sim.population);assert.deepEqual(r.city.sim.ids,city.sim.ids);for(const [k,n] of r.lanes){const kind=new Map(r.city.world.tiles).get(Math.floor(k/8));if(kind===1||kind===2)assert(n<=3&&n>=0)}for(const a of r.agents){assert(Math.abs(a.from%128-a.to%128)+Math.abs(Math.floor(a.from/128)-Math.floor(a.to/128))<=1);assert(a.elapsed<=a.duration)}checks.push({name,ticks,arrived:r.city.sim.arrived,moving:r.city.sim.moving,max_wait:Math.max(...r.agents.map(a=>a.wait)),wall_ms});return r;}
+const ring=JSON.parse(fs.readFileSync('tests/fixtures/full-ring-v4.json'));const junction=JSON.parse(fs.readFileSync('tests/fixtures/junction-ring-v4.json'));
+const a=verify('full-lane-cycle-recovers',ring,80);assert(a.city.sim.arrived>=12,'all original journeys should complete');
+const b=verify('adjacent-junctions-release-crossing',junction,80);assert(b.city.sim.arrived>=4,'all initial crossing journeys should complete');
+const c=verify('old-sustained-jam-resumes',JSON.parse(fs.readFileSync('tests/fixtures/stalled-ring-v4.json')),100);assert(c.city.sim.arrived>=12);
+const replay=verify('cycle-replay',ring,80);assert.deepEqual(a,replay);
+const largeIds=structuredClone(ring);for(const [k,r] of largeIds.sim.agents){r.id+=5000}largeIds.sim.agents=largeIds.sim.agents.map(([k,r])=>[k+5000,r]);largeIds.sim.ids=largeIds.sim.ids.map(k=>k+5000);largeIds.sim.nextId+=5000;assert(verify('stable-heads-after-lifetime-turnover',largeIds,80).city.sim.arrived>=12);
+fs.writeFileSync('evidence/repair-regression.json',JSON.stringify({passed:true,artifact_sha256:selection.artifact_sha256,checks},null,2));console.log(checks);

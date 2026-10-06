@@ -1,0 +1,2 @@
+import fs from 'node:fs';
+for(const file of fs.readdirSync('src').filter(x=>x.endsWith('.lkjc'))){let depth=0,line=1,str=false,esc=false,comment=false;const s=fs.readFileSync('src/'+file,'utf8');for(const c of s){if(c==='\n'){line++;comment=false;}if(comment)continue;if(str){if(esc)esc=false;else if(c==='\\')esc=true;else if(c==='"')str=false;continue;}if(c===';')comment=true;else if(c==='"')str=true;else if(c==='(')depth++;else if(c===')'){depth--;if(depth<0){console.log(file,'negative at',line);depth=0;}}}console.log(file,'remaining',depth);}

@@ -1,0 +1,6 @@
+// Development-only syntax/type probe against the pinned public compiler.
+import fs from 'node:fs';import {spawnSync} from 'node:child_process';const bin=process.env.LKJSCRIPT||'./tools/lkjscript/lkjscript',p=process.env.PROBE_PROJECT||'.build/probe-'+Date.now();
+function run(a){const r=spawnSync(bin,a,{encoding:'utf8',maxBuffer:32*1024*1024});if(r.status){console.error(r.stdout+r.stderr);process.exit(r.status)}return r.stdout}
+if(!process.env.PROBE_PROJECT)run(['new',p,'--template','command','--name','journeys']);for(const n of process.argv.slice(2)){const rev=run(['--project',p,'status']).match(/revision id=(rev_[a-f0-9]+)/)[1];const f=p+'/'+n+'.lkjc';fs.writeFileSync(f,'request base='+rev+'\n'+fs.readFileSync('src/'+n+'.lkjc'));const plan=run(['--project',p,'change','plan','--input-file',f]);const token=plan.match(/plan_[a-f0-9]+/)[0];run(['--project',p,'change','apply','--input-file',f,'--plan',token]);console.log(n+' accepted');}console.log(run(['--project',p,'check']));fs.writeFileSync('.build/probe-latest',p);
+
+if(process.env.PROBE_ARTIFACT){console.log(run(['--project',p,'build','--output',process.env.PROBE_ARTIFACT]));fs.writeFileSync('.build/journeys-selection.json',JSON.stringify({bin:process.cwd()+'/'+bin,project:p,artifact:process.env.PROBE_ARTIFACT}));}

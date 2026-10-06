@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+usage() { printf '%s\n' 'Usage: ./sandbox list | ./sandbox <project> <task> [arguments...]' 'Common tasks: setup, build, check, test, run'; }
+if [[ $# -eq 0 || "${1:-}" == '--help' || "${1:-}" == '-h' ]]; then usage; exit 0; fi
+if [[ "$1" == 'list' ]]; then
+  [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+  for entry in "$root"/projects/*/project.sh; do
+    [[ -f "$entry" ]] || continue
+    name=${entry%/project.sh}; printf '%s\n' "${name##*/}"
+  done
+  exit 0
+fi
+project=$1; shift
+[[ "$project" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || { echo 'Invalid project name.' >&2; exit 2; }
+entry="$root/projects/$project/project.sh"
+[[ -f "$entry" && -x "$entry" && ! -L "$root/projects/$project" && ! -L "$entry" ]] || { echo "Unknown project: $project" >&2; exit 2; }
+[[ $# -ge 1 ]] || { usage >&2; exit 2; }
+exec "$entry" "$@"

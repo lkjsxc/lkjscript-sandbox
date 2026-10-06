@@ -1,0 +1,37 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';const {chromium}=createRequire(import.meta.url)('playwright');
+import {selectTool,districtPoint} from './ui-driver.mjs';
+const recovery=JSON.parse(fs.readFileSync(process.env.PLAYER_UI_KEY_FILE));
+const prefix=process.env.RAIL_PASSENGER_EVIDENCE||'evidence/rail-passengers-ui',checks=[],errors=[];
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM||undefined,args:['--no-sandbox']});
+try {
+ const context=await browser.newContext({viewport:{width:1440,height:1000}});
+ await context.addInitScript(key=>localStorage.setItem('flowgarden-city-v4',key),recovery.key);
+ const page=await context.newPage();page.setDefaultTimeout(90000);page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(process.env.PREVIEW_URL);await page.waitForFunction(()=>window.__flowgarden?.sessionStatus===1&&window.__flowgarden.rails.length===1);
+ const state=()=>page.evaluate(()=>({stats:window.__flowgarden.stats,rails:window.__flowgarden.rails}));
+ const before=await state();assert(before.stats.railBoardings>0);assert(before.rails[0].occupancy>0);assert(before.stats.paused);
+ await page.locator('#fit').click();await page.waitForFunction(()=>window.__flowgarden.detail&&window.__flowgarden.actors.some(a=>a.mode===3));
+ await page.screenshot({path:prefix+'-native-passengers.png'});
+ let p=await districtPoint(page,9,7);await page.mouse.click(p.x,p.y);await page.waitForFunction(()=>!document.querySelector('#inspector').hidden);
+ assert.match(await page.locator('#inspect-title').textContent(),/Shuttle 1/);
+ await page.screenshot({path:prefix+'-occupied-inspector.png'});await page.locator('#inspect-close').click();
+ checks.push('legally played saved city renders actual access walkers, native occupied train and platform queues through browser controls');
+ await selectTool(page,0);p=await districtPoint(page,16,7);await page.mouse.click(p.x,p.y);await page.waitForFunction(()=>document.querySelector('#removal').open);
+ const quote=await page.evaluate(()=>window.__flowgarden.review);
+ assert.equal(quote.rails,1);assert.equal(quote.refund,198);assert.equal(quote.moveouts,0);
+ assert(quote.cancelled>=before.rails[0].occupancy+before.stats.railWaiting);
+ await page.screenshot({path:prefix+'-occupied-removal.png'});
+ await page.locator('#remove-confirm').click();await page.waitForFunction(()=>window.__flowgarden.rails.length===0);
+ const removed=await state();assert.equal(removed.stats.cancelled,before.stats.cancelled+quote.cancelled);assert.equal(removed.stats.arrived,before.stats.arrived);assert.equal(removed.stats.requested,before.stats.requested);assert.equal(removed.stats.population,before.stats.population);assert.equal(removed.stats.cash,before.stats.cash+198);
+ checks.push('whole-line demolition with actual waiting and riding residents counts every cancelled trip, refunds exactly and awards no arrival income');
+ await page.locator('#menu-open').click();await page.locator('#save').click();await page.waitForFunction(()=>document.querySelector('#notice').textContent==='City saved.');
+ await page.reload();await page.waitForFunction(()=>window.__flowgarden?.sessionStatus===1);assert.deepEqual(await state(),removed);
+ await selectTool(page,8);const a=await districtPoint(page,9,7),b=await districtPoint(page,22,7);await page.mouse.move(a.x,a.y);await page.mouse.down();await page.mouse.move(b.x,b.y,{steps:14});await page.mouse.up();await page.waitForFunction(()=>window.__flowgarden.rails.length===1);assert.equal((await state()).stats.cash,removed.stats.cash-396);
+ await selectTool(page,-2);await page.locator('#play').click();await page.waitForFunction(n=>window.__flowgarden.stats.railBoardings>n,before.stats.railBoardings);
+ await page.locator('#play').click();await page.waitForFunction(()=>window.__flowgarden.stats.paused);
+ checks.push('cancelled-trip ledger survives native reload; a rebuilt line attracts new actual boardings without resetting residents');
+ await page.setViewportSize({width:390,height:844});await page.locator('#fit').click();
+ await page.screenshot({path:prefix+'-mobile-passengers.png'});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);
+ const report={passed:true,artifact_sha256:JSON.parse(fs.readFileSync(process.env.CITY_SELECTION||'.build/selection.json')).artifact_sha256,source:'Native DataStore copy of legal rail-player city, no fixture-state injection',checks,errors,before,quote,removed,after:await state()};fs.writeFileSync(prefix+'.json',JSON.stringify(report,null,2));console.log(report);
+} finally {await browser.close()}

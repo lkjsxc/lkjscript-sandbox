@@ -1,0 +1,10 @@
+import fs from 'node:fs';import os from 'node:os';import assert from 'node:assert/strict';import {startNative,connect,memory,root} from './native.mjs';
+const report=[],samples=Number(process.env.SCALE_SAMPLES||144);
+for(const rows of [2,8,32,64]){
+ const n=await startNative({target:'benchmark-live',tick:1,name:'scale-'+rows});const start=performance.now();const c=connect(n.address,'/live?'+rows);
+ try{
+  await c.wait(f=>f.stats.tick>=samples+5,300000);const frames=c.frames.filter(f=>f.stats.tick>=5&&f.stats.tick<=samples+5),intervals=frames.slice(1).map((f,i)=>({tick:f.stats.tick,ms:f.at-frames[i].at,bytes:f.bytes}));const gaps=intervals.map(x=>x.ms).sort((a,b)=>a-b),q=p=>gaps[Math.ceil(gaps.length*p)-1];
+  const entry={artifact_sha256:n.selection.artifact_sha256,tiles:rows*128,population:frames.at(-1).stats.population,samples:gaps.length,initial_open_ms:c.frames[0].at-start,median_tick_ms:q(.5),p95_tick_ms:q(.95),p99_tick_ms:q(.99),maximum_tick_ms:q(1),over_500_ms:gaps.filter(x=>x>500).length,first_frame_bytes:c.frames[0].bytes,mean_delta_bytes:frames.reduce((s,f)=>s+f.bytes,0)/frames.length,largest_delta_bytes:Math.max(...frames.map(f=>f.bytes)),...memory(n.child.pid),stats:frames.at(-1).stats,intervals};assert(entry.first_frame_bytes<131072);assert(entry.largest_delta_bytes<131072);report.push(entry);console.log(JSON.stringify({...entry,intervals:undefined}));
+ }finally{await c.close();await n.stop()}
+ fs.writeFileSync(root+'/evidence/scaling.json',JSON.stringify({environment:{node:process.version,kernel:os.release(),cpu:os.cpus()[0].model,memory_bytes:os.totalmem()},workload:`Dense 128-column road lattice; even rows have 8 residents at x=0 and 16 jobs at x=127; odd rows have shopping and parks. Independent native benchmark target, 1 ms requested timer, ${samples} intervals after five warmup ticks; includes native simulation, state retention, viewport selection, JSON encoding and WebSocket transport, excludes persistence. Route cache refresh at tick 128 is included. These are measured sizes, not a certification of the 2,048-resident build limit.`,report},null,2));
+}

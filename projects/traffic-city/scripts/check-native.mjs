@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+const root=path.resolve(import.meta.dirname,'..');
+const file=path.resolve(root,process.env.CITY_SELECTION||'.build/selection.json');
+if(!fs.existsSync(file))throw Error('Build Traffic City first: ./sandbox traffic-city build');
+const selected=JSON.parse(fs.readFileSync(file,'utf8'));
+const result=spawnSync(selected.bin,['--project',selected.project,'check'],{cwd:root,stdio:'inherit'});
+if(result.error)throw result.error;
+process.exitCode=result.status??1;
