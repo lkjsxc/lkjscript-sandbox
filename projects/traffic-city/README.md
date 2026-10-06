@@ -79,6 +79,8 @@ npm run test:ui-expansion
 
 The build performs native graph checks and embedded tests. The core suite checks motion geometry, independent routing comparisons, conservation, deterministic replay, and WebSocket persistence/ownership. Browser wrappers start isolated loopback listeners on automatically assigned ports with fresh stores. `CHROMIUM` can select an existing browser executable; otherwise Playwright's installed Chromium is used. Never set `PREVIEW_URL` to a real preview unless testing that actual deployment and consuming city slots is explicitly intended.
 
+The native throughput changes, exact predecessor comparisons and save-compatibility reproduction are documented in [docs/THROUGHPUT.md](docs/THROUGHPUT.md).
+
 Additional workloads are listed in package.json. Some advanced tests deliberately require a prior test-generated city (for example rail-player before rail-removal) or a separately supplied historical selection (migration/upgrade/planner comparison/hotpath equivalence). Migration and upgrade tests require OLD_CITY_SELECTION pointing at a separately built predecessor; they are not part of the fresh-clone command sequence above. Historical binaries and operational test inputs are not included. Do not treat these optional comparisons as self-contained fresh-clone tests.
 
 The map limits are 128 × 128, 8,192 occupied tiles, and 2,048 residents. They are admission limits, not a promise of real-time performance for maximum-size cities. CI's smoke test does not establish large-city scalability. See [docs/IMPORT.md](../../docs/IMPORT.md) for source provenance and the publication boundary.

@@ -38,4 +38,8 @@ jobs:
         working-directory: projects/traffic-city
       - run: ./sandbox traffic-city build
       - run: ./sandbox traffic-city test
+      - run: npm run test:rail
+        working-directory: projects/traffic-city
+      - run: npm run test:repair
+        working-directory: projects/traffic-city
       - run: ./sandbox traffic-city smoke

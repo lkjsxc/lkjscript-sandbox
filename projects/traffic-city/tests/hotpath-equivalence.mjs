@@ -1,8 +1,9 @@
 // Compare detached artifacts serially, including every resident, route and account.
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
 const originalSelection=process.env.CITY_SELECTION;
-const baselinePath=process.env.BASELINE_SELECTION||'runtime/hotpath-20261007/baseline-selection.json';
-const candidatePath=originalSelection||'.build/hotpath-final.json';
+const baselinePath=process.env.BASELINE_SELECTION;
+assert(baselinePath,'Set BASELINE_SELECTION to a retained predecessor selection.');
+const candidatePath=originalSelection||'.build/selection.json';
 process.env.CITY_SELECTION=baselinePath;const baseline=await import('./run-case.mjs?hotpath-baseline');
 process.env.CITY_SELECTION=candidatePath;const candidate=await import('./run-case.mjs?hotpath-candidate');
 assert.notEqual(baseline.selection.artifact_sha256,candidate.selection.artifact_sha256,'Compare different artifacts');

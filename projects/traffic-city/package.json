@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/author.mjs",
     "start": "./play.sh",
-    "test": "node tests/motion-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
+    "test": "node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
     "test:browser": "node tests/with-preview.mjs tests/browser.mjs",
     "test:scale": "node tests/scaling.mjs",
     "test:backpressure": "node tests/backpressure.mjs",
@@ -45,7 +45,11 @@
     "test:ui-expansion": "node tests/with-preview.mjs tests/ui-expansion.mjs",
     "test:expansion-life-cycle": "node tests/expansion-life-cycle.mjs",
     "check": "node scripts/check-native.mjs",
-    "test:smoke": "node tests/with-preview.mjs tests/smoke.mjs"
+    "test:smoke": "node tests/with-preview.mjs tests/smoke.mjs",
+    "test:throughput-live": "node tests/throughput-live.mjs",
+    "test:save-compatibility": "node tests/save-compatibility.mjs",
+    "test:hotpath-equivalence": "node tests/hotpath-equivalence.mjs",
+    "test:source-reproduction": "node tests/source-reproduction.mjs"
   },
   "engines": {
     "node": ">=22"

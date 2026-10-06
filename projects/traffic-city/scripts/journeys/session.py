@@ -1,6 +1,6 @@
 from protocol import *
 from native import emit as write_source
-import re,subprocess
+import re
 D=[]
 def fn(n,p,r,b,task=False):D.append(FN(n,p,r,b,effect='(task (requirement service::data) (requirement service::streams) (requirement service::config))' if task else 'pure'))
 def cap(op,*args):return '(capability-call service::data std::DataStore::'+op+' '+' '.join(args)+')'
@@ -20,8 +20,10 @@ fn('checkpoint',[('state','State')],'I64',tx('I64',LET([('key',key(V('state.toke
 fn('claim-retry',[('token','Text'),('owner','Text'),('remaining','I64')],'Claim',LET([('result',C('claim',V('token'),V('owner')))],IF(AND(eq(V('result.status'),I(5)),lt(I(0),V('remaining'))),C('claim-retry',V('token'),V('owner'),sub(V('remaining'),I(1))),V('result'))),True)
 fn('checkpoint-retry',[('state','State'),('remaining','I64')],'I64',LET([('result',C('checkpoint',V('state')))],IF(AND(eq(V('result'),I(5)),lt(I(0),V('remaining'))),C('checkpoint-retry',V('state'),sub(V('remaining'),I(1))),V('result'))),True)
 fn('owned',[('state','State')],'Bool',LET([('entries',cap('get',space,key(V('state.token'))))],IF(eq(llen('std::DataEntry',V('entries')),I(0)),B(False),LET([('saved',C('migrate::decode',ef('entries','value')))],AND(eq(V('saved.format'),I(7)),te(V('saved.owner'),V('state.owner')))))),True)
-# Keep the established native Origin rules exactly; only the city protocol changes.
-old=subprocess.check_output(['git','show','HEAD:src/session.lkjc'],text=True)
+# The checked-in native declaration input owns the established Origin policy.
+# Preserve it exactly without depending on a standalone repository's Git paths
+# or private history. This also works from a source archive without .git.
+old=(ROOT/'src'/'session.lkjc').read_text()
 for name in ['find-header','origin-allowed','test-header']:
  start=old.index('  (function create '+name+' ');depth=0;quoted=False;escaped=False
  for i in range(start, len(old)):
