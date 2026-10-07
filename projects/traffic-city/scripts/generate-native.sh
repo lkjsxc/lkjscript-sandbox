@@ -10,6 +10,9 @@ python3 scripts/journeys/city.py
 python3 scripts/journeys/scenarios.py
 python3 scripts/journeys/migration.py
 python3 scripts/journeys/actorview.py
+python3 scripts/journeys/lab_atlas.py
+python3 scripts/journeys/lab_atlas_tests.py
+python3 scripts/journeys/lab_atlas_probe.py
 python3 scripts/journeys/lab.py
 python3 scripts/journeys/lab_tests.py
 python3 scripts/journeys/views.py

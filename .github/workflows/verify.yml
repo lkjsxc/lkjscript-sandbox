@@ -43,3 +43,7 @@ jobs:
       - run: npm run test:repair
         working-directory: projects/traffic-city
       - run: ./sandbox traffic-city smoke
+      - run: npm run test:delay-atlas
+        working-directory: projects/traffic-city
+      - run: npm run test:delay-atlas-ui
+        working-directory: projects/traffic-city

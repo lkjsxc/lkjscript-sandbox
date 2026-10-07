@@ -18,6 +18,7 @@ fn('measure',[('origin','City'),('city','City'),('disconnected','I64')],'LabMeas
  wealthError=C('money::conservation',V('city'))))
 fn('report',[('origin','City'),('lab','Lab')],'LabView',R(
  **{k:V('lab.'+k) for k in 'phase horizon step confirmation control changed'.split()},
+ atlas=C('atlasreport::wire',V('lab.atlas'),AND(eq(V('lab.phase'),I(4)),NOT(V('lab.atlasSent')))),atlasChanged=AND(eq(V('lab.phase'),I(4)),NOT(V('lab.atlasSent'))),
  realTick=V('origin.sim.tick'),planCost=IF(lt(I(0),V('lab.phase')),sub(V('origin.cash'),V('lab.plan.cash')),I(0)),
  newResidents=IF(lt(I(0),V('lab.phase')),sub(V('lab.plan.sim.born'),V('origin.sim.born')),I(0)),
  moveouts=IF(lt(I(0),V('lab.phase')),sub(V('lab.plan.sim.removed'),V('origin.sim.removed')),I(0)),
@@ -34,13 +35,14 @@ fn('advance',[('lab','Lab'),('origin','City')],'Lab',IF(OR(eq(V('lab.phase'),I(2
  ('next',C('traffic::tick',V('lab.trial'))),('step',add(V('lab.step'),I(1))),
  ('disconnected',add(V('lab.disconnect'),V('next.sim.disconnected'))),
  ('measure',C('labmetrics::measure',V('origin'),V('next'),V('disconnected'))),
+ ('samples',C('atlassample::sample',V('next.sim'),I(0),IF(eq(V('lab.phase'),I(2)),V('lab.controlAtlas'),V('lab.changedAtlas')))),
  ('done',le(V('lab.horizon'),V('step')))],
  IF(eq(V('lab.phase'),I(2)),
-  PATCH('Lab',V('lab'),control=V('measure'),phase=IF(V('done'),I(3),I(2)),step=IF(V('done'),I(0),V('step')),disconnect=IF(V('done'),I(0),V('disconnected')),trial=IF(V('done'),PATCH('City',V('lab.plan'),paused=B(False)),V('next'))),
-  PATCH('Lab',V('lab'),changed=V('measure'),phase=IF(V('done'),I(4),I(3)),step=V('step'),disconnect=V('disconnected'),trial=PATCH('City',V('next'),paused=V('done'))))),V('lab')))
+  PATCH('Lab',V('lab'),controlAtlas=V('samples'),control=V('measure'),phase=IF(V('done'),I(3),I(2)),step=IF(V('done'),I(0),V('step')),disconnect=IF(V('done'),I(0),V('disconnected')),trial=IF(V('done'),PATCH('City',V('lab.plan'),paused=B(False)),V('next'))),
+  PATCH('Lab',V('lab'),changedAtlas=V('samples'),atlas=IF(V('done'),C('atlasreport::report',V('origin.sim'),V('lab.plan.sim'),V('lab.controlAtlas'),V('samples')),V('lab.atlas')),changed=V('measure'),phase=IF(V('done'),I(4),I(3)),step=V('step'),disconnect=V('disconnected'),trial=PATCH('City',V('next'),paused=V('done'))))),V('lab')))
 emit('labstep','labstep',D)
 D=[]
-fn('run',[('lab','Lab'),('origin','City'),('horizon','I64')],'LabChange',IF(AND(OR(eq(V('lab.phase'),I(1)),eq(V('lab.phase'),I(4))),NOT(V('lab.quote.valid')),OR(eq(V('horizon'),I(64)),eq(V('horizon'),I(128)),eq(V('horizon'),I(256)))),C('labbase::result',PATCH('Lab',V('lab'),phase=I(2),horizon=V('horizon'),step=I(0),disconnect=I(0),trial=PATCH('City',V('origin'),paused=B(False)),control=ZERO('LabMeasure'),changed=ZERO('LabMeasure'),confirmation=I(0)),T('Comparing two futures from the same cycle. Your real city stays frozen.')),C('labbase::result',V('lab'),T('Finish any removal review, then choose 64, 128 or 256 cycles in City Lab.'))))
+fn('run',[('lab','Lab'),('origin','City'),('horizon','I64')],'LabChange',IF(AND(OR(eq(V('lab.phase'),I(1)),eq(V('lab.phase'),I(4))),NOT(V('lab.quote.valid')),OR(eq(V('horizon'),I(64)),eq(V('horizon'),I(128)),eq(V('horizon'),I(256)))),C('labbase::result',PATCH('Lab',V('lab'),phase=I(2),horizon=V('horizon'),atlasSent=B(False),controlAtlas=MP('I64 AtlasSample'),changedAtlas=MP('I64 AtlasSample'),atlas=ZERO('AtlasView'),step=I(0),disconnect=I(0),trial=PATCH('City',V('origin'),paused=B(False)),control=ZERO('LabMeasure'),changed=ZERO('LabMeasure'),confirmation=I(0)),T('Comparing two futures from the same cycle. Your real city stays frozen.')),C('labbase::result',V('lab'),T('Finish any removal review, then choose 64, 128 or 256 cycles in City Lab.'))))
 emit('labrun','labrun',D)
 D=[]
 fn('edit',[('lab','Lab'),('command','Command'),('ack','I64')],'LabChange',
@@ -52,7 +54,7 @@ emit('labedit','labedit',D)
 D=[]
 fn('input',[('lab','Lab'),('origin','City'),('command','Command'),('ack','I64')],'LabChange',
  IF(te(V('command.op'),T('lab-run')),C('labrun::run',V('lab'),V('origin'),V('command.kind')),
- IF(te(V('command.op'),T('lab-edit')),C('labbase::result',PATCH('Lab',V('lab'),phase=I(1),step=I(0),disconnect=I(0),trial=ZERO('City'),control=ZERO('LabMeasure'),changed=ZERO('LabMeasure'),quote=ZERO('EditQuote'),confirmation=I(0)),T('Edit your plan. The comparison has been cleared; your real city is unchanged.')),
+ IF(te(V('command.op'),T('lab-edit')),C('labbase::result',PATCH('Lab',V('lab'),phase=I(1),atlasSent=B(False),controlAtlas=MP('I64 AtlasSample'),changedAtlas=MP('I64 AtlasSample'),atlas=ZERO('AtlasView'),step=I(0),disconnect=I(0),trial=ZERO('City'),control=ZERO('LabMeasure'),changed=ZERO('LabMeasure'),quote=ZERO('EditQuote'),confirmation=I(0)),T('Edit your plan. The comparison has been cleared; your real city is unchanged.')),
  IF(te(V('command.op'),T('lab-review')),IF(AND(eq(V('lab.phase'),I(4)),eq(V('lab.control.wealthError'),I(0)),eq(V('lab.changed.wealthError'),I(0))),C('labbase::result',PATCH('Lab',V('lab'),confirmation=V('ack')),T('Review applying the plan at the original cycle. Experimental time and earnings will not be imported.')),C('labbase::result',V('lab'),T('Complete a valid comparison before applying the plan.'))),
  IF(te(V('command.op'),T('cancel-review')),C('labbase::result',PATCH('Lab',V('lab'),quote=ZERO('EditQuote'),confirmation=I(0)),T('')),
  IF(te(V('command.op'),T('set-running')),C('labbase::result',V('lab'),IF(eq(V('command.kind'),I(0)),T(''),T('Use Compare in City Lab. The real city remains frozen.'))),C('labedit::edit',V('lab'),V('command'),V('ack'))))))))

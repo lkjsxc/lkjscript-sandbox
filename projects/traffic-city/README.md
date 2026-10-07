@@ -88,3 +88,5 @@ The map limits are 128 × 128, 8,192 occupied tiles, and 2,048 residents. They a
 ## City Lab
 
 Use **Menu → City Lab** to edit a temporary plan and compare two native futures from the same starting cycle. Applying imports only the original-cycle plan, never simulated income or time. Experiments are connection-local and leave the real saved city and previous-city backup intact. See [City Lab](docs/CITY-LAB.md) for metrics, limits and verification commands.
+
+City Lab also includes a [journey burden atlas](docs/DELAY-ATLAS.md): compare the same residents, see signed home markers and mixed local effects, and inspect unfinished-journey, long-wait and disconnected exposure without applying the plan.

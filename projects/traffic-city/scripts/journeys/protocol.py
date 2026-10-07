@@ -37,3 +37,17 @@ TYPES['LabChange']={'lab':'Lab','notice':'Text'}
 TYPES['LabView']={**{k:'I64' for k in 'phase horizon step realTick planCost newResidents moveouts cancelled confirmation'.split()},'control':'LabMeasure','changed':'LabMeasure'}
 TYPES['State']['lab']='Lab'
 TYPES['Frame']['lab']='LabView'
+
+# Transient observations are private to the experiment, not City/Saved data.
+TYPES['AtlasSample']={k:'I64' for k in 'time wait lost'.split()}
+TYPES['AtlasLedger']='(map I64 AtlasSample)'
+TYPES['AtlasHome']={k:'I64' for k in 'home before after same less more equal baseTime planTime baseWait planWait baseLost planLost'.split()}
+TYPES['AtlasHomes']='(map I64 AtlasHome)'
+TYPES['AtlasHomePair']={'key':'I64','value':'AtlasHome'}
+TYPES['AtlasView']={'homes':'(list AtlasHome)',**{k:'I64' for k in 'same less more equal removed added baseTime planTime baseWait planWait baseLost planLost'.split()}}
+TYPES['Lab'].update({'controlAtlas':'AtlasLedger','changedAtlas':'AtlasLedger','atlas':'AtlasView'})
+TYPES['AtlasWireHome']='(list I64)'
+TYPES['AtlasWire']={**TYPES['AtlasView'],'homes':'(list AtlasWireHome)'}
+TYPES['Lab']['atlasSent']='Bool'
+TYPES['LabView']['atlas']='AtlasWire'
+TYPES['LabView']['atlasChanged']='Bool'
