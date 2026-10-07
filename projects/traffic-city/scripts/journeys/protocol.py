@@ -23,6 +23,9 @@ def variant(t,a=None):return '(variant '+t+(' '+a if a else '')+')'
 ECONOMY_FIELDS='households businesses opening grants exports salvage construction operating withdrawn wages sales taxes fares concessions upkeepDue periodTaxes periodFares periodOperating lastTaxes lastFares lastOperating'.split()
 TYPES['Stats'].update({'eco'+k[0].upper()+k[1:]:'I64' for k in ECONOMY_FIELDS})
 TYPES['Stats']['wealthError']='I64'
+# Derived frame observations only; City and Saved remain format 8.
+TYPES['PlanningCounts']={'total':'I64','long':'I64'}
+TYPES['Stats'].update({'planning':'I64','planningLong':'I64'})
 TYPES['Frame']['inspectFunds']='I64'
 TYPES['Frame']['tracks']='(list I64)'
 TYPES['Frame']['river']='(list I64)'

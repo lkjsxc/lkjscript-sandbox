@@ -35,7 +35,9 @@ async function stop() {
   if (client) { await client.close(); client = null; }
   if (native) { const instance = native; native = null; await instance.stop(); }
 }
-function state(frame) { return {stats: frame.stats, rails: frame.rails}; }
+// These two frame-only observations were absent in the predecessor. Exclude
+// exactly those additions, and still compare every pre-existing statistic.
+function state(frame) { const {planning, planningLong, ...stats} = frame.stats; return {stats, rails: frame.rails}; }
 async function people(population) {
   await command('view', {x: 0, y: 0, x2: 128, y2: 128});
   const residents = [];
@@ -67,7 +69,10 @@ try {
   assert.deepEqual(state(resumed), before.state);
   const restoredPeople = await people(512);
   assert.deepEqual(restoredPeople, before.people);
-  checks.push('Published predecessor store reopens with exact stats, both three-stop trains, all 512 resident records, individual wallets and rail journey plans.');
+  const pending = restoredPeople.filter(p => p.resident.state === 1 && p.resident.reason === 8);
+  assert.equal(resumed.stats.planning, pending.length);
+  assert.equal(resumed.stats.planningLong, pending.filter(p => p.resident.wait >= 8).length);
+  checks.push('Published predecessor store reopens with every pre-existing statistic, both three-stop trains, all 512 resident records, individual wallets and rail journey plans.');
 
   const resetReview = await command('review-reset');
   const fresh = await command('reset-city', {x: resetReview.confirmation});
@@ -95,7 +100,7 @@ try {
   await stop();
   assert.deepEqual(state(await start(latest, directory)), state(continued));
   checks.push('The restored residents continue travelling, checkpoint and survive a second native process restart without reset.');
-  const report = {passed: true, old_artifact_sha256: selections[0].artifact_sha256, candidate_artifact_sha256: selections[1].artifact_sha256, compiler_sha256: selections[1].compiler_sha256, checks, resident_records_compared: 512, resident_wallet_rail_plan_sha256: digest(before.people), saved_stats: saved.stats, continued_stats: continued.stats};
+  const report = {passed: true, old_artifact_sha256: selections[0].artifact_sha256, candidate_artifact_sha256: selections[1].artifact_sha256, compiler_sha256: selections[1].compiler_sha256, checks, resident_records_compared: 512, derived_planning_counts_checked: true, resident_wallet_rail_plan_sha256: digest(before.people), saved_stats: saved.stats, continued_stats: continued.stats};
   fs.writeFileSync('evidence/save-compatibility.json', JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally {

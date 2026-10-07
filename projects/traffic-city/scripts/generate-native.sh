@@ -22,3 +22,5 @@ python3 scripts/journeys/views.py
 python3 scripts/journeys/session.py
 python3 scripts/journeys/tests.py
 python3 scripts/journeys/benchmark.py
+python3 scripts/journeys/planning_proof.py
+python3 scripts/journeys/planning_checks.py

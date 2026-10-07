@@ -38,16 +38,7 @@ fn('build',[('city','City'),('c','Command')],'Outcome',IF(AND(*[AND(le(I(0),V('c
 fn('service',[('city','City'),('c','Command')],'Outcome',LET([('l',line(V('city.sim.transit'),V('c.x')))],IF(AND(lt(I(0),V('l.id')),OR(eq(V('c.kind'),I(0)),eq(V('c.kind'),I(1)))),R(city=PATCH('City',V('city'),sim=PATCH('Sim',V('city.sim'),transit=setline(V('city.sim.transit'),PATCH('RailLine',V('l'),enabled=eq(V('c.kind'),I(1)))))),notice=IF(eq(V('c.kind'),I(1)),T('Rail service enabled. Departures require funds.'),T('Service suspended. Trains finish paid legs; waiting residents can walk.'))),R(city=V('city'),notice=T('Invalid rail service command.')))))
 exec((Path(__file__).parent/'rail_pairs.py').read_text())
 # Rail searches use the same cache and per-tick budget as walking and driving.
-fn('candidate',[('world','World'),('q','Numbers'),('origin','I64'),('dest','I64'),('l','RailLine'),('reverse','Bool'),('out','RailSearch')],'RailSearch',LET([
- ('pair',C('pair',V('l'),V('origin'),V('dest'),I(0),I(0),R(board=V('l.a'),alight=V('l.b'),estimate=I(1000000)))),('board',V('pair.board')),('alight',V('pair.alight'))],
- IF(AND(le(C('game::manhattan',V('origin'),V('board')),I(12)),le(C('game::manhattan',V('alight'),V('dest')),I(12))),
- LET([('access',C('game::ensure-route',V('world'),V('q'),V('origin'),V('board'),I(1),V('out.plan'))),
- ('egress',C('game::ensure-route',V('world'),V('q'),V('alight'),V('dest'),I(1),V('access'))),
- ('a',C('game::route',V('egress.routes'),V('access.id'))),('b',C('game::route',V('egress.routes'),V('egress.id'))),
- ('queue',llen('I64',C('platform',V('l'),V('board'),C('travel-direction',V('l'),V('board'),V('alight'))))),
- ('eta',add(add(V('a.cost'),V('b.cost')),add(add(C('ride-between',V('l'),V('board'),V('alight')),div(C('period',V('l')),I(2))),mul(div(V('queue'),V('l.capacity')),C('period',V('l')))))),
- ('valid',AND(lt(I(0),V('access.id')),lt(I(0),V('egress.id')),le(I(0),V('a.cost')),le(I(0),V('b.cost'))))],
- R(plan=V('egress'),complete=AND(V('out.complete'),lt(I(0),V('access.id')),lt(I(0),V('egress.id'))),choice=IF(AND(V('valid'),OR(eq(V('out.choice.line'),I(0)),lt(V('eta'),V('out.choice.eta')))),R(line=V('l.id'),board=V('board'),alight=V('alight'),accessRoute=V('access.id'),egressRoute=V('egress.id'),stage=I(1),eta=V('eta')),V('out.choice')))),V('out'))))
+exec((Path(__file__).parent/'rail_choice.py').read_text())
 fn('search',[('world','World'),('q','Numbers'),('t','Transit'),('cash','I64'),('origin','I64'),('dest','I64'),('index','I64'),('out','RailSearch')],'RailSearch',IF(lt(V('index'),llen('I64',V('t.ids'))),LET([('l',line(V('t'),at('I64',V('t.ids'),V('index')))),('next',IF(AND(V('l.enabled'),le(C('expense',V('l')),V('cash'))),C('candidate',V('world'),V('q'),V('origin'),V('dest'),V('l'),B(False),V('out')),V('out')))],C('search',V('world'),V('q'),V('t'),V('cash'),V('origin'),V('dest'),add(V('index'),I(1)),V('next'))),V('out')))
 # Waiting queues are append-only on station arrival and drained in stable order.
 fn('enqueue',[('m','Move'),('r','Resident'),('tick','I64')],'Move',LET([('p',plan(V('m.transit'),V('r.id'))),('l',line(V('m.transit'),V('p.line'))),('next',PATCH('RailLine',V('l'),queueA=IF(eq(V('p.board'),V('l.a')),append('I64',V('l.queueA'),V('r.id')),V('l.queueA')),queueB=IF(eq(V('p.board'),V('l.b')),append('I64',V('l.queueB'),V('r.id')),V('l.queueB'))))],PATCH('Move',V('m'),transit=setplan(setline(V('m.transit'),V('next')),V('r.id'),PATCH('RailPlan',V('p'),stage=I(2))),agents=mput('I64 Resident',V('m.agents'),V('r.id'),PATCH('Resident',V('r'),state=I(5),wait=I(0),ready=V('tick'),reason=I(10),elapsed=I(0),duration=I(0),**{'from':V('r.cell'),'to':V('r.cell')})))))
@@ -96,7 +87,7 @@ sets={
  'railpath':set('append-path segment path stops index distance service-direction next-stop ride queue-key travel-direction platform set-platform waiting-loop waiting track-put keys track-ids path-slice leg shares blocked'.split()),
  'railinfra':set('track-plan track-build station-build track-route create-service service-pair insert-stop add-stop'.split()),
  'railbuild':{'build','service'},
- 'railplan':{'candidate','search','pair','pair-positions','pair-scan','ride-between'},
+ 'railplan':{'candidate','candidate-pair','candidate-bounded','search','search-bounded','boarding-cost','lower-bound','can-improve','pair','pair-positions','pair-scan','ride-between'},
  'railqueue':{'enqueue','board','riders'},
  'railboarding':{'suspend-riders','depart'},
  'railtrain':{'step-line','tick','fallback'},

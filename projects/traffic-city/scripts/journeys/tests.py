@@ -30,4 +30,14 @@ TYPES['Continuation']={'city':'City','ticks':'I64','commands':'(list Command)','
 fn('continue-city',[('input','Continuation')],'Result',LET([('result',C('commands',C('traffic::advance',C('commands',V('input.city'),V('input.commands'),I(0)),mx(I(0),mn(I(12000),V('input.ticks')))),V('input.after'),I(0))),('agents',C('resident-list',V('result.sim'),I(0),LS('Resident'))),('facts',C('people::facts',V('result.world'),V('result.sim.agents'),V('result.sim.ids'),I(0),ZERO('Facts')))],R(city=V('result'),agents=V('agents'),lanes=V('facts.occ'),reserved=V('facts.q'),busy=V('facts.busy'),routes=G('std::map-entries','I64 Route',V('result.sim.routes')),conservation=sub(sub(sub(V('result.sim.requested'),V('result.sim.arrived')),V('result.sim.cancelled')),C('outstanding',V('agents'),I(0))),largestQueue=I(0))))
 D.append('(component create continuation (visibility private) (port create run (type (function (Continuation) Result)) (function continue-city)))')
 D.append('(component create harness (visibility private) (port create run (type (function (Workload) Result)) (function workload)))')
-emit('tests','testbed',D,tail=' (target create workload (component testbed::harness) (runner command) (port testbed::harness::run)) (target create continuation (component testbed::continuation) (runner command) (port testbed::continuation::run))')
+# Keep every existing assertion, but give test observations their own requests.
+# Larger modal planners must not exhaust one all-in-one authored witness budget.
+import re
+checks=[d for d in D if d.lstrip().startswith('(test create ')]
+owners={re.search(r'\(function create ([^ ]+)',d)[1] for d in D if '(function create ' in d}
+emit('tests','testbed',[d for d in D if d not in checks],tail=' (target create workload (component testbed::harness) (runner command) (port testbed::harness::run)) (target create continuation (component testbed::continuation) (runner command) (port testbed::continuation::run))')
+for name,selected in [('simulationtests',[d for d in checks if '(test create rail-pair-' not in d]),('railpairtests',[d for d in checks if '(test create rail-pair-' in d])]:
+ def qualify(m):
+  n=m[1]
+  return '(call '+('testbed::'+n if n in owners else n)
+ emit(name,name,[re.sub(r'\(call ([a-z][a-z-]*)(?=[ )])',qualify,d) for d in selected])

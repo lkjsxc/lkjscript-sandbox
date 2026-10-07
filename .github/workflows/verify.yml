@@ -53,3 +53,7 @@ jobs:
         working-directory: projects/traffic-city
       - run: npm run test:waterfront-ui
         working-directory: projects/traffic-city
+      - run: npm run test:planning-bounds
+        working-directory: projects/traffic-city
+      - run: npm run test:planning-ui
+        working-directory: projects/traffic-city

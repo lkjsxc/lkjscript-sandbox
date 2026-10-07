@@ -63,7 +63,11 @@
     "test:waterfront-geometry": "node tests/waterfront-geometry.mjs",
     "test:bootstrap-equivalence": "node tests/bootstrap-equivalence.mjs",
     "test:planning-fastpath": "node tests/planning-fastpath.mjs",
-    "test:planning-live": "node tests/planning-live.mjs"
+    "test:planning-live": "node tests/planning-live.mjs",
+    "test:planning-bounds": "node tests/planning-bounds.mjs",
+    "test:planning-ui": "node tests/with-preview.mjs tests/planning-ui.mjs",
+    "test:planning-delivery": "node tests/planning-delivery.mjs",
+    "test:planning-profile": "node tests/planning-profile.mjs"
   },
   "engines": {
     "node": ">=22"
