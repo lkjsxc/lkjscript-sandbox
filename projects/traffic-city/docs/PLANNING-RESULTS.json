@@ -1,0 +1,440 @@
+{
+  "passed": true,
+  "baseline_artifact_sha256": "29a7f8557a16fb38c5eb0bfebefd499f6c8a57912c66a618a2cb642ed0d45865",
+  "candidate_artifact_sha256": "7077eb8e933ee4fe645f3937fca0854830d456cdb37b75298f9ab2314ee2c9dc",
+  "compiler_sha256": "5eaadae4df214f4c5eaa2d4407acab58574b56447307b5a77261b2b9ff7adb37",
+  "method": "Paired serial native runs with full state equality, including every resident, cached route, train and account. Shared-host timings are not isolated hardware benchmarks.",
+  "cases": [
+    {
+      "name": "garden-startup-0",
+      "population": 384,
+      "start_tick": 0,
+      "ticks": 16,
+      "commands": [],
+      "input_sha256": "a15b2a3e3cbf3375828994c8be77cf154f5d9043f1bac314e555cb3d77159e91",
+      "result_sha256": "390c6943d0f2ff9a4c361b5755346463b7bc79bd476c3c22ffbe3337d32c3bf6",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 3737.4580209999995,
+        "instructions": 12258268,
+        "allocated_bytes": 943410772,
+        "calls": 1563651
+      },
+      "after": {
+        "wall_ms": 3565.7641459999995,
+        "instructions": 11393068,
+        "allocated_bytes": 869400654,
+        "calls": 1532263
+      },
+      "instruction_reduction": 0.07058093361965978,
+      "allocation_reduction": 0.07844951552026591,
+      "wall_speedup": 1.0481506538206131
+    },
+    {
+      "name": "garden-startup-1",
+      "population": 384,
+      "start_tick": 16,
+      "ticks": 16,
+      "commands": [],
+      "input_sha256": "2184bf36e5a79da3eefb5a1dc64c87595793d1e2142cb1c6af9aad5f97d4f6bc",
+      "result_sha256": "1ed6c08ad129dde0d700d063cb29bf3a9ff7de3c55f66cba65d00ce6d26e7db9",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 4018.992155,
+        "instructions": 14708986,
+        "allocated_bytes": 1092107919,
+        "calls": 1948533
+      },
+      "after": {
+        "wall_ms": 4002.8448370000006,
+        "instructions": 13630150,
+        "allocated_bytes": 999686141,
+        "calls": 1908661
+      },
+      "instruction_reduction": 0.07334536860664631,
+      "allocation_reduction": 0.08462696441632522,
+      "wall_speedup": 1.004033960509971
+    },
+    {
+      "name": "metro-startup-0",
+      "population": 512,
+      "start_tick": 0,
+      "ticks": 16,
+      "commands": [],
+      "input_sha256": "2a67454d90ce636c39e9fa262b948b76b61a95e092d0274bef51c7843d1690e6",
+      "result_sha256": "c6eb08da27ed22100d2641dacbc28c4b5b0dab6b19f2b67cf3a9a50bf89235a7",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 10716.278343999998,
+        "instructions": 51906271,
+        "allocated_bytes": 2990541158,
+        "calls": 13141484
+      },
+      "after": {
+        "wall_ms": 4371.338781000006,
+        "instructions": 15842677,
+        "allocated_bytes": 1182971278,
+        "calls": 2252792
+      },
+      "instruction_reduction": 0.6947829868186832,
+      "allocation_reduction": 0.6044290262197421,
+      "wall_speedup": 2.451486576738968
+    },
+    {
+      "name": "metro-startup-1",
+      "population": 512,
+      "start_tick": 16,
+      "ticks": 16,
+      "commands": [],
+      "input_sha256": "d1ff339d8089d754718100385f0e0f06e31355960645ac1195d20fde2ce4981a",
+      "result_sha256": "37ca8c91abc299664d4c366b25d1af045231feffc616614dc184a134effd4c23",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 13581.137737999998,
+        "instructions": 69221315,
+        "allocated_bytes": 3922180387,
+        "calls": 17729579
+      },
+      "after": {
+        "wall_ms": 5239.342771999996,
+        "instructions": 18778383,
+        "allocated_bytes": 1367764619,
+        "calls": 2690905
+      },
+      "instruction_reduction": 0.7287196436531147,
+      "allocation_reduction": 0.6512744228864555,
+      "wall_speedup": 2.592145299326487
+    },
+    {
+      "name": "metro-suspend",
+      "population": 512,
+      "start_tick": 32,
+      "ticks": 4,
+      "commands": [
+        {
+          "op": "rail-service",
+          "x": 1,
+          "y": 0,
+          "x2": 0,
+          "y2": 0,
+          "kind": 0
+        }
+      ],
+      "input_sha256": "228a44964f40eeb4d330ea631f5157c02a8e82d7551f11849e9e77c9f4570ca9",
+      "result_sha256": "4333c352d134f10b6291e8da92320b486b34f6cacd7ee1caaff8c9309cb1eeae",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 4193.848124000004,
+        "instructions": 11461142,
+        "allocated_bytes": 705092787,
+        "calls": 2643300
+      },
+      "after": {
+        "wall_ms": 2640.4092160000073,
+        "instructions": 4866453,
+        "allocated_bytes": 377370582,
+        "calls": 702336
+      },
+      "instruction_reduction": 0.5753954536118653,
+      "allocation_reduction": 0.4647930187945605,
+      "wall_speedup": 1.5883326336640056
+    },
+    {
+      "name": "metro-resume",
+      "population": 512,
+      "start_tick": 36,
+      "ticks": 4,
+      "commands": [
+        {
+          "op": "rail-service",
+          "x": 1,
+          "y": 0,
+          "x2": 0,
+          "y2": 0,
+          "kind": 1
+        }
+      ],
+      "input_sha256": "eebdf8f2879ac5d95a96673fb3ec820973a021e9c118b66f57587c4f3fc854b7",
+      "result_sha256": "a617fd0ab3b860c2844a11c9ab1e9316d4eb79b5fb0f19119df8964f6ecc4e39",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 4384.634724999996,
+        "instructions": 15409025,
+        "allocated_bytes": 901581432,
+        "calls": 3873074
+      },
+      "after": {
+        "wall_ms": 2721.3650240000134,
+        "instructions": 5055680,
+        "allocated_bytes": 386412803,
+        "calls": 756347
+      },
+      "instruction_reduction": 0.6719013694896335,
+      "allocation_reduction": 0.5714055444300676,
+      "wall_speedup": 1.611189489955014
+    },
+    {
+      "name": "boroughs-startup-0",
+      "population": 1024,
+      "start_tick": 0,
+      "ticks": 8,
+      "commands": [],
+      "input_sha256": "182e861d9dd03684bab1d612a748a66cbc689b3fef476258b6a8bfde6fcb8fc9",
+      "result_sha256": "791a5b90e70201f3bd80b34149cadfe63f0a1ee5d070fbbfb3bd51607d7ca473",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 15346.410554000002,
+        "instructions": 78710205,
+        "allocated_bytes": 4309369015,
+        "calls": 22255644
+      },
+      "after": {
+        "wall_ms": 4071.4660860000004,
+        "instructions": 12995345,
+        "allocated_bytes": 1002742570,
+        "calls": 1751220
+      },
+      "instruction_reduction": 0.8348963136355698,
+      "allocation_reduction": 0.7673110456520048,
+      "wall_speedup": 3.7692590899306833
+    },
+    {
+      "name": "boroughs-startup-1",
+      "population": 1024,
+      "start_tick": 8,
+      "ticks": 8,
+      "commands": [],
+      "input_sha256": "1d1d8d97ded2ec7c3ffc15d3925883727696a5963f5395f7c7f421fe8f19abce",
+      "result_sha256": "7e2ae1392d4bc7896a22373ce75ce19a1d0c88eac023bbf18a59735aac63494f",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 41012.20435900001,
+        "instructions": 211995503,
+        "allocated_bytes": 10955180954,
+        "calls": 63580173
+      },
+      "after": {
+        "wall_ms": 5195.360753999994,
+        "instructions": 19246127,
+        "allocated_bytes": 1407040448,
+        "calls": 2894021
+      },
+      "instruction_reduction": 0.9092144563085378,
+      "allocation_reduction": 0.8715639245113285,
+      "wall_speedup": 7.894005113586008
+    },
+    {
+      "name": "boroughs-startup-2",
+      "population": 1024,
+      "start_tick": 16,
+      "ticks": 8,
+      "commands": [],
+      "input_sha256": "ed617fa075aae9d812ab5d3985f774f3c06e53cb7b2c689e6baa2d8ae1865319",
+      "result_sha256": "2c631fa3adc2c39acb854c7b1280b9b3b9b595f72fd02f3cc4cad223c01ddfc6",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 50832.303598,
+        "instructions": 265016344,
+        "allocated_bytes": 13455460330,
+        "calls": 80674062
+      },
+      "after": {
+        "wall_ms": 5199.234396999993,
+        "instructions": 19130113,
+        "allocated_bytes": 1407453185,
+        "calls": 2750378
+      },
+      "instruction_reduction": 0.9278153463621851,
+      "allocation_reduction": 0.8953991056060733,
+      "wall_speedup": 9.77688246318164
+    },
+    {
+      "name": "boroughs-suspend",
+      "population": 1024,
+      "start_tick": 24,
+      "ticks": 4,
+      "commands": [
+        {
+          "op": "rail-service",
+          "x": 1,
+          "y": 0,
+          "x2": 0,
+          "y2": 0,
+          "kind": 0
+        }
+      ],
+      "input_sha256": "4a56e9035dad279195254c64347ac8f346158a5ef46df9204087964ab44df22c",
+      "result_sha256": "da3a56834131ffde8ea411fe772eed774beee8db8a361ebb7d069894e6a4085a",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 22493.384059000004,
+        "instructions": 108932207,
+        "allocated_bytes": 5560607893,
+        "calls": 32816390
+      },
+      "after": {
+        "wall_ms": 3808.4000110000197,
+        "instructions": 10569651,
+        "allocated_bytes": 783850475,
+        "calls": 1604530
+      },
+      "instruction_reduction": 0.9029703767959094,
+      "allocation_reduction": 0.859035110893765,
+      "wall_speedup": 5.906255643848092
+    },
+    {
+      "name": "boroughs-resume",
+      "population": 1024,
+      "start_tick": 28,
+      "ticks": 4,
+      "commands": [
+        {
+          "op": "rail-service",
+          "x": 1,
+          "y": 0,
+          "x2": 0,
+          "y2": 0,
+          "kind": 1
+        }
+      ],
+      "input_sha256": "81ee4a3a67dff79041b8653a8e8d8605c200caba1d5f32a74314c5e48ddac279",
+      "result_sha256": "89e53cd1a6c84217100a64a5566ab88b770e85aadad81fd9c7351685ff91734b",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 24739.86219699998,
+        "instructions": 125714874,
+        "allocated_bytes": 6450477073,
+        "calls": 37956005
+      },
+      "after": {
+        "wall_ms": 3841.502544000017,
+        "instructions": 11388996,
+        "allocated_bytes": 838453439,
+        "calls": 1755852
+      },
+      "instruction_reduction": 0.9094061375744608,
+      "allocation_reduction": 0.870016832939451,
+      "wall_speedup": 6.440152495965617
+    },
+    {
+      "name": "boroughs-cache-boundary",
+      "population": 1024,
+      "start_tick": 128,
+      "ticks": 4,
+      "commands": [],
+      "input_sha256": "20bd97fa8a08b34096b08e3c7d87cfc957d07aadc05d6f4334a6e092b20cfd35",
+      "result_sha256": "35bfa089b5ceec3866a495bb6778f4814c1af14f68f5b93109a944cb9cc9459f",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 14670.613056000002,
+        "instructions": 70177454,
+        "allocated_bytes": 3699347022,
+        "calls": 20524643
+      },
+      "after": {
+        "wall_ms": 3825.184505000012,
+        "instructions": 10462652,
+        "allocated_bytes": 749227623,
+        "calls": 1705627
+      },
+      "instruction_reduction": 0.8509114907474415,
+      "allocation_reduction": 0.7974703052878396,
+      "wall_speedup": 3.8352693933648454
+    },
+    {
+      "name": "boroughs-topology-edit",
+      "population": 1024,
+      "start_tick": 132,
+      "ticks": 4,
+      "commands": [
+        {
+          "op": "build",
+          "x": 61,
+          "y": 62,
+          "x2": 68,
+          "y2": 62,
+          "kind": 1
+        }
+      ],
+      "input_sha256": "a8435105748c6e920192406f22411aaab9c4cc32d1e4d2260eda641b04c8f18d",
+      "result_sha256": "13d693c2383ed893180513c281904ff395ee554b2b708219b19617657ef35bea",
+      "exact_state_equal": true,
+      "before": {
+        "wall_ms": 17569.86583799997,
+        "instructions": 86463604,
+        "allocated_bytes": 4502832829,
+        "calls": 25369651
+      },
+      "after": {
+        "wall_ms": 5995.70300400001,
+        "instructions": 25644860,
+        "allocated_bytes": 1493735891,
+        "calls": 6215623
+      },
+      "instruction_reduction": 0.7034028329422863,
+      "allocation_reduction": 0.6682675223073444,
+      "wall_speedup": 2.9304096327450346
+    }
+  ],
+  "live": {
+    "passed": true,
+    "full_tick_statistics_equal": true,
+    "method": "Serial disposable native sessions; usual 500ms requested tick, 1,024-cell detail and autosave. Shared development host, not an isolated hardware benchmark or browser FPS measurement.",
+    "results": [
+      {
+        "name": "before",
+        "artifact_sha256": "29a7f8557a16fb38c5eb0bfebefd499f6c8a57912c66a618a2cb642ed0d45865",
+        "population": 1024,
+        "viewport": [
+          40,
+          44,
+          32,
+          32
+        ],
+        "requested_tick_ms": 500,
+        "ticks": 32,
+        "measured_ticks": [
+          9,
+          32
+        ],
+        "wall_ms": 151023.46989799998,
+        "mean_delivered_ms": 5450.965015249999,
+        "p95_delivered_ms": 6039.90778400001,
+        "maximum_delivered_ms": 6669.886213999998,
+        "cycles_per_second": 0.1834537549227211,
+        "memory": {
+          "rss_kib": 77696,
+          "peak_rss_kib": 107016
+        },
+        "maximum_frame_bytes": 5616
+      },
+      {
+        "name": "after",
+        "artifact_sha256": "7077eb8e933ee4fe645f3937fca0854830d456cdb37b75298f9ab2314ee2c9dc",
+        "population": 1024,
+        "viewport": [
+          40,
+          44,
+          32,
+          32
+        ],
+        "requested_tick_ms": 500,
+        "ticks": 32,
+        "measured_ticks": [
+          9,
+          32
+        ],
+        "wall_ms": 18442.30793000001,
+        "mean_delivered_ms": 575.7812691250001,
+        "p95_delivered_ms": 701.9216399999859,
+        "maximum_delivered_ms": 742.789678000001,
+        "cycles_per_second": 1.7367706343064513,
+        "memory": {
+          "rss_kib": 77256,
+          "peak_rss_kib": 108604
+        },
+        "maximum_frame_bytes": 5616
+      }
+    ]
+  }
+}

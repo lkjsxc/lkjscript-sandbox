@@ -1,5 +1,6 @@
 # City Lab: compare a plan without gambling the city
 
+> The original implementation record below predates the waterfront update. Current terrain identity, save format 8 and configurable saved-city capacity are described in [Waterfront cities](WATERFRONT.md).
 City Lab is a native, temporary counterfactual experiment. Open **Menu → City Lab**, start an experiment, edit the map with the ordinary construction tools, and choose **Compare**. The unchanged city and the plan run from exactly the same original cycle for 64, 128 or 256 simulation cycles each. They run sequentially, not simultaneously. A timer callback advances at most one experimental city by one ordinary `traffic::tick`.
 
 The real city is checkpointed first and remains frozen. The map shows the plan while editing, then the unchanged future, then the planned future. The tray labels which one is displayed. **Stop comparison** returns to the unadvanced plan, and **Discard** restores the original city. There is no second game engine or approximate browser predictor.
@@ -47,6 +48,6 @@ These tests use fresh native listeners and disposable local stores, not the publ
 
 ## Further experiments enabled by this design
 
-The feature is a foundation for testing counterintuitive interventions: replacing a car connection with a footpath, placing a useful destination closer instead of widening a road, changing signal priorities, or suspending an underperforming service. None is declared beneficial in advance. Future work can add spatial difference maps, completed and unfinished journey distributions, and multi-stage planning, but those are not part of this implementation. A native replayable experiment format would need explicit retention, resource and data-version policies before experiments could safely survive reconnects.
+The feature is a foundation for testing counterintuitive interventions: replacing a car connection with a footpath, placing a useful destination closer instead of widening a road, changing signal priorities, or suspending an underperforming service. None is declared beneficial in advance. The [journey burden atlas](DELAY-ATLAS.md) adds identity-matched spatial differences and includes unfinished journeys. Completed-journey duration distributions and multi-stage planning remain future work. A native replayable experiment format would need explicit retention, resource and data-version policies before experiments could safely survive reconnects.
 
 The metro regression additionally uses the authored 512-resident, two-line city. Suspending one service is compared with two independently executed native command-runner futures. It reconstructs disconnected person-cycles from the individual frames, verifies unchanged real time, checked rail seating and finances, and confirms that discarding restores both original services. These are bounded 64-cycle cases, not certification of every mature 2,048-resident city.

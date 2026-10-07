@@ -5,7 +5,7 @@ component=next(d for d in D if d.startswith('(component create service '))
 bootstrap=FN('transition',[('state','(option State)'),('event','std::SessionEvent')],'Decision',C('view::finish'),effect='(task (requirement service::data) (requirement service::streams) (requirement service::config))')
 write_source('session-capabilities','live',[bootstrap,component])
 sets={
- 'persist':{'invalid-save','hex-loop','token-valid','claim','claim-retry','has-undo'},
+ 'persist':{'invalid-save','hex-loop','token-valid','save-limit','claim','claim-retry','has-undo'},
  'checkpoint':{'checkpoint','checkpoint-retry','owned'},
  'replacement':{'replace-saved','replace-retry'},
  'saving':{'save-state','clear-review'},
@@ -17,12 +17,13 @@ sets={
  'origin':{'find-header','origin-allowed','test-header','reject','invalid'},
  'reconnect':{'resume','open'},
  'heartbeat':{'tick','close'},
+ 'inputdispatch':{'input'},
 }
 owners={}
 for d in D:
  m=re.search(r'\(function create ([^ ]+)',d)
  if m:owners[m.group(1)]=next((module for module,names in sets.items() if m.group(1) in names),'live')
-for source,module in [('persistence','persist'),('checkpoint','checkpoint'),('replacement','replacement'),('saving','saving'),('removals','removals'),('reviews','reviews'),('management','management'),('labstore','labstore'),('laboratory','laboratory'),('session-origin','origin'),('session-reconnect','reconnect'),('session-heartbeat','heartbeat'),('session','live')]:
+for source,module in [('persistence','persist'),('checkpoint','checkpoint'),('replacement','replacement'),('saving','saving'),('removals','removals'),('reviews','reviews'),('management','management'),('labstore','labstore'),('laboratory','laboratory'),('session-origin','origin'),('session-reconnect','reconnect'),('session-heartbeat','heartbeat'),('session-input','inputdispatch'),('session','live')]:
  defs=[]
  for d in D:
   if d.startswith('(component create service '):continue

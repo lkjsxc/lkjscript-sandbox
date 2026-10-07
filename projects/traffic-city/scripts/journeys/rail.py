@@ -14,7 +14,7 @@ fn('period',[('l','RailLine')],'I64',mul(add(V('l.rideTicks'),mul(sub(llen('I64'
 fn('expense',[('l','RailLine')],'I64',add(I(2),div(add(C('distance',V('l'),V('l.from'),C('next-stop',V('l'))),I(15)),I(16))))
 fn('on-line',[('l','RailLine'),('id','I64')],'Bool',le(I(0),C('index',C('path',V('l')),V('id'),I(0))))
 fn('overlap',[('t','Transit'),('id','I64'),('index','I64')],'Bool',OR(lt(I(0),get(V('t.tracks'),V('id'))),IF(lt(V('index'),llen('I64',V('t.ids'))),OR(C('on-line',line(V('t'),at('I64',V('t.ids'),V('index'))),V('id')),C('overlap',V('t'),V('id'),add(V('index'),I(1)))),B(False))))
-fn('water',[('city','City'),('id','I64')],'Bool',AND(le(add(V('city.originX'),I(14)),C('game::x',V('id'))),le(C('game::x',V('id')),add(V('city.originX'),I(15)))))
+fn('water',[('city','City'),('id','I64')],'Bool',C('terrain::water',V('city'),V('id')))
 fn('access',[('world','World'),('id','I64'),('d','I64')],'Bool',IF(lt(V('d'),I(4)),LET([('k',get(V('world.tiles'),C('game::neighbor',V('id'),V('d'))))],OR(C('game::road',V('k')),eq(V('k'),I(7)),C('access',V('world'),V('id'),add(V('d'),I(1))))),B(False)))
 fn('corridor',[('city','City'),('a','I64'),('b','I64'),('d','I64')],'Bool',AND(NOT(C('game::building',get(V('city.world.tiles'),V('a')))),NOT(C('overlap',V('city.sim.transit'),V('a'),I(0))),IF(eq(V('a'),V('b')),B(True),C('corridor',V('city'),C('game::neighbor',V('a'),V('d')),V('b'),V('d')))))
 fn('water-count',[('city','City'),('a','I64'),('b','I64'),('d','I64')],'I64',add(IF(C('water',V('city'),V('a')),I(1),I(0)),IF(eq(V('a'),V('b')),I(0),C('water-count',V('city'),C('game::neighbor',V('a'),V('d')),V('b'),V('d')))))

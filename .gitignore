@@ -1,5 +1,5 @@
 # Generated, downloaded, or private: never publication inputs.
-**/node_modules/
+**/node_modules
 **/.build/
 /projects/*/runtime/
 /projects/*/evidence/

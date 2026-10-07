@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {randomBytes} from 'node:crypto';
 import {startNative,connect,memory,root} from './native.mjs';
 import {runCase,selection} from './run-case.mjs';
-let native=await startNative({name:'city-lab',tick:25});
+let native=await startNative({name:'city-lab',tick:25,savedCityLimit:8});
 const clients=[],checks=[],token=randomBytes(32).toString('hex');
 async function client(key=token,expect=1){
  const c=connect(native.address);clients.push(c);await c.wait(f=>f.seq===1);let id=0;
@@ -59,7 +59,7 @@ try{
  // Closing, restarting and ownership loss must never checkpoint the displayed trial.
  await a.command('lab-start');await a.command('build',build(3,3));await a.command('lab-run',{kind:128});await a.wait(f=>f.lab.phase===2&&f.lab.step>=3);
  f=await a.command('save');assert.equal(f.saved,committed.tick);await a.close();
- const directory=native.dir;await native.stop();native=await startNative({directory,name:'city-lab-restart',tick:25});
+ const directory=native.dir;await native.stop();native=await startNative({directory,name:'city-lab-restart',tick:25,savedCityLimit:8});
  const b=await client();assert.equal(b.resumed.lab.phase,0);assert.deepEqual(b.resumed.stats,committed);assert.equal(b.resumed.undo,true);
  await b.command('lab-start');await b.command('build',build(3,3));await comparison(b);const stale=await b.command('lab-review');
  const owner=await client();assert.deepEqual(owner.resumed.stats,committed);
@@ -78,7 +78,7 @@ try{
  await owner.close();
  for(let i=0;i<7;i++){const c=await client(randomBytes(32).toString('hex'));await c.close()}
  const full=await client(randomBytes(32).toString('hex'),4);await full.close();
- checks.push('Many experiments consume no extra saved-city slots: all seven remaining slots are available and the ninth city still rejects.');
+ checks.push('Many experiments consume no extra saved-city slots: the configured eight-slot test host retains seven remaining slots and rejects the ninth city.');
  const maxFrame=Math.max(...clients.flatMap(c=>c.frames.map(f=>f.bytes)));assert(maxFrame<131072);
  const result={passed:true,artifact_sha256:selection.artifact_sha256,checks,comparison:{unchanged:unchanged.lab,plan:changed.lab},maximum_frame_bytes:maxFrame,memory:memory(native.child.pid)};
  fs.writeFileSync(root+'/evidence/city-lab.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));

@@ -1,0 +1,51 @@
+// Real visible controls and pointer input, with a disposable native city.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {chromium} from 'playwright';
+import {selectTool,districtPoint,waitTile} from './ui-driver.mjs';
+const url=process.env.PREVIEW_URL;assert(url&&['127.0.0.1','localhost'].includes(new URL(url).hostname));
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM||undefined}),errors=[],checks=[];
+try{
+ const context=await browser.newContext({viewport:{width:1360,height:1000}}),page=await context.newPage();page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(url);await page.waitForFunction(()=>window.__flowgarden?.sessionStatus===1);const original=await page.evaluate(()=>window.__flowgarden.stats);
+ await page.locator('#menu-open').click();await page.locator('#lab-open').click();await page.locator('#lab-start').click();await page.waitForFunction(()=>window.__flowgarden.lab.phase===1);
+ await selectTool(page,4);const p=await districtPoint(page,6,9);await page.mouse.click(p.x,p.y);await waitTile(page,6,9,4);await selectTool(page,-2);
+ await page.locator('#lab-compare').click();await page.waitForFunction(()=>window.__flowgarden.lab.phase===4,undefined,{timeout:240000});await page.locator('#lab-results').waitFor({state:'visible'});
+ assert.match(await page.locator('#atlas-cohort').textContent(),/32 of the same residents/);
+ assert.equal(await page.locator('#atlas-counts strong').count(),3);
+ await page.screenshot({path:'evidence/delay-atlas-results-desktop.png'});
+ const report=await page.evaluate(()=>window.__flowgarden.lab.atlas);const rows=await page.evaluate(()=>window.__flowgarden.atlas.homes);assert.equal(rows.length,4);
+ await page.locator('#atlas-map-open').click();assert(!await page.locator('#lab-results').isVisible());assert.equal(await page.locator('#atlas-toggle').getAttribute('aria-pressed'),'true');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'atlas-home-select');
+ const seq=await page.evaluate(()=>window.__flowgarden.sequence);await page.waitForFunction(seq=>window.__flowgarden.sequence>=seq+2,seq);
+ assert.deepEqual(await page.evaluate(()=>window.__flowgarden.lab.atlas),report);assert.equal(await page.locator('#atlas-home-select option').count(),5);assert.equal(await page.evaluate(()=>document.activeElement.id),'atlas-home-select');
+ checks.push('Result transition has the native 32-person cohort; full home data and focus survive metadata-only heartbeat frames.');
+ await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await page.locator('#inspector').waitFor({state:'visible'});
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'inspect-title');await page.keyboard.press('Escape');assert(!await page.locator('#inspector').isVisible());assert.equal(await page.evaluate(()=>document.activeElement.id),'atlas-home-select');
+ const row=rows.find(r=>r.less||r.more)||rows[0];
+ await page.locator('#atlas-home-select').selectOption(String(row.home));await page.locator('#inspector').waitFor({state:'visible'});
+ assert.match(await page.locator('#inspect-body').textContent(),/identical residents compared/);
+ assert((await page.locator('#inspect-details').textContent()).includes(`${row.baseTime.toLocaleString()} → ${row.planTime.toLocaleString()}`));
+ const detail=await page.locator('#inspect-details > div').elementHandle();await page.getByText('Time in journeys',{exact:true}).dblclick();const selectedText=await page.evaluate(()=>getSelection().toString());assert(selectedText.length>0);
+ const selectedSeq=await page.evaluate(()=>window.__flowgarden.sequence);await page.waitForFunction(seq=>window.__flowgarden.sequence>=seq+2,selectedSeq);assert(await detail.evaluate(node=>node===document.querySelector('#inspect-details > div')));assert.equal(await page.evaluate(()=>getSelection().toString()),selectedText);await detail.dispose();await page.locator('#inspect-title').click();
+ await page.screenshot({path:'evidence/delay-atlas-home-desktop.png'});
+ await page.locator('#inspect-close').click();await page.locator('#fit').click();await page.waitForFunction(()=>window.__flowgarden.atlas.rendered.length>0);
+ const point=await page.evaluate(id=>window.__flowgarden.worldToScreen(id%128+.5,Math.floor(id/128)+.5),row.home);
+ await page.mouse.click(point.x,point.y);assert(await page.locator('#inspector').isVisible());assert.match(await page.locator('#inspect-title').textContent(),new RegExp(`${row.home%128}, ${Math.floor(row.home/128)}`));
+ await page.locator('#inspect-close').click();await page.locator('#atlas-toggle').click();await page.waitForFunction(()=>!window.__flowgarden.atlas.active&&window.__flowgarden.atlas.rendered.length===0);
+ checks.push('Keyboard selection moves focus to the home heading; Escape returns to the selector. Native heartbeats preserve inspector nodes and actual selected text.');
+ checks.push('Signed canvas markers and keyboard-accessible home selector open exact native home measurements; toggling removes the overlay.');
+ await page.setViewportSize({width:390,height:844});await page.locator('#atlas-toggle').click();await page.locator('#fit').click();
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ for(const id of ['lab-bar','atlas-toggle','atlas-home-select','lab-details','lab-exit']){const r=await page.locator('#'+id).boundingBox();assert(r&&r.x>=0&&r.y>=0&&r.x+r.width<=391&&r.y+r.height<=845,id)}
+ await page.screenshot({path:'evidence/delay-atlas-map-mobile.png'});
+ await page.locator('#atlas-home-select').selectOption(String(rows.find(r=>r.home!==row.home).home));await page.locator('#inspector').waitFor({state:'visible'});
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'evidence/delay-atlas-home-mobile.png'});
+ const close=await page.locator('#inspect-close').boundingBox();assert(close.y>=0&&close.y+close.height<=844);await page.locator('#inspect-close').click();
+ await page.locator('#lab-details').click();await page.locator('#lab-results').waitFor({state:'visible'});assert.match(await page.locator('#atlas-cohort').textContent(),/32/);await page.locator('#lab-results-close').click();
+ checks.push('390×844 layout, accessible selector, inspect/close and reopening results retain the comparison without horizontal overflow.');
+ await page.locator('#lab-edit').click();await page.waitForFunction(()=>window.__flowgarden.lab.phase===1);assert.equal(await page.evaluate(()=>window.__flowgarden.atlas.active),false);assert.equal(await page.evaluate(()=>window.__flowgarden.atlas.homes.length),0);
+ await page.reload();await page.waitForFunction(()=>window.__flowgarden?.sessionStatus===1);assert.deepEqual(await page.evaluate(()=>window.__flowgarden.stats),original);assert.equal(await page.evaluate(()=>window.__flowgarden.atlas.active),false);
+ assert.deepEqual(errors,[]);checks.push('Edit and reload clear the atlas and temporary plan; original saved city is exact and no browser errors occurred.');
+ fs.writeFileSync('evidence/delay-atlas-ui.json',JSON.stringify({passed:true,artifact_sha256:JSON.parse(fs.readFileSync(process.env.CITY_SELECTION||'.build/selection.json')).artifact_sha256,http_artifact_sha256:process.env.HTTP_CITY_SELECTION?JSON.parse(fs.readFileSync(process.env.HTTP_CITY_SELECTION)).artifact_sha256:null,checks,errors},null,2));console.log(checks.join('\n'));
+}finally{await browser.close()}

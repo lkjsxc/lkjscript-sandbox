@@ -1,11 +1,13 @@
 // Presentation only. Native lkjscript owns the branches, clock, metrics and commit.
-export function createCityLab({send,leaveMenu,cancelGesture,setTool,toast}){
+import {createDelayAtlas} from './atlas.js';
+export function createCityLab({send,leaveMenu,cancelGesture,setTool,toast,focusHome}){
  const $=id=>document.getElementById(id);
  let frame={phase:0},status=0,pending=null,hadLab=false,disconnected=false;
  const money=n=>(n<0?'−$':'$')+Math.abs(n).toLocaleString();
   const usable=()=>status===1&&!disconnected;
  const close=id=>{if($(id).open)$(id).close()};
  const allDialogs=['lab-intro','lab-results','lab-confirm','lab-discard'];
+ const atlas=createDelayAtlas({focusHome,closeResults:()=>close('lab-results'),clearSelection:()=>setTool(-2)});
  function command(op,fields={},kind=op){if(!usable()||pending)return;cancelGesture();const id=send(op,fields);if(id){pending={id,kind};render()}}
  function render(){
   const active=frame.phase>0,running=frame.phase===2||frame.phase===3,ready=usable()&&!pending;
@@ -42,6 +44,7 @@ export function createCityLab({send,leaveMenu,cancelGesture,setTool,toast}){
    $('save').textContent='Save original city';
    $('session-note').textContent='Experimental plans are temporary. Reconnecting or session expiry discards them; your real saved city and previous-city backup are retained.';
   }
+  atlas.receive(frame,ready);
   for(const id of ['examples-open','manage-open'])$(id).disabled=active;
   for(const button of document.querySelectorAll('button[data-tool],button[data-palette]')){if(button.dataset.tool===undefined||Number(button.dataset.tool)>=0)button.disabled=active&&frame.phase!==1}
  }
@@ -60,10 +63,12 @@ export function createCityLab({send,leaveMenu,cancelGesture,setTool,toast}){
  $('lab-discard-yes').onclick=()=>command('lab-discard');
  for(const id of allDialogs)$(id).addEventListener('cancel',e=>{e.preventDefault();if(pending)return;if(id==='lab-confirm')command('cancel-review');close(id)});
  return {
-  get active(){return frame.phase>0},get phase(){return frame.phase},get report(){return structuredClone(frame)},
+  get active(){return frame.phase>0},get phase(){return frame.phase},get report(){return structuredClone(frame)},get atlas(){return atlas.state},
+  drawAtlas(...args){atlas.draw(...args)},pickAtlas(...args){return atlas.pick(...args)},inspectAtlas(...args){return atlas.inspect(...args)},
   offline(){disconnected=true;if(frame.phase)hadLab=true;pending=null;allDialogs.forEach(close);render()},
   receive(f){
-   const previous=frame.phase;let focusAfterRender=null;frame=f.lab||{phase:0};status=f.status;
+   const previous=frame.phase,retainedAtlas=frame.atlas;let focusAfterRender=null;frame=f.lab||{phase:0};
+   if(frame.phase===4&&!frame.atlasChanged&&previous===4)frame={...frame,atlas:{...frame.atlas,homes:retainedAtlas?.homes||[]}};status=f.status;
    if(status===1&&disconnected){disconnected=false;if(hadLab&&!frame.phase)toast('Temporary experiment discarded after reconnect. Your original saved city was restored.',8000);hadLab=false}
    if(previous!==frame.phase){cancelGesture();setTool(-2);if(!frame.phase)allDialogs.forEach(close)}
    if(pending&&f.ack>=pending.id){const action=pending;pending=null;if(action.kind==='lab-review'&&frame.phase===4&&frame.confirmation===action.id&&status===1){close('lab-results');$('lab-confirm').showModal();focusAfterRender='lab-confirm-cancel'}if(action.kind==='lab-apply'||action.kind==='lab-discard'){allDialogs.forEach(close);$('map').focus()}}

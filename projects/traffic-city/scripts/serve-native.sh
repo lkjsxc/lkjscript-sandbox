@@ -27,7 +27,7 @@ while true; do
  while kill -0 "$http_pid" 2>/dev/null && kill -0 "$session_pid" 2>/dev/null; do
    sleep 1
    save_kib=$(du -sk runtime/data-v4/store | cut -f1)
-   # Eight cities, each with one optional previous-city value, <=4 MiB/value.
+   # Configurable saved-city admission; one optional previous-city value each, <=4 MiB/value.
    # Use twice the last compacted size when retained values exceed half the base
    # watermark. Otherwise a legitimately large backup could cause restart loops.
    compacted_kib=0

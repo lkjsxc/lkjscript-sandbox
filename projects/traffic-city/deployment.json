@@ -96,6 +96,10 @@
     "local_origin": {
       "kind": "text",
       "value": "http://localhost:19140"
+    },
+    "saved_city_limit": {
+      "kind": "text",
+      "value": "1024"
     }
   }
 }

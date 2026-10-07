@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/author.mjs",
     "start": "./play.sh",
-    "test": "node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
+    "test": "node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
     "test:browser": "node tests/with-preview.mjs tests/browser.mjs",
     "test:scale": "node tests/scaling.mjs",
     "test:backpressure": "node tests/backpressure.mjs",
@@ -52,7 +52,18 @@
     "test:source-reproduction": "node tests/source-reproduction.mjs",
     "test:city-lab": "node tests/city-lab.mjs",
     "test:city-lab-ui": "node tests/with-preview.mjs tests/city-lab-ui.mjs",
-    "test:city-lab-metro": "node tests/city-lab-metro.mjs"
+    "test:city-lab-metro": "node tests/city-lab-metro.mjs",
+    "test:atlas-presentation": "node tests/atlas-presentation.mjs",
+    "test:delay-atlas": "node tests/delay-atlas.mjs",
+    "test:delay-atlas-ui": "node tests/with-preview.mjs tests/delay-atlas-ui.mjs",
+    "test:delay-atlas-metro": "node tests/delay-atlas-metro.mjs",
+    "test:waterfront": "node tests/waterfront.mjs",
+    "test:waterfront-ui": "node tests/with-preview.mjs tests/waterfront-ui.mjs",
+    "test:save-capacity": "node tests/save-capacity.mjs",
+    "test:waterfront-geometry": "node tests/waterfront-geometry.mjs",
+    "test:bootstrap-equivalence": "node tests/bootstrap-equivalence.mjs",
+    "test:planning-fastpath": "node tests/planning-fastpath.mjs",
+    "test:planning-live": "node tests/planning-live.mjs"
   },
   "engines": {
     "node": ">=22"

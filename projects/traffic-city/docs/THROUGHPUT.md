@@ -1,5 +1,6 @@
 # Native traffic throughput
 
+> The original implementation record below predates the waterfront update. Current terrain identity, save format 8 and configurable saved-city capacity are described in [Waterfront cities](WATERFRONT.md).
 ## Implementation boundary
 
 The simulation continues to use pinned lkjscript 0.1.77. City format 7, every resident field, monetary rules, finite road storage, junction exit reservations, train capacity, route search budgets, the requested session interval and browser presentation are unchanged.

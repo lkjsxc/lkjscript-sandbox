@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {atlasFields,decodeAtlas,atlasKind} from '../web/atlas.js';
+assert.equal(atlasFields.length,13);
+const row={home:100,before:8,after:8,same:8,less:2,more:2,equal:4,baseTime:400,planTime:400,baseWait:8,planWait:16,baseLost:0,planLost:0};
+assert.deepEqual(decodeAtlas({homes:[atlasFields.map(k=>row[k])]}).homes,[row]);
+assert.equal(atlasKind(row),'mixed','A net-zero total must not hide a harmed subgroup');
+assert.equal(atlasKind({...row,more:0}),'less');assert.equal(atlasKind({...row,less:0}),'more');
+assert.equal(atlasKind({...row,less:0,more:0}),'equal');
+assert.equal(atlasKind({...row,same:0}),'changed','Equal population is not identical residents');
+assert.equal(atlasKind({...row,before:0,after:8,same:0}),'changed');
+assert.equal(atlasKind({...row,before:8,after:0,same:0}),'changed');
+for(const homes of [[[]],[[1]],[[...Array(12).fill(0),NaN]],[[...Array(12).fill(0),Number.MAX_SAFE_INTEGER+1]]])assert.throws(()=>decodeAtlas({homes}),/Invalid native atlas row/);
+const worst=Array.from({length:512},(_,home)=>atlasFields.map(k=>k==='home'?16383-home:['before','after','same','less','more','equal'].includes(k)?8:2048));
+assert(Buffer.byteLength(JSON.stringify(worst))<40000,'A full union is bounded compact presentation data');
+console.log('PASS compact wire, validation, changed identity, mixed effects despite zero net change, and 512-home payload bound');
