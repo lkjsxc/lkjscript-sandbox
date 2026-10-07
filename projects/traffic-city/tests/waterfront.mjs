@@ -23,4 +23,10 @@ checks.push('Native seed creates 1,024 residents, 1,024 jobs, sixteen dry statio
 const samples=[];let maxWait=0;for(let i=0;i<16;i++){const run=runCase({city,ticks:8,commands:[],after:[]},'waterfront-advance-'+i,'continuation');invariants(run.result);city=run.result.city;maxWait=Math.max(maxWait,city.sim.waiting);samples.push({tick:city.sim.tick,visits:city.sim.visits,arrived:city.sim.arrived,waiting:city.sim.waiting,disconnected:city.sim.disconnected,boardings:city.sim.transit.boardings,completed:city.sim.transit.completed,wall_ms:run.wall_ms});console.log("Native city",samples.at(-1))}
 assert(city.sim.visits>0);assert(city.sim.transit.boardings>0);assert(city.sim.transit.completed>0);
 checks.push('128 native cycles preserve residents, requests, money and train capacity while producing actual visits and completed rail journeys.');
-fs.writeFileSync('runtime/waterfront-20261007/mature-city.json',JSON.stringify(city));const report={passed:true,artifact_sha256:selection.artifact_sha256,checks,seed_ms:seeded.wall_ms,tiles:tiles.size,population:city.sim.population,samples,maxWait};fs.writeFileSync('evidence/waterfront.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+// runCase already owns a fresh directory. Do not rely on a dated local directory
+// or overwrite the fixture from another invocation of this integration test.
+const fixture=seeded.dir+'/mature-city.json';
+fs.writeFileSync(fixture,JSON.stringify(city));
+assert.deepEqual(JSON.parse(fs.readFileSync(fixture,'utf8')),city);
+checks.push('Mature-city evidence writes and round-trips inside this invocation\'s fresh native directory.');
+const report={passed:true,artifact_sha256:selection.artifact_sha256,checks,fixture_file:fixture,seed_ms:seeded.wall_ms,tiles:tiles.size,population:city.sim.population,samples,maxWait};fs.writeFileSync('evidence/waterfront.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
