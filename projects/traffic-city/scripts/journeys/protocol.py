@@ -25,6 +25,8 @@ TYPES['Stats'].update({'eco'+k[0].upper()+k[1:]:'I64' for k in ECONOMY_FIELDS})
 TYPES['Stats']['wealthError']='I64'
 TYPES['Frame']['inspectFunds']='I64'
 TYPES['Frame']['tracks']='(list I64)'
+TYPES['Frame']['river']='(list I64)'
+TYPES['Frame']['riverWidth']='I64'
 TYPES['RailView'].update({'path':'(list I64)','stops':'(list I64)','direction':'I64'})
 
 TYPES['RailPlatform']={k:'I64' for k in 'station forward reverse'.split()}

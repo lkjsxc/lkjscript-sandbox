@@ -5,7 +5,7 @@ component=next(d for d in D if d.startswith('(component create service '))
 bootstrap=FN('transition',[('state','(option State)'),('event','std::SessionEvent')],'Decision',C('view::finish'),effect='(task (requirement service::data) (requirement service::streams) (requirement service::config))')
 write_source('session-capabilities','live',[bootstrap,component])
 sets={
- 'persist':{'invalid-save','hex-loop','token-valid','claim','claim-retry','has-undo'},
+ 'persist':{'invalid-save','hex-loop','token-valid','save-limit','claim','claim-retry','has-undo'},
  'checkpoint':{'checkpoint','checkpoint-retry','owned'},
  'replacement':{'replace-saved','replace-retry'},
  'saving':{'save-state','clear-review'},

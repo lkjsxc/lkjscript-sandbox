@@ -1,7 +1,7 @@
 import fs from 'node:fs';import path from 'node:path';import {spawn,spawnSync} from 'node:child_process';import {once} from 'node:events';import {createRequire} from 'node:module';
 export const WS=createRequire(import.meta.url)('playwright-core/lib/utilsBundle').ws;
 export const root=path.resolve(import.meta.dirname,'..');
-export async function startNative({target='live',tick=500,name='native-test',directory=null,publicDemo=false,origin=null,idleMilliseconds=null,lifetimeMilliseconds=null}={}){
+export async function startNative({target='live',tick=500,name='native-test',directory=null,publicDemo=false,origin=null,idleMilliseconds=null,lifetimeMilliseconds=null,savedCityLimit=null}={}){
  const selection=JSON.parse(fs.readFileSync(process.env.CITY_SELECTION||root+'/.build/selection.json'));const dir=directory||fs.mkdtempSync(root+'/runtime/'+name+'-');
  fs.rmSync(dir+'/app.lkja',{force:true});try{fs.linkSync(selection.artifact,dir+'/app.lkja')}catch{fs.copyFileSync(selection.artifact,dir+'/app.lkja')}
  if(!publicDemo&&!fs.existsSync(dir+'/data/HEAD')){const init=spawnSync(selection.bin,['data','initialize','--root',dir+'/data'],{encoding:'utf8'});if(init.status!==0)throw Error(init.stdout+init.stderr);}
@@ -9,6 +9,7 @@ export async function startNative({target='live',tick=500,name='native-test',dir
  if(target==='benchmark-live'){config.grants=config.grants.filter(x=>x.requirement==='streams');}
  if(publicDemo){config.grants=config.grants.filter(x=>x.requirement!=='data');config.session.maximum_active_sessions=4;config.session.maximum_state_bytes=8388608;config.session.maximum_state_nodes=300000;config.session.maximum_lifetime_milliseconds=1800000;config.session.idle_timeout_milliseconds=300000;}
  for(const [field,value]of [['idle_timeout_milliseconds',idleMilliseconds],['maximum_lifetime_milliseconds',lifetimeMilliseconds]])if(value!==null){if(!Number.isInteger(value)||value<750||value>config.session[field])throw Error('Test session limit must be a shorter positive duration');config.session[field]=value;}
+ if(savedCityLimit!==null){if(!Number.isInteger(savedCityLimit)||savedCityLimit<1||savedCityLimit>4096)throw Error('Invalid isolated-test city capacity');config.configuration.saved_city_limit={kind:'text',value:String(savedCityLimit)};}
  if(origin)config.configuration.direct_origin.value=origin;
  fs.writeFileSync(dir+'/session.json',JSON.stringify(config));
  let output='',address;const child=spawn(selection.bin,['serve','--deployment',dir+'/session.json']);const log=fs.createWriteStream(root+'/evidence/'+name+'.jsonl');

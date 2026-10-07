@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/author.mjs",
     "start": "./play.sh",
-    "test": "node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
+    "test": "node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
     "test:browser": "node tests/with-preview.mjs tests/browser.mjs",
     "test:scale": "node tests/scaling.mjs",
     "test:backpressure": "node tests/backpressure.mjs",
@@ -56,7 +56,12 @@
     "test:atlas-presentation": "node tests/atlas-presentation.mjs",
     "test:delay-atlas": "node tests/delay-atlas.mjs",
     "test:delay-atlas-ui": "node tests/with-preview.mjs tests/delay-atlas-ui.mjs",
-    "test:delay-atlas-metro": "node tests/delay-atlas-metro.mjs"
+    "test:delay-atlas-metro": "node tests/delay-atlas-metro.mjs",
+    "test:waterfront": "node tests/waterfront.mjs",
+    "test:waterfront-ui": "node tests/with-preview.mjs tests/waterfront-ui.mjs",
+    "test:save-capacity": "node tests/save-capacity.mjs",
+    "test:waterfront-geometry": "node tests/waterfront-geometry.mjs",
+    "test:bootstrap-equivalence": "node tests/bootstrap-equivalence.mjs"
   },
   "engines": {
     "node": ">=22"

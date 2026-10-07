@@ -74,6 +74,8 @@ TYPES={
 # Format 7: explicit household/business accounts and reusable rail infrastructure.
 TYPES['Economy']={'wallets':'Numbers','firms':'Numbers','active':'Bool',**{k:'I64' for k in 'opening grants exports salvage construction operating withdrawn households businesses wages sales taxes fares concessions upkeepDue periodTaxes periodFares periodOperating lastTaxes lastFares lastOperating'.split()}}
 TYPES['City']['economy']='Economy'
+# Format 8: preserve each city's authored terrain identity.
+TYPES['City']['landscape']='I64'
 TYPES['RailLine'].update({'path':'(list I64)','stops':'(list I64)','queues':'Buckets','direction':'I64'})
 TYPES['Transit']['tracks']='Numbers'
 TYPES['Removal']['tracks']='Numbers'

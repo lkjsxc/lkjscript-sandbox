@@ -32,7 +32,7 @@ Listeners default to loopback. For a separately authorized reverse-proxy deploym
 
 Explore is selected initially. Drag to pan, pinch or scroll to zoom, and use Fit to return to your built city. Two fingers always cancel construction and navigate. At low zoom, the server sends an overview. Tap a tile to inspect a resident, junction or rail service. Roads and Places open their own small palettes; Rail and Remove have dedicated tools.
 
-Roads cost $8 per tile; avenues $24; footpaths $4. A home costs $70 and a permit and adds eight permanent residents. Workplaces cost $140 and offer sixteen jobs; shops cost $110 and parks $90. Junction controls cost $40. Place buildings individually on empty land. Roads and paths support straight strokes of up to 64 tiles.
+On land, roads cost $8 per tile, avenues $24 and footpaths $4. Over water the prices are $32, $72 and $16; draw a complete dry-bank-to-dry-bank stroke to build a bridge anywhere along the river. The construction preview includes the full cost. A home costs $70 and a permit and adds eight permanent residents. Workplaces cost $140 and offer sixteen jobs; shops cost $110 and parks $90. Junction controls cost $40. Place buildings individually on empty land. Roads and paths support straight strokes of up to 64 tiles.
 
 Rail has three separate tools: **Track → Station → Service**. Drag straight or bent track; the bend-order control and preview show its shape. New track costs $12 per tile, or $36 over water. A $90 station needs empty dry track beside a road or footpath. Select two connected stations to create a $120, 16-seat service. Its inspector opens with the service suspended: add stops, then enable departures.
 
@@ -52,9 +52,9 @@ Only the latest tab to resume a city may save it. Earlier tabs become inactive a
 
 **Menu → Example cities** offers Garden City (384 residents), Crossing Challenge (256), and Willow Metro (512, two bent three-stop services). Each has a different traffic challenge. These are authored layouts with native-generated residents, never player saves. Loading requires confirmation and makes the current city the one recoverable backup; loading another example replaces the older backup. Cancel leaves the city unchanged.
 
-Menu also contains Save, Guide, Preferences and Manage city. Reset requires a review and keeps one native backup of the previous city under the same private key. Restore previous city recovers that backup once; resetting does not consume another city slot. Format 7 explicitly reads published format-4, format-5 and format-6 saves, retaining coordinates and resident state. Legacy rail services gain explicit geometry and stops; the monetary ledger records opening balances without rewriting earlier income.
+Menu also contains Save, Guide, Preferences and Manage city. Reset requires a review and keeps one native backup of the previous city under the same private key. Restore previous city recovers that backup once; resetting does not consume another city slot. Format 8 records a landscape identity and explicitly reads published format-4 through format-7 saves, retaining coordinates and resident state. Legacy rail services gain explicit geometry and stops; the monetary ledger records opening balances without rewriting earlier income.
 
-This development preview has **eight saved-city slots**, four simultaneous sessions, a 4 MiB value limit, and no automatic city eviction. Each slot can also hold one previous-city backup. Native backup/restore compacts physical history at the greater of 64 MiB or twice its last compacted size. This is a maintenance threshold, not a hard OS quota; in-flight writes can exceed it temporarily. Old checkpoint directories remain untouched.
+The supplied host descriptor allows **1,024 saved cities**, four simultaneous sessions, a 4 MiB value limit, and no automatic city eviction. The saved-city limit is configurable from 1 to 4,096 with `configuration.saved_city_limit`; it is independent of simultaneous sessions. Each slot can also hold one previous-city backup. Native backup/restore compacts physical history at the greater of 64 MiB or twice its last compacted size. This is a maintenance threshold, not a hard OS quota; in-flight writes can exceed it temporarily. Old checkpoint directories remain untouched.
 
 
 ## Source layout
@@ -90,3 +90,7 @@ The map limits are 128 × 128, 8,192 occupied tiles, and 2,048 residents. They a
 Use **Menu → City Lab** to edit a temporary plan and compare two native futures from the same starting cycle. Applying imports only the original-cycle plan, never simulated income or time. Experiments are connection-local and leave the real saved city and previous-city backup intact. See [City Lab](docs/CITY-LAB.md) for metrics, limits and verification commands.
 
 City Lab also includes a [journey burden atlas](docs/DELAY-ATLAS.md): compare the same residents, see signed home markers and mixed local effects, and inspect unfinished-journey, long-wait and disconnected exposure without applying the plan.
+
+## River Boroughs and free bridge construction
+
+The fourth example has 1,024 residents in sixteen mixed neighbourhoods, four four-stop trains and a broad winding river. New starter cities use the same terrain style. Facility thresholds are shared with resident motion, and congestion follows the actual road direction. See [Waterfront cities](docs/WATERFRONT.md) for bridge prices, construction rules, capacity configuration and verification.

@@ -1,5 +1,6 @@
 # City Lab: compare a plan without gambling the city
 
+> The original implementation record below predates the waterfront update. Current terrain identity, save format 8 and configurable saved-city capacity are described in [Waterfront cities](WATERFRONT.md).
 City Lab is a native, temporary counterfactual experiment. Open **Menu → City Lab**, start an experiment, edit the map with the ordinary construction tools, and choose **Compare**. The unchanged city and the plan run from exactly the same original cycle for 64, 128 or 256 simulation cycles each. They run sequentially, not simultaneously. A timer callback advances at most one experimental city by one ordinary `traffic::tick`.
 
 The real city is checkpointed first and remains frozen. The map shows the plan while editing, then the unchanged future, then the planned future. The tray labels which one is displayed. **Stop comparison** returns to the unadvanced plan, and **Discard** restores the original city. There is no second game engine or approximate browser predictor.

@@ -23,7 +23,7 @@ jobs:
       - run: node scripts/check-repository.mjs
   traffic-city:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -46,4 +46,10 @@ jobs:
       - run: npm run test:delay-atlas
         working-directory: projects/traffic-city
       - run: npm run test:delay-atlas-ui
+        working-directory: projects/traffic-city
+      - run: npm run test:waterfront
+        working-directory: projects/traffic-city
+      - run: npm run test:save-capacity
+        working-directory: projects/traffic-city
+      - run: npm run test:waterfront-ui
         working-directory: projects/traffic-city

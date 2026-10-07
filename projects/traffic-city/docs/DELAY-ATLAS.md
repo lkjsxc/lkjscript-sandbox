@@ -1,5 +1,6 @@
 # Journey burden atlas
 
+> The original implementation record below predates the waterfront update. Current terrain identity, save format 8 and configurable saved-city capacity are described in [Waterfront cities](WATERFRONT.md).
 City Lab can now answer **which residents spend more time tied up in journeys**, not only whether a citywide total changes. Complete a comparison, then choose **Show on map** in its results or **Journey atlas** in the experiment tray. Select a signed home marker or use the keyboard-accessible home selector for the exact measurements.
 
 The underlying map is the planned future. Markers belong to residents' **homes**, not the road tiles where they queued. Their signs describe the same residents across the two futures: less journey time (−), more (+), unchanged (=), or mixed effects within one home (±). A dashed × means the original and planned home have different residents. A mixed home remains mixed even when opposing effects cancel to an unchanged total.

@@ -3,10 +3,12 @@
 set -eu
 cd "$(dirname "$0")/.."
 python3 scripts/journeys/simulation.py
+python3 scripts/journeys/terrain.py
 python3 scripts/journeys/rail.py
 python3 scripts/journeys/economy.py
 python3 scripts/journeys/removal.py
 python3 scripts/journeys/city.py
+python3 scripts/journeys/waterfront.py
 python3 scripts/journeys/scenarios.py
 python3 scripts/journeys/migration.py
 python3 scripts/journeys/actorview.py
