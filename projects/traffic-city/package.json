@@ -61,7 +61,9 @@
     "test:waterfront-ui": "node tests/with-preview.mjs tests/waterfront-ui.mjs",
     "test:save-capacity": "node tests/save-capacity.mjs",
     "test:waterfront-geometry": "node tests/waterfront-geometry.mjs",
-    "test:bootstrap-equivalence": "node tests/bootstrap-equivalence.mjs"
+    "test:bootstrap-equivalence": "node tests/bootstrap-equivalence.mjs",
+    "test:planning-fastpath": "node tests/planning-fastpath.mjs",
+    "test:planning-live": "node tests/planning-live.mjs"
   },
   "engines": {
     "node": ">=22"

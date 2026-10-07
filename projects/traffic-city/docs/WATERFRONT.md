@@ -52,3 +52,7 @@ The save-count setting is an admission ceiling, not a storage guarantee. Pinned 
 ## Large-city performance scope
 
 The 1,024-person example is a large simulation workload, not a promise of real-time playback. On the shared development host, its initial 128-cycle workload completes real rail journeys but runs below the two-cycles-per-second goal; many residents initially wait for the bounded route planner. The browser test checks eight or more real live cycles, start/pause and exact save/reload, while the separate native integration test requires 128 cycles, actual boardings and completed rail journeys. Integration uses eight-cycle segments to remain within the same per-request deadline on slower hosts. Unverified further planner optimizations are not included in this change.
+
+## Planning work reduction
+
+The [guarded planner fast path](PLANNING.md) removes railway enumeration when the already exhausted surface-search budget makes a wait unavoidable. It preserves exact resident, route, train and monetary state. This improves the responsiveness of large examples without increasing the native search budget or promising that every large city runs in real time.
