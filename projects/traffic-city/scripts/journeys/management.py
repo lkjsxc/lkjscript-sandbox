@@ -1,16 +1,16 @@
 # Imported by session.py: same native transactional capability, no external host.
 def backup_key(token): return LS('std::DataKeyPart',variant('std::DataKeyPart::Text',token),variant('std::DataKeyPart::Text',T('previous-city')))
-fn('has-undo',[('token','Text')],'Bool',LET([('entries',cap('get',space,backup_key(V('token'))))],IF(eq(llen('std::DataEntry',V('entries')),I(0)),B(False),eq(F(C('migrate::decode',ef('entries','value')),'format'),I(8)))),True)
+fn('has-undo',[('token','Text')],'Bool',LET([('entries',cap('get',space,backup_key(V('token'))))],IF(eq(llen('std::DataEntry',V('entries')),I(0)),B(False),eq(F(C('migrate::decode',ef('entries','value')),'format'),I(9)))),True)
 fn('replace-saved',[('state','State'),('restore','Bool')],'Claim',tx('Claim',LET([
  ('entries',cap('get',space,key(V('state.token')))),
  ('backup',cap('get',space,backup_key(V('state.token')))),
  ('saved',IF(eq(llen('std::DataEntry',V('entries')),I(0)),C('invalid-save'),C('migrate::decode',ef('entries','value')))),
  ('previous',IF(eq(llen('std::DataEntry',V('backup')),I(0)),C('invalid-save'),C('migrate::decode',ef('backup','value'))))],
- IF(NOT(eq(V('saved.format'),I(8))),R(status=I(3),saved=V('saved')),
+ IF(NOT(eq(V('saved.format'),I(9))),R(status=I(3),saved=V('saved')),
  IF(NOT(te(V('saved.owner'),V('state.owner'))),R(status=I(2),saved=V('saved')),
- IF(AND(V('restore'),NOT(eq(V('previous.format'),I(8)))),R(status=I(6),saved=V('saved')),
+ IF(AND(V('restore'),NOT(eq(V('previous.format'),I(9)))),R(status=I(6),saved=V('saved')),
  LET([('city',IF(V('restore'),PATCH('City',V('previous.city'),paused=B(True)),IF(le(I(11),V('state.management')),C('scenarios::load',sub(V('state.management'),I(10))),C('town::initial')))),
-      ('next',R(format=I(8),owner=V('state.owner'),serial=add(V('saved.serial'),I(1)),city=V('city'))),
+      ('next',R(format=I(9),owner=V('state.owner'),serial=add(V('saved.serial'),I(1)),city=V('city'))),
       ('put',cap('put',space,key(V('state.token')),enc('Saved',V('next')),expectation('entries'))),
       ('backupPut',cap('put',space,backup_key(V('state.token')),enc('Saved',IF(V('restore'),C('invalid-save'),V('saved'))),expectation('backup')))],
  R(status=IF(AND(V('put'),V('backupPut')),I(1),I(5)),saved=V('next'))))))),R(status=I(5),saved=C('invalid-save'))),True)

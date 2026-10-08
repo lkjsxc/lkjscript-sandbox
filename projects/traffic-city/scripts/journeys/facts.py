@@ -33,7 +33,7 @@ def add_derived_facts(fn, test):
            LET([
                ('key', C('resident-lane', V('r'))),
                ('oldhead', get(V('f.heads'), V('key'))),
-               ('junction', IF(lt(I(0), get(V('world.junctions'), V('r.cell'))), V('r.cell'), IF(AND(lt(V('r.elapsed'), V('r.duration')), lt(I(0), get(V('world.junctions'), V('r.from')))), V('r.from'), I(-1)))),
+               ('junction', IF(lt(I(0), get(V('world.junctions'), V('r.cell'))), C('junction-key', V('world'), V('r.cell')), IF(AND(lt(V('r.elapsed'), V('r.duration')), lt(I(0), get(V('world.junctions'), V('r.from')))), C('junction-key', V('world'), V('r.from')), I(-1)))),
            ], PATCH('Facts', V('f'), **admission_fields)),
            PATCH('Facts', V('f'), inside=inside))))
     for name in ['summary', 'admission']:

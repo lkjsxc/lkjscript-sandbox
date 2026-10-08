@@ -7,7 +7,7 @@ def add_cycle_functions(fn):
   IF(AND(eq(V('r.state'),I(2)),eq(V('r.mode'),I(2)),le(V('r.duration'),V('r.elapsed')),le(I(8),V('r.wait')),eq(V('r.exitKey'),I(0)),C('road',get(V('world.tiles'),V('r.cell'))),eq(get(V('world.junctions'),V('r.cell')),I(0)),eq(get(V('f.heads'),C('resident-lane',V('r'))),V('r.id'))),
    LET([('route',C('route',V('sim.routes'),V('r.route'))),('step',add(V('r.step'),I(1)))],
     IF(lt(V('step'),llen('I64',V('route.path'))),LET([('next',at('I64',V('route.path'),V('step'))),('kind',get(V('world.tiles'),V('next'))),('key',C('lane-key',V('next'),C('direction',V('r.cell'),V('next')),C('lane',V('kind'),V('r.id'))))],
-     IF(AND(C('road',V('kind')),eq(C('manhattan',V('r.cell'),V('next')),I(1)),eq(get(V('world.junctions'),V('next')),I(0)),eq(get(V('f.occ'),V('key')),I(3))),get(V('f.heads'),V('key')),I(0))),I(0))),I(0)))
+     IF(AND(C('road',V('kind')),C('can-step',V('world.tiles'),V('r.cell'),V('next'),V('route.origin'),V('route.dest'),I(2)),eq(C('manhattan',V('r.cell'),V('next')),I(1)),eq(get(V('world.junctions'),V('next')),I(0)),eq(get(V('f.occ'),V('key')),I(3))),get(V('f.heads'),V('key')),I(0))),I(0))),I(0)))
  fn('cycle-dependencies',[('world','World'),('sim','Sim'),('f','Facts'),('index','I64'),('deps','Numbers')],'Numbers',
   IF(lt(V('index'),llen('I64',V('sim.ids'))),LET([('id',at('I64',V('sim.ids'),V('index'))),('next',C('cycle-next',V('world'),V('sim'),V('f'),C('agent',V('sim.agents'),V('id'))))],
    C('cycle-dependencies',V('world'),V('sim'),V('f'),add(V('index'),I(1)),IF(lt(I(0),V('next')),put(V('deps'),V('id'),V('next')),V('deps')))),V('deps')))

@@ -10,7 +10,7 @@ for walk,cars in [(0,0),(0,200),(200,0),(3,200),(200,3),(80,80),(1,127),(127,1),
  D.append(TEST(f'street-car-slots-{walk}-{cars}',C('actorpool::car-slots',I(walk),I(cars)),I(c)))
 for count,slots,i in [(0,0,0),(8,8,0),(8,8,7),(200,64,0),(200,64,63),(2048,128,100)]:
  D.append(TEST(f'street-index-{count}-{slots}-{i}',C('actorpool::sample-index',I(count),I(slots),I(i)),I((2*i+1)*count//(2*slots) if slots else 0)))
-view=R(x=I(1),y=I(1),w=I(3),h=I(3))
+view=R(x=I(1),y=I(1),w=I(3),h=I(3),layer=I(0))
 tiles=put(put(put(MP(),I(130),I(1)),I(131),I(3)),I(258),I(8))
 for label,state,mode,source,target,want in [
  ('walker',2,1,129,130,True),('driver',2,2,129,130,True),('rail-access',2,3,129,130,True),

@@ -1,6 +1,6 @@
 from native import *
 TYPES.update({
-'View':{k:'I64' for k in 'x y w h'.split()},
+'View':{k:'I64' for k in 'x y w h layer'.split()},
 'Cell':{k:'I64' for k in 'id kind q walk flow inside junction control'.split()},
 'Seen':'(map I64 Cell)','Picture':{'seen':'Seen','changed':'(list Cell)'},
 'RailView':{**{k:'I64' for k in 'id a b from to elapsed duration dwell status cost capacity rideTicks departures boardings spent occupancy waitingA waitingB expense'.split()},'enabled':'Bool'},

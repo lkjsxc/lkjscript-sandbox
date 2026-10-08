@@ -60,7 +60,7 @@ TYPES={
 'City':{'world':'World','sim':'Sim','cash':'I64','level':'I64','permits':'I64','paused':'Bool','milestone':'I64','originX':'I64','originY':'I64'},
 'Command':{'op':'Text','x':'I64','y':'I64','x2':'I64','y2':'I64','kind':'I64'},
 'Outcome':{'city':'City','notice':'Text'},
-'EditQuote':{**{k:'I64' for k in 'id version x y x2 y2 tiles homes moveouts relocated cancelled refund rails'.split()},'valid':'Bool'},
+'EditQuote':{**{k:'I64' for k in 'id version x y x2 y2 tiles homes moveouts relocated cancelled refund rails layer'.split()},'valid':'Bool'},
 'Removal':{'tiles':'Numbers','signals':'Numbers','selected':'Numbers','count':'I64','homes':'I64','refund':'I64','rails':'I64','railIds':'Numbers'},
 'Relocation':{'agents':'Residents','ids':'(list I64)','moveouts':'I64','relocated':'I64','cancelled':'I64'},
 'Buckets':'(map I64 (list I64))',

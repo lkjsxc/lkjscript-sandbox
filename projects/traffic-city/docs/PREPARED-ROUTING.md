@@ -1,10 +1,13 @@
 # Prepared directed-routing kernel (experimental)
 
-This is a command-only, independently tested routing kernel. It is **not an
-integrated game release**. The game's normal authoring pipeline, construction,
-layer-specific removal, persistence transition, UI and complete moving-vehicle
-reservation rules still need integration and verification. Do not deploy this
-worktree as a game or infer full-game performance from these measurements.
+This document records the earlier command-only routing-kernel experiments.
+The kernel is now wired into the ordinary game pipeline together with layered
+construction, removal, migration, and browser controls. The integrated candidate
+is **not release-approved**: directed-trip gates remain unresolved, and paired
+whole-game measurements do not establish an overall performance improvement.
+See [the integration checkpoint](DIRECTED-TUNNELS-STATUS.md) for the exact tested
+artifact and outstanding failures. Do not infer game speedups from the kernel
+measurements below.
 
 ## Native representation
 

@@ -1,10 +1,10 @@
 from protocol import *
 D=[]
 def fn(n,p,r,b):D.append(FN(n,p,r,b))
-fn('visible',[('view','View'),('cell','I64')],'Bool',AND(le(V('view.x'),C('game::x',V('cell'))),lt(C('game::x',V('cell')),add(V('view.x'),V('view.w'))),le(V('view.y'),C('game::y',V('cell'))),lt(C('game::y',V('cell')),add(V('view.y'),V('view.h')))))
+fn('visible',[('view','View'),('cell','I64')],'Bool',AND(eq(C('roads::layer',V('cell')),V('view.layer')),le(V('view.x'),C('game::x',V('cell'))),lt(C('game::x',V('cell')),add(V('view.x'),V('view.w'))),le(V('view.y'),C('game::y',V('cell'))),lt(C('game::y',V('cell')),add(V('view.y'),V('view.h')))))
 # Presentation metadata is derived from authoritative routes and current FIFO order.
 # It never changes saved Resident/City records or admission/capacity decisions.
-fn('actor-out',[('city','City'),('r','Resident')],'I64',LET([('route',C('game::route',V('city.sim.routes'),V('r.route'))),('next',add(V('r.step'),I(1)))],IF(lt(V('next'),llen('I64',V('route.path'))),C('game::direction',V('r.to'),at('I64',V('route.path'),V('next'))),V('r.dir'))))
+fn('actor-out',[('city','City'),('r','Resident')],'I64',LET([('route',C('game::route',V('city.sim.routes'),V('r.route'))),('next',add(V('r.step'),I(1)))],IF(lt(V('next'),llen('I64',V('route.path'))),IF(eq(C('roads::ground',V('r.to')),C('roads::ground',at('I64',V('route.path'),V('next')))),V('r.dir'),C('game::direction',V('r.to'),at('I64',V('route.path'),V('next')))),V('r.dir'))))
 fn('actor-key',[('city','City'),('r','Resident')],'I64',IF(C('game::road',get(V('city.world.tiles'),V('r.to'))),C('game::lane-key',V('r.to'),C('actor-out',V('city'),V('r')),V('r.lane')),add(I(200000),V('r.to'))))
 # Routes and lane keys are only needed for moving drivers, never parked people.
 fn('actor-buckets',[('city','City'),('index','I64'),('buckets','Buckets')],'Buckets',IF(lt(V('index'),llen('I64',V('city.sim.ids'))),LET([('r',C('game::agent',V('city.sim.agents'),at('I64',V('city.sim.ids'),V('index'))))],C('actor-buckets',V('city'),add(V('index'),I(1)),IF(AND(eq(V('r.state'),I(2)),eq(V('r.mode'),I(2))),LET([('key',C('actor-key',V('city'),V('r')))],mput('I64 (list I64)',V('buckets'),V('key'),append('I64',mget('I64 (list I64)',V('buckets'),V('key'),LS('I64')),V('r.id')))),V('buckets')))),V('buckets')))
