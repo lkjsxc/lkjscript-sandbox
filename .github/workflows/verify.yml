@@ -51,6 +51,8 @@ jobs:
       - run: npm run test:repair
         working-directory: projects/traffic-city
       - run: ./sandbox traffic-city smoke
+      - run: npm run test:motion-cadence
+        working-directory: projects/traffic-city
       - run: npm run test:webkit
         working-directory: projects/traffic-city
       - run: npm run test:delay-atlas

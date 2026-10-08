@@ -65,6 +65,8 @@ The supplied host descriptor allows **1,024 saved cities**, four simultaneous se
 
 All local saves, test stores, downloaded tools, accepted graphs, and evidence are ignored. Do not delete `runtime/` to clean a project with a city you need to keep. Browser city keys and native stores must be preserved together.
 
+The browser smooths received traffic snapshots using measured update cadence rather than assuming every update arrives in 500 ms. Cars, walkers and trains share the buffered clock; native traffic speed and saved state are unchanged. See [motion playback verification](docs/MOTION-PLAYBACK.md).
+
 ## Tests
 
 ```sh

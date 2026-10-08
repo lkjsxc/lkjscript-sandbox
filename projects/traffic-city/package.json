@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/author.mjs",
     "start": "./play.sh",
-    "test": "node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
+    "test": "node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/motion-timing.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
     "test:browser": "node tests/with-preview.mjs tests/browser.mjs",
     "test:scale": "node tests/scaling.mjs",
     "test:backpressure": "node tests/backpressure.mjs",
@@ -75,7 +75,9 @@
     "test:tunnels": "node tests/return-planning.mjs && node tests/tunnel-journeys.mjs && node tests/tunnel-edits.mjs && node tests/tunnel-portals.mjs && node tests/tunnel-persistence.mjs && node tests/tunnel-lab.mjs",
     "test:tunnel-ui": "node tests/with-preview.mjs tests/tunnel-ui.mjs",
     "test:return-planning": "node tests/return-planning.mjs",
-    "test:routing-performance": "node tests/integrated-routing-performance.mjs"
+    "test:routing-performance": "node tests/integrated-routing-performance.mjs",
+    "build:web": "node scripts/author-web.mjs",
+    "test:motion-cadence": "PREVIEW_TICK_MS=1000 node tests/with-preview.mjs tests/motion-cadence-ui.mjs"
   },
   "engines": {
     "node": ">=22"

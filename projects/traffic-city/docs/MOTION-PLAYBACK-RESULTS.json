@@ -1,0 +1,102 @@
+{
+  "scope": "presentation-only",
+  "baseline_main": "4816a5c1e91a265ca1cd4f9ff019a031955376a0",
+  "native_artifact_sha256": "15efe04181ac026cde80e72b178d9ce25eda572ade404ea3f9c674dc9806dccd",
+  "http_artifact_sha256": "f70e9c4382121d56490ae5daa6ddfcc1abc0ca589f9cb8c62fc0efc6e9382a4c",
+  "compiler_sha256": "8a92ff982e06c2ce1efafd90bf824242edfe782359ecf849036772befc261cf7",
+  "http_native_tests": 99,
+  "native_sources_unchanged_except_embedded_assets": true,
+  "browser_sources": {
+    "app.js": "8ad4b89cb541f96c6dce0a31b4d0ca8cc12b5dd7d58a7a41fa22a8505465bcb6",
+    "motion.js": "e23362012b1a74ceb40125e3d2ed592b2443340151fae8c720e09fc2c195253d",
+    "index.html": "ff299dcf78882f519c40974bf954717dae03fb5a38d9984a1412531c7db14de3",
+    "style.css": "b418f86fb06188be6b446afaf301a2e7ef79e0e27720813de387ab1dc4a65e98",
+    "geometry.js": "6c1bc0ff5908bfc7b3bf69a74ecdfbb4d2b4e816513ed1b8bfb87b5831a843da",
+    "lab.js": "15c5c59edd937f502b0a011e0bb2eeb477e527c237daa4af8bfec1e9b776e08d",
+    "atlas.js": "cc38c88ee4e7ab2565fab027cdc89d98fe9e066938e3473ca5079f473638dda1",
+    "favicon.svg": "39eb6b712b7a2bda18578e5962371d4da3a8b8f3e1301c60e37cfeea860c4a49"
+  },
+  "unit_tests": {
+    "passed": true,
+    "checks": [
+      "500/1,000/2,000 ms cadences and bounded arrival jitter remain smooth without extrapolating beyond received ticks",
+      "Repeated same-tick save/inspect/view replies do not contaminate cadence or reset playback",
+      "Pause settles continuously, resume excludes the paused interval, and reduced-motion still shows the exact committed snapshot",
+      "Cached geometry matches the reference interpolation exactly across 300 redraws; cars and trains share one timeline",
+      "Same-tick replies preserve visible position and a missing network update can never extrapolate an unreceived journey",
+      "Layer changes and topology/time resets clear old geometry and ghost snapshots"
+    ],
+    "measurements": {
+      "fixed500": {
+        "samples": 1200,
+        "stationaryFraction": 0,
+        "maxStallMs": 0,
+        "periodMs": 500
+      },
+      "fixed1000": {
+        "samples": 2400,
+        "stationaryFraction": 0,
+        "maxStallMs": 0,
+        "periodMs": 1000
+      },
+      "fixed2000": {
+        "samples": 4800,
+        "stationaryFraction": 0,
+        "maxStallMs": 0,
+        "periodMs": 2000
+      },
+      "jitter": {
+        "samples": 2115,
+        "stationaryFraction": 0.002364066193853428,
+        "maxStallMs": 83.33333333333394,
+        "periodMs": 699.999907223811
+      }
+    },
+    "geometryPreparationsFor300Frames": 1
+  },
+  "browser_comparison": {
+    "before": {
+      "passed": true,
+      "label": "baseline",
+      "native_artifact_sha256": "15efe04181ac026cde80e72b178d9ce25eda572ade404ea3f9c674dc9806dccd",
+      "http_artifact_sha256": "15efe04181ac026cde80e72b178d9ce25eda572ade404ea3f9c674dc9806dccd",
+      "frames": 959,
+      "stationaryFrameFraction": 0.4848800834202294,
+      "medianNativeIntervalMs": 1009.1267169999992,
+      "p95DrawMs": 1.700000286102295,
+      "metrics": null,
+      "errors": [],
+      "method": "Unchanged 384-person native example, 1,000ms test-only server timer, actual Chromium canvas animation samples. A stationary frame means none of over ten matched displayed travellers changed position. Not a native simulation speedup or physical-device measurement."
+    },
+    "after": {
+      "passed": true,
+      "label": "candidate",
+      "native_artifact_sha256": "15efe04181ac026cde80e72b178d9ce25eda572ade404ea3f9c674dc9806dccd",
+      "http_artifact_sha256": "f70e9c4382121d56490ae5daa6ddfcc1abc0ca589f9cb8c62fc0efc6e9382a4c",
+      "frames": 960,
+      "stationaryFrameFraction": 0,
+      "medianNativeIntervalMs": 1005.5813300000009,
+      "p95DrawMs": 1.299999713897705,
+      "metrics": {
+        "periodMs": 1005.9558582552363,
+        "jitterMs": 193.19167922120482,
+        "bufferTicks": 1.1679914158120326,
+        "observations": 29,
+        "geometryPreparations": 63,
+        "snapshots": 8
+      },
+      "errors": [],
+      "method": "Unchanged 384-person native example, 1,000ms test-only server timer, actual Chromium canvas animation samples. A stationary frame means none of over ten matched displayed travellers changed position. Not a native simulation speedup or physical-device measurement."
+    }
+  },
+  "regressions": [
+    "npm test",
+    "native HTTP check/build",
+    "smoke",
+    "tunnel-ui",
+    "street-ui",
+    "gestures",
+    "webkit"
+  ],
+  "deployment": "HTTP-only cutover is verified separately; no new native game artifact is claimed."
+}

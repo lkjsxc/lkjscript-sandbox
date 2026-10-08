@@ -25,51 +25,103 @@ function basePath(a,cells){const fromKind=cells.get(a.from)?.kind,toKind=cells.g
  const sign=turn===1?1:-1,radius=ANCHOR-sign*side,arcCenter=plus(bendStart,normal(incoming),sign*radius),angle=Math.atan2(bendStart.y-arcCenter.y,bendStart.x-arcCenter.x);
  return path([cubic(start,plus(start,incoming,approach),plus(bendStart,incoming,-approach),bendStart),{length:Math.PI/2*radius,at:t=>{const theta=angle+sign*t*Math.PI/2;return{x:arcCenter.x+Math.cos(theta)*radius,y:arcCenter.y+Math.sin(theta)*radius,angle:theta+sign*Math.PI/2}}}])
 }
-export function actorPath(a,cells){const p=basePath(a,cells);return{length:p.length,at:s=>{if(s<0&&a.trail){const previous=actorPath(a.trail,cells);return previous.at(previous.length+s)}return p.at(s)}}}
+function compilePath(a,cells,cache){
+ if(cache?.has(a))return cache.get(a);
+ const p=basePath(a,cells),trail=a.trail?compilePath(a.trail,cells,cache):null;
+ const value={length:p.length,at:s=>s<0&&trail?trail.at(trail.length+s):p.at(s)};
+ cache?.set(a,value);return value;
+}
+export function actorPath(a,cells){return compilePath(a,cells)}
 function trailCopy(a,depth=2){if(!a)return undefined;const {trail,...copy}=a;return depth?{...copy,trail:trailCopy(trail,depth-1)}:copy}
 function station(a,p,cells){const lead=a.mode===2&&!isFacility(cells?.get(a.from)?.kind)?1:0,progress=a.duration?clamp((a.elapsed+lead)/(a.duration+lead),0,1):1;const s=progress*p.length-(a.mode===2?(a.rank||0)*GAP:0);return isFacility(cells?.get(a.from)?.kind)?Math.max(0,s):s}
-function blend(a,b,t){let delta=Math.atan2(Math.sin(b.angle-a.angle),Math.cos(b.angle-a.angle));return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,angle:a.angle+delta*t}}
+function blend(a,b,t){const delta=Math.atan2(Math.sin(b.angle-a.angle),Math.cos(b.angle-a.angle));return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,angle:a.angle+delta*t}}
 export function actorPose(a,cells){const p=actorPath(a,cells);return p.at(station(a,p,cells))}
-export function transitionPose(a,b,t,cells){const p=actorPath(a,cells),q=actorPath(b,cells),s=station(a,p,cells),e=station(b,q,cells);
- if(a.from===b.from&&a.to===b.to&&a.out===b.out){if(a.from===a.to)return blend(p.at(0),q.at(0),t);return p.at(s+(e-s)*t)}
+function compileTransition(a,b,cells,paths){
+ const p=compilePath(a,cells,paths),q=compilePath(b,cells,paths),s=station(a,p,cells),e=station(b,q,cells);
+ if(a.from===b.from&&a.to===b.to&&a.out===b.out){if(a.from===a.to)return t=>blend(p.at(0),q.at(0),t);return t=>p.at(s+(e-s)*t)}
  if(a.to===b.from&&a.mode===b.mode){
-  if(a.from===a.to){const parked=p.at(0),start=q.at(0),dir=D[b.dir],advance=Math.max(.01,(start.x-parked.x)*dir[0]+(start.y-parked.y)*dir[1])/3,connector=cubic(parked,plus(parked,dir,advance),plus(start,dir,-advance),start),length=connector.length+e,pos=t*length;return pos<connector.length?connector.at(pos/connector.length):q.at(pos-connector.length)}
-  const remaining=p.length-s,length=remaining+e,pos=t*length;
-  return pos<remaining?p.at(s+pos):q.at(pos-remaining)
+  if(a.from===a.to){const parked=p.at(0),start=q.at(0),dir=D[b.dir],advance=Math.max(.01,(start.x-parked.x)*dir[0]+(start.y-parked.y)*dir[1])/3,connector=cubic(parked,plus(parked,dir,advance),plus(start,dir,-advance),start),length=connector.length+e;return t=>{const pos=t*length;return pos<connector.length?connector.at(pos/connector.length):q.at(pos-connector.length)}}
+  const remaining=p.length-s,length=remaining+e;return t=>{const pos=t*length;return pos<remaining?p.at(s+pos):q.at(pos-remaining)};
  }
- // An authoritative re-route/reset can break adjacency. Never extrapolate an
- // invented journey: settle the newly committed pose without a diagonal trip.
- return actorPose(b,cells)
+ // Nonadjacent authoritative reroutes/reset are not diagonal invented travel.
+ const pose=q.at(e);return()=>pose;
+}
+export function transitionPose(a,b,t,cells){return compileTransition(a,b,cells)(t)}
+
+// A shared playback clock for already received native snapshots. Extra delay
+// absorbs ordinary cadence jitter; it never advances beyond committed state.
+// Same-tick inspect/save/view replies do not count as new simulation samples.
+export class PresentationClock{
+ constructor(){this.reset()}
+ reset(tick=-1,now=0,paused=false){this.latest=tick;this.time=tick;this.at=now;this.arrival=now;this.period=500;this.jitter=0;this.intervals=[];this.paused=paused;this.settle=null;this.observations=0}
+ receive(tick,now,paused=false){
+  if(this.latest<0||tick<this.latest){this.reset(tick,now,paused);return}
+  this.sample(now);
+  if(tick>this.latest){
+   const delta=tick-this.latest,elapsed=now-this.arrival;
+   if(!this.paused&&elapsed>0&&elapsed<=5000*delta){
+    const interval=clamp(elapsed/delta,80,5000);this.intervals.push(interval);if(this.intervals.length>12)this.intervals.shift();
+    // A short burst after a network delay is not a new, faster server cadence.
+    const sorted=[...this.intervals].sort((a,b)=>a-b),median=sorted[Math.floor(sorted.length/2)];
+    this.period=this.observations===0?median:this.period+(median-this.period)*.25;
+    this.jitter=this.jitter*.8+Math.abs(interval-this.period)*.2;this.observations++;
+   }
+   this.latest=tick;this.arrival=now;
+  }else if(this.paused&&!paused)this.arrival=now;
+  if(paused&&!this.paused)this.settle={from:this.time,at:now,duration:Math.min(350,this.period)};
+  if(!paused)this.settle=null;
+  this.paused=paused;
+ }
+ sample(now,reduced=false){
+  if(this.latest<0)return 0;
+  const dt=Math.max(0,now-this.at);this.at=Math.max(now,this.at);
+  if(reduced){this.time=this.latest;return this.time}
+  if(this.paused){if(this.settle){const t=clamp((now-this.settle.at)/this.settle.duration,0,1);this.time=Math.min(this.latest,this.settle.from+(this.latest-this.settle.from)*t)}return this.time}
+  // Integrating a bounded phase correction preserves monotonic motion when a
+  // new arrival changes the cadence estimate. No per-packet rewind or snap.
+  const extra=clamp(Math.max(80,this.period*.15)+this.jitter*3,80,this.period),delay=1+extra/this.period;
+  const desired=this.latest+Math.max(0,now-this.arrival)/this.period-delay;
+  const rate=1+clamp((desired-this.time)*.35,-.22,.16);
+  this.time=Math.min(this.latest,this.time+dt/this.period*rate);return this.time;
+ }
+ get diagnostics(){return{periodMs:this.period,jitterMs:this.jitter,bufferTicks:Math.max(0,this.latest-this.time),observations:this.observations}}
 }
 export class TrafficMotion{
- constructor(){this.frames=new Map();this.latest=-1;this.time=-1;this.at=0;this.version=-1;this.layer=-1;this.cells=new Map();this.rendered=[]}
- clock(now,reduced=false){if(this.latest<0)return 0;this.time=reduced?this.latest:Math.min(this.latest,this.time+Math.max(0,now-this.at)/500);this.at=now;return this.time}
+ constructor(){this.frames=new Map();this.railFrames=new Map();this.timeline=new PresentationClock();this.latest=-1;this.time=-1;this.version=-1;this.layer=-1;this.cells=new Map();this.rendered=[];this.revision=0;this.prepared=null;this.preparations=0}
+ clock(now,reduced=false){this.time=this.timeline.sample(now,reduced);return this.time}
  receive(frame,now,cells){this.cells=cells;const tick=frame.stats.tick;
-  if(this.latest<0||tick<this.latest||frame.stats.version!==this.version||(frame.view?.layer||0)!==this.layer){this.frames.clear();this.latest=tick;this.time=tick;this.at=now;this.version=frame.stats.version;this.layer=frame.view?.layer||0}
-  this.clock(now);this.latest=tick;
-  if(frame.mapChanged){this.visible=false;this.rendered=[];return}
+  if(this.latest<0||tick<this.latest||frame.stats.version!==this.version||(frame.view?.layer||0)!==this.layer){this.frames.clear();this.railFrames.clear();this.timeline.reset(tick,now,!!frame.stats.paused);this.version=frame.stats.version;this.layer=frame.view?.layer||0}
+  this.timeline.receive(tick,now,!!frame.stats.paused);this.latest=tick;this.time=this.timeline.time;this.revision++;
+  this.railFrames.set(tick,new Map((frame.rails||[]).map(l=>[l.id,l])));
+  if(frame.mapChanged){this.visible=false;this.rendered=[];this.prepared=null;return}
   this.visible=true;
   const current=this.time>=tick?new Map():this.frames.get(tick)||new Map();
-  // Same-tick view/inspect/save replies revise this snapshot without changing
-  // the timeline or the preceding snapshot used by interpolation.
   for(const a of frame.actors){const old=current.get(a.id)||this.frames.get(tick-1)?.get(a.id);const trail=old?.from===a.from&&old?.to===a.to?old.trail:old?.to===a.from?trailCopy(old):undefined;current.set(a.id,{...a,trail})}
   this.frames.set(tick,current);this.active=new Set(frame.actors.map(a=>a.id));
-  for(const k of this.frames.keys())if(k<tick-3)this.frames.delete(k);
-  if(this.time<tick-2)this.time=tick-1;
+  // History and trails are bounded, even across long sessions/viewport commands.
+  for(const k of this.frames.keys())if(k<tick-7)this.frames.delete(k);
+  for(const k of this.railFrames.keys())if(k<tick-7)this.railFrames.delete(k);
+  if(this.time<tick-6){this.timeline.time=tick-1;this.time=tick-1;this.prepared=null}
  }
+ pair(frames,time){const ticks=[...frames.keys()].sort((a,b)=>a-b),lo=ticks.filter(t=>t<=time).at(-1)??ticks[0],hi=ticks.find(t=>t>time)??lo;return{lo,hi,t:hi===lo?1:clamp((time-lo)/(hi-lo),0,1)}}
  sample(now,reduced=false){const time=this.clock(now,reduced);if(!this.visible)return this.rendered=[];
-  const ticks=[...this.frames.keys()].sort((a,b)=>a-b),lo=ticks.filter(t=>t<=time).at(-1)??ticks[0],hi=ticks.find(t=>t>time)??lo;
-  const a=this.frames.get(lo)||new Map(),b=this.frames.get(hi)||a,t=hi===lo?1:clamp((time-lo)/(hi-lo),0,1),ids=new Set([...a.keys(),...b.keys()]);
-  const poses=[];
-  for(const id of ids){const previous=a.get(id),next=b.get(id);if(!this.active?.has(id)&&time>=this.latest)continue;
-   const current=next||previous;let pose;
-   if(previous&&next)pose=transitionPose(previous,next,t,this.cells);
-   else if(previous){const p=actorPath(previous,this.cells),s=station(previous,p,this.cells);pose=p.at(s+(p.length-s)*t)}
-   else {if(hi!==lo&&t<1)continue;pose=actorPose(next,this.cells)}
-   poses.push({...current,...pose})
+  const {lo,hi,t}=this.pair(this.frames,time);
+  if(!this.prepared||this.prepared.lo!==lo||this.prepared.hi!==hi||this.prepared.revision!==this.revision){
+   const a=this.frames.get(lo)||new Map(),b=this.frames.get(hi)||a,paths=new WeakMap(),items=[];
+   for(const id of new Set([...a.keys(),...b.keys()])){
+    const previous=a.get(id),next=b.get(id),current=next||previous;let pose;
+    if(previous&&next)pose=compileTransition(previous,next,this.cells,paths);
+    else if(previous){const p=compilePath(previous,this.cells,paths),s=station(previous,p,this.cells);pose=t=>p.at(s+(p.length-s)*t)}
+    else {const p=compilePath(next,this.cells,paths),value=p.at(station(next,p,this.cells));pose=()=>value}
+    items.push({id,current,pose,born:!previous});
+   }
+   this.prepared={lo,hi,revision:this.revision,items};this.preparations++;
   }
+  const poses=[];for(const item of this.prepared.items){if(!this.active?.has(item.id)&&time>=this.latest||item.born&&hi!==lo&&t<1)continue;poses.push({...item.current,...item.pose(t)})}
   return this.rendered=poses;
  }
+ sampleRails(now,reduced=false){const time=this.clock(now,reduced),{lo,hi,t}=this.pair(this.railFrames,time),a=this.railFrames.get(lo)||new Map(),b=this.railFrames.get(hi)||a;return[...b.values()].map(current=>({current,previous:a.get(current.id),mix:t}))}
+ get diagnostics(){return{...this.timeline.diagnostics,geometryPreparations:this.preparations,snapshots:this.frames.size}}
 }
 
 // Schematic screen-space minimum; positions and time remain native-authoritative.
