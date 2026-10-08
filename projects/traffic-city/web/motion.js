@@ -74,7 +74,7 @@ export class TrafficMotion{
 // Schematic screen-space minimum; positions and time remain native-authoritative.
 export function pedestrianSize(scale){
  if(!Number.isFinite(scale)||scale<=0)throw new RangeError('Positive camera scale required');
- return {radius:Math.max(1.5,scale*.06)/scale,outline:.7/scale,detailed:scale>=16};
+ return {radius:Math.max(1.5,scale*.05)/scale};
 }
 export function streetCaption(frame){
  if(frame.mapChanged)return {counts:'Updating street view…',sample:''};

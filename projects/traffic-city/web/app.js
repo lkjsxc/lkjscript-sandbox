@@ -153,9 +153,8 @@ function drawBuilding(c){const x=c.id%128+.5,y=Math.floor(c.id/128)+.5;
 }
 function actorPosition(a){return actorPose(a,cells)}
 function drawResidents(now){const glyph=pedestrianSize(camera.scale);for(const a of trafficMotion.sample(now,motionReduced())){ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);if(a.mode!==2){
- const r=glyph.radius;ctx.fillStyle=['#375d4b','#ae6342','#6c548a'][a.id%3];ctx.strokeStyle='#fff9e9';ctx.lineWidth=glyph.outline;
- ctx.beginPath();if(glyph.detailed)ctx.ellipse(-r*.25,0,r*.65,r,0,0,Math.PI*2);else ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();
- if(glyph.detailed){ctx.fillStyle='#eed6b7';ctx.beginPath();ctx.arc(r*.35,0,r*.57,0,Math.PI*2);ctx.fill()}
+ // One solid circle at every zoom; retain the minimum screen-space size.
+ ctx.fillStyle=['#466957','#be7e58','#826f99'][a.id%3];ctx.beginPath();ctx.arc(0,0,glyph.radius,0,Math.PI*2);ctx.fill();
  }else{pathRound(-.08,-.0325,.16,.065,.019,['#f8e8bb','#cf7d61','#89b2af','#e7b961'][a.id%4]);pathRound(-.014,-.026,.043,.052,.010,'#405a58');ctx.fillStyle='#fff4cf';ctx.fillRect(.057,-.027,.018,.011);ctx.fillRect(.057,.016,.018,.011)}ctx.restore()}}
 function drawFootpaths(visible){ctx.strokeStyle='#baa886';ctx.lineWidth=.16;ctx.setLineDash([.12,.06]);for(const c of visible){if(c.kind!==7)continue;const x=c.id%128+.5,y=Math.floor(c.id/128)+.5;ctx.beginPath();ctx.moveTo(x-.05,y);ctx.lineTo(x+.05,y);for(const id of [c.id-1,c.id+1,c.id-128,c.id+128])if(cells.has(id)&&Math.abs(id%128-c.id%128)<=1){ctx.moveTo(x,y);ctx.lineTo((x+id%128+.5)/2,(y+Math.floor(id/128)+.5)/2)}ctx.stroke()}ctx.setLineDash([])}
 // Rendering bounds include the whole canvas, including beneath translucent HUD.

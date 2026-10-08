@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {Script} from 'node:vm';
 import {actorPath,actorPose,transitionPose,TrafficMotion,pedestrianSize,streetCaption} from '../web/motion.js';
 const directions=[[1,0],[0,1],[-1,0],[0,-1]], center=50+50*128, cells=new Map();
 for(let y=46;y<55;y++)for(let x=46;x<55;x++)cells.set(x+y*128,{kind:2});
@@ -29,9 +30,21 @@ const birth=new TrafficMotion();birth.receive(frame(1,a),0,cells);birth.receive(
 // Overview packets carrying real people are drawn, not thrown away.
 const overviewMotion=new TrafficMotion();overviewMotion.receive(frame(4,a,{detail:false}),0,cells);assert.equal(overviewMotion.sample(0).length,1);
 overviewMotion.receive(frame(5,a,{detail:false,mapChanged:true}),500,cells);assert.deepEqual(overviewMotion.sample(500),[]);
-for(const scale of[.5,2,5,12,20,48,96,240]){const g=pedestrianSize(scale);assert(g.radius*scale>=1.5);assert(Math.abs(g.outline*scale-.7)<1e-9);assert.equal(g.detailed,scale>=16)}
+for(const scale of[.5,2,5,12,20,48,96,240]){const g=pedestrianSize(scale);assert(g.radius*scale>=1.5);assert.equal(g.radius,Math.max(1.5,scale*.05)/scale);assert.deepEqual(Object.keys(g),['radius'])}
+// Execute the real draw loop against a recording context: every pedestrian,
+// including rail access/egress, is exactly one filled circle at every zoom.
+const app=fs.readFileSync(new URL('../web/app.js',import.meta.url),'utf8'),begin=app.indexOf('function drawResidents('),end=app.indexOf('\nfunction drawFootpaths(',begin);
+assert(begin>=0&&end>begin);const draw=new Script(app.slice(begin,end)+';drawResidents(0);');
+let dotCases=0;
+for(const mode of[1,3])for(const id of[0,1,2,1330])for(const scale of[2,15.9,16,48,240]){
+ const calls=[],paints=[],context=new Proxy({}, {get:(_,name)=>(...args)=>calls.push({name,args}),set:(_,name,value)=>(paints.push({name,value}),true)});
+ draw.runInNewContext({ctx:context,camera:{scale},pedestrianSize,trafficMotion:{sample:()=>[{id,mode,x:7,y:11,angle:.7}]},motionReduced:()=>false});
+ assert.deepEqual(calls.map(c=>c.name),['save','translate','rotate','beginPath','arc','fill','restore']);
+ assert.deepEqual(calls.find(c=>c.name==='arc').args,[0,0,pedestrianSize(scale).radius,0,Math.PI*2]);
+ assert.deepEqual(paints,[{name:'fillStyle',value:['#466957','#be7e58','#826f99'][id%3]}]);dotCases++;
+}
 for(const scale of[0,-1,NaN,Infinity])assert.throws(()=>pedestrianSize(scale),RangeError);
 assert.deepEqual(streetCaption({streetWalkers:81,streetDrivers:200,actors:Array(128)}),{counts:'In view · 81 on foot · 200 in cars',sample:'128 of 281 shown · zoom for detail'});
 assert.equal(streetCaption({mapChanged:true}).counts,'Updating street view…');
 assert.equal(streetCaption({streetWalkers:2,streetDrivers:0,actors:[{},{}]}).sample,'2 street travellers shown');
-const report={passed:true,geometries:cases,maxStepPerHundredth:maxStep,maxHeadingPerHundredth:maxHeading,checks:['C1 adjacent edge joins','arc length movement','opposite lanes','three FIFO ranks despite duplicate stored slots','same-tick view/save reply continuity','pause settles without teleport','overview/detail return','authoritative reset']};fs.writeFileSync('evidence/motion-geometry.json',JSON.stringify(report,null,2));console.log(report);
+const report={passed:true,pedestrianDotCases:dotCases,geometries:cases,maxStepPerHundredth:maxStep,maxHeadingPerHundredth:maxHeading,checks:['C1 adjacent edge joins','arc length movement','opposite lanes','three FIFO ranks despite duplicate stored slots','same-tick view/save reply continuity','pause settles without teleport','overview/detail return','authoritative reset']};fs.writeFileSync('evidence/motion-geometry.json',JSON.stringify(report,null,2));console.log(report);

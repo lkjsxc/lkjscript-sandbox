@@ -10,7 +10,7 @@ The drawing reserves up to 64 slots for each of walking and driving, lending unu
 
 These are mode-separated illustrative samples, **not proportional mode-share charts**. The map explicitly labels the complete on-foot/in-car counts and the number actually drawn. Neither unsampled people nor their travel are deleted from the simulation. A glyph never stands for several people. Zooming and panning request the corresponding viewport, including changes inside a previously loaded rectangle, so the totals do not silently describe an old, wider view.
 
-The browser keeps the native positions, paths and interpolation clock. A pedestrian has a minimum three-CSS-pixel body with a contrasting outline at low zoom and a directional head/jacket shape when close. There is no decorative population and no client-side route simulation. Reduced-motion behavior and authoritative reset handling are retained.
+The browser keeps the native positions, paths and interpolation clock. A pedestrian is one solid colored circle at every zoom, with the original palette and 0.05-tile radius at close range. A minimum three-CSS-pixel diameter keeps it visible at low zoom. There are no separate head/body shapes or outlines. There is no decorative population and no client-side route simulation. Reduced-motion behavior and authoritative reset handling are retained.
 
 ## Walking versus driving
 
