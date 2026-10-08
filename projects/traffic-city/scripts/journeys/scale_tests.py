@@ -76,4 +76,3 @@ for i,d in enumerate(functions):
 for index in range(0,len(checks),2):
  module='scaletests'+(str(index//2+1) if index else '')
  emit(module,module,[qualify(d,module) for d in checks[index:index+2]])
-
