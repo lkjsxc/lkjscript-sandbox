@@ -8,12 +8,17 @@ python3 scripts/journeys/roadbuild.py
 python3 scripts/journeys/planning_gate.py
 python3 scripts/journeys/returnplan.py
 python3 scripts/journeys/simulation.py
+python3 scripts/journeys/money_probe.py
+python3 scripts/journeys/scale_tests.py
 python3 scripts/journeys/terrain.py
 python3 scripts/journeys/rail.py
 python3 scripts/journeys/economy.py
+python3 scripts/journeys/economy_changes.py
 python3 scripts/journeys/removal.py
 python3 scripts/journeys/city.py
 python3 scripts/journeys/waterfront.py
+python3 scripts/journeys/region.py
+python3 scripts/journeys/region_probe.py
 python3 scripts/journeys/scenarios.py
 python3 scripts/journeys/migration.py
 python3 scripts/journeys/actorpool.py

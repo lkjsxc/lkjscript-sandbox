@@ -1,0 +1,24 @@
+// Three separate questions: released runtime -> accepted main runtime -> game
+// algorithms. Compare complete outputs, not selected favourable counters.
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+const paths=[process.env.RELEASE_SELECTION||'.build/baseline083.json',process.env.BASELINE_SELECTION||'.build/baseline088.json',process.env.CITY_SELECTION||'.build/scale-candidate.json'];
+const labels=['release083','main088','optimized088'],runners=[];
+const original=process.env.CITY_SELECTION;
+for(let i=0;i<paths.length;i++){process.env.CITY_SELECTION=paths[i];runners.push(await import('./run-case.mjs?scale-'+i));}
+if(original===undefined)delete process.env.CITY_SELECTION;else process.env.CITY_SELECTION=original;
+assert.equal(runners[1].selection.compiler_sha256,runners[2].selection.compiler_sha256,'Algorithm comparison keeps compiler fixed');
+assert.notEqual(runners[0].selection.compiler_sha256,runners[1].selection.compiler_sha256);
+for(const [name,sha]of Object.entries(runners[0].selection.sources))if(name!=='assets')assert.equal(runners[1].selection.sources[name],sha,'Runtime comparison changes source '+name);
+const hash=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
+const report={passed:false,method:'Serial three-arm counterbalanced complete native executions. Same full input/result and exact paths, residents, trains and accounts required. Runtime and algorithm effects are separated. Native invocation excludes artifact loading/JSON/transport; wall time includes them. Shared host, not isolated hardware or browser FPS. Allocation is cumulative modeled allocation, not RSS.',arms:labels.map((label,i)=>({label,artifact_sha256:runners[i].selection.artifact_sha256,compiler_sha256:runners[i].selection.compiler_sha256})),seeds:[],samples:[]};
+const save=()=>fs.writeFileSync('evidence/scale-comparison.json',JSON.stringify(report,null,2)+'\n');
+function metrics(r){const m=r.observation.match(/production-observation=("(?:[^"\\]|\\.)*")/);assert(m,'Missing native observation');const o=JSON.parse(JSON.parse(m[1]));for(const key of ['live_call_frames_after','live_handles_after','live_transactions_after'])assert.equal(o[key],0,key);return{wall_ms:r.wall_ms,invocation_ms:Number(r.observation.match(/invocation-nanoseconds=(\d+)/)[1])/1e6,instructions:o.instructions,allocated_bytes:o.allocated_bytes,calls:o.calls};}
+function invariant(r){const c=r.city,s=c.sim,e=c.economy,a=s.agents.map(([,v])=>v);assert.equal(r.conservation,0);assert.equal(s.population,a.length);assert.equal(s.population,s.born-s.removed);assert.equal(new Set(a.map(v=>v.id)).size,a.length);assert.equal(s.requested,s.arrived+s.cancelled+a.filter(v=>[1,2,4,5,6].includes(v.state)).length);assert.equal(c.cash+e.households+e.businesses,e.opening+e.grants+e.exports+e.salvage-e.construction-e.operating-e.withdrawn);for(const[,l]of s.transit.lines){assert(l.passengers.length<=l.capacity);assert.equal(new Set(l.passengers).size,l.passengers.length);}}
+const seeds=new Map();
+for(const scenario of [3,4]){let expected;for(let arm=0;arm<3;arm++){const r=runners[arm].runCase(scenario,`scale-seed-${scenario}-${labels[arm]}`,'scenario-seed');if(expected)assert.deepEqual(r.result,expected,'Same authored seed');else expected=r.result;report.seeds.push({scenario,arm:labels[arm],sha256:hash(r.result),...metrics(r)});save();}seeds.set(scenario,expected);}
+const cases=[{name:'starter-32people-64cycles',target:'workload',input:{rows:-1,ticks:64,tiles:[],commands:[],after:[]}},{name:'grid-64people-32cycles',target:'workload',input:{rows:16,ticks:32,tiles:[],commands:[],after:[]}},{name:'metro-512people-16cycles',target:'continuation',input:{city:seeds.get(3),ticks:16,commands:[],after:[]}},{name:'boroughs-1024people-4cycles',target:'continuation',input:{city:seeds.get(4),ticks:4,commands:[],after:[]}}];
+const repetitions=Number(process.env.SCALE_REPETITIONS||3);assert(Number.isInteger(repetitions)&&repetitions>=1&&repetitions<=7);
+for(const c of cases){let expected;for(let repetition=0;repetition<repetitions;repetition++)for(let position=0;position<3;position++){const arm=(position+repetition)%3,r=runners[arm].runCase(c.input,`scale-${c.name}-${labels[arm]}-${repetition}`,c.target);invariant(r.result);if(expected)assert.deepEqual(r.result,expected,c.name+' complete result');else expected=r.result;const s=r.result.city.sim,row={case:c.name,arm:labels[arm],repetition,position,input_sha256:hash(c.input),result_sha256:hash(r.result),exact_result_equal:true,...metrics(r),outcome:{population:s.population,tick:s.tick,requested:s.requested,arrived:s.arrived,waiting:s.waiting,disconnected:s.disconnected,walkTrips:s.walkTrips,carTrips:s.carTrips}};report.samples.push(row);save();console.log(JSON.stringify(row));}}
+report.passed=true;save();console.log('PASS exact three-arm native game comparison');
