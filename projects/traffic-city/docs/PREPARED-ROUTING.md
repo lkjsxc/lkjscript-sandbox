@@ -29,7 +29,8 @@ integration must retain a prepared world once, rather than re-preparing an old
 world for every query. Saved-city compatibility has **not** been certified.
 
 The driving axis bound now includes every occupied endpoint kind, including
-paths and stations; their destination entry cost cannot exceed the bound.
+paths and stations, so a cheaper final entry cannot make the heuristic
+overestimate the route cost.
 
 ## Reproduction (Linux x86-64, Node 22+, lkjscript 0.1.83)
 
