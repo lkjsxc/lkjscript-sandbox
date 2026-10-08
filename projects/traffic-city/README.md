@@ -94,3 +94,7 @@ City Lab also includes a [journey burden atlas](docs/DELAY-ATLAS.md): compare th
 ## River Boroughs and free bridge construction
 
 The fourth example has 1,024 residents in sixteen mixed neighbourhoods, four four-stop trains and a broad winding river. New starter cities use the same terrain style. Facility thresholds are shared with resident motion, and congestion follows the actual road direction. See [Waterfront cities](docs/WATERFRONT.md) for bridge prices, construction rules, capacity configuration and verification.
+
+## Bounded modal planning
+
+Rail alternatives which cannot beat an available surface or rail option no longer consume route-search budget. Long waits now distinguish native route planning from other causes, without changing the saved city schema or hiding those waits. See [the decision rule and verification contracts](docs/BOUNDED-PLANNING.md).
