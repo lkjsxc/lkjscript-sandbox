@@ -32,8 +32,8 @@ fn('passable',[('tiles','Numbers'),('id','I64'),('origin','I64'),('dest','I64'),
  IF(AND(le(I(0),V('id')),lt(V('id'),I(32768))),LET([('kind',read(V('tiles'),V('id')))],
  OR(eq(V('id'),V('origin')),eq(V('id'),V('dest')),C('road',V('kind')),AND(eq(V('mode'),I(1)),eq(V('kind'),I(7))))),B(False)))
 fn('drive-edge',[('a','I64'),('b','I64'),('direction','I64')],'Bool',
- AND(OR(NOT(C('oneway',V('a'))),eq(V('direction'),sub(V('a'),I(9))),C('building',V('b')),eq(V('b'),I(8))),
-     OR(NOT(C('oneway',V('b'))),NOT(eq(V('direction'),rem(sub(V('b'),I(7)),I(4)))),C('building',V('a')),eq(V('a'),I(8)))))
+ AND(IF(C('oneway',V('a')),OR(eq(V('direction'),sub(V('a'),I(9))),C('building',V('b')),eq(V('b'),I(8))),B(True)),
+     IF(C('oneway',V('b')),OR(NOT(eq(V('direction'),rem(sub(V('b'),I(7)),I(4)))),C('building',V('a')),eq(V('a'),I(8))),B(True))))
 fn('can-step',[('tiles','Numbers'),('from','I64'),('to','I64'),('origin','I64'),('dest','I64'),('mode','I64')],'Bool',
  IF(AND(le(I(0),V('from')),lt(V('from'),I(32768)),C('passable',V('tiles'),V('to'),V('origin'),V('dest'),V('mode'))),
  IF(eq(C('layer',V('from')),C('layer',V('to'))),

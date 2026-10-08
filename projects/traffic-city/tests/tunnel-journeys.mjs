@@ -26,8 +26,8 @@ for(const kind of [1,2,7,9,10,11,12]){
  const price=kind===2?72:kind===7?24:kind>=9?60:48;assert.equal(seed.city.cash,10000-39*price-120);assert.equal(seed.city.world.version,2);checks.push(`Complete kind ${kind} tunnel is atomic, fully charged, and preserves the park overhead`);
  if(![1,2,7,9,11].includes(kind))continue;
  const played=run('journey-'+kind,{city:seed.city,ticks:440,commands:[],after:[]},'continuation');assert(played.city.sim.workVisits>0,`No native work visits through tunnel ${kind}`);
- if([1,2,9].includes(kind))assert(played.city.sim.carTrips>0,`No driving through tunnel ${kind}`);else assert.equal(played.city.sim.carTrips,0);assert(played.routes.some(p=>(p.value||p[1]).path.some(id=>id>=under)),`No route uses the tunnel ${kind}`);
- if(kind===9)assert(played.city.sim.walkTrips>0,'Return journey must walk against the one-way tunnel');checks.push(`Kind ${kind} tunnel carries real residents, obeys vehicle directions, and preserves finite lane and money invariants`);
+ if([1,2].includes(kind))assert(played.city.sim.carTrips>0,`No driving through tunnel ${kind}`);else assert.equal(played.city.sim.carTrips,0);assert(played.routes.some(p=>(p.value||p[1]).path.some(id=>id>=under)),`No route uses the tunnel ${kind}`);
+ if(kind===9)assert(played.city.sim.walkTrips>0,'Choose walking before departure when a car cannot return');checks.push(`Kind ${kind} tunnel carries real residents, obeys vehicle directions, and preserves finite lane and money invariants`);
 }
 for(const portals of [0,1]){
  const cmds=[command('build-underground',1,20,39,20,1)];if(portals)cmds.push(command('build-portal',1,20));

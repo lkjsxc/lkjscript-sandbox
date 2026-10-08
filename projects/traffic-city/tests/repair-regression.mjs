@@ -16,7 +16,11 @@ if (process.env.BASELINE_SELECTION) {
 }
 const emptyInput = {rows: 0, ticks: 0, tiles: [], commands: [], after: []};
 const template = runCase(emptyInput, 'repair-fixture-template').result.city;
-if (baseline) assert.deepEqual(baseline.runCase(emptyInput, 'repair-fixture-template-baseline').result.city, template);
+// The empty native template now carries the derived no-one-way certificate.
+// Exclude exactly that metadata key here; full historical fixture executions
+// below still require exact predecessor state equality, with nothing stripped.
+const comparableTemplate = city => ({...city, world: {...city.world, junctions: city.world.junctions.filter(([key]) => key !== -259)}});
+if (baseline) assert.deepEqual(comparableTemplate(baseline.runCase(emptyInput, 'repair-fixture-template-baseline').result.city), comparableTemplate(template));
 const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
 function fixture(city) {

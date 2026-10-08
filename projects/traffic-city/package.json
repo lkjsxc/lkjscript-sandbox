@@ -72,8 +72,10 @@
     "test:walkability": "node tests/walkability.mjs",
     "test:street-ui": "node tests/with-preview.mjs tests/street-ui.mjs",
     "test:walking-profile": "node tests/walking-profile.mjs",
-    "test:tunnels": "node tests/tunnel-journeys.mjs && node tests/tunnel-edits.mjs && node tests/tunnel-portals.mjs && node tests/tunnel-persistence.mjs",
-    "test:tunnel-ui": "node tests/with-preview.mjs tests/tunnel-ui.mjs"
+    "test:tunnels": "node tests/return-planning.mjs && node tests/tunnel-journeys.mjs && node tests/tunnel-edits.mjs && node tests/tunnel-portals.mjs && node tests/tunnel-persistence.mjs && node tests/tunnel-lab.mjs",
+    "test:tunnel-ui": "node tests/with-preview.mjs tests/tunnel-ui.mjs",
+    "test:return-planning": "node tests/return-planning.mjs",
+    "test:routing-performance": "node tests/integrated-routing-performance.mjs"
   },
   "engines": {
     "node": ">=22"

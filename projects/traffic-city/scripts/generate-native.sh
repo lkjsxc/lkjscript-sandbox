@@ -6,6 +6,7 @@ python3 scripts/journeys/roads.py
 python3 scripts/journeys/roadcache.py
 python3 scripts/journeys/roadbuild.py
 python3 scripts/journeys/planning_gate.py
+python3 scripts/journeys/returnplan.py
 python3 scripts/journeys/simulation.py
 python3 scripts/journeys/terrain.py
 python3 scripts/journeys/rail.py

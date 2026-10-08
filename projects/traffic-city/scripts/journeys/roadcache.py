@@ -35,7 +35,9 @@ fn('code',[('tiles','Numbers'),('id','I64')],'I64',LET([
  add(add(add(V('east'),mul(V('south'),I(4))),add(mul(V('west'),I(16)),mul(V('north'),I(64)))),
  add(mul(V('vertical'),I(256)),add(mul(V('cost'),I(1048576)),mul(V('capacity'),I(16777216)))))))
 fn('build',[('tiles','Numbers'),('ids','(list I64)'),('i','I64'),('cache','Numbers')],'Numbers',
- IF(lt(V('i'),llen('I64',V('ids'))),LET([('id',at('I64',V('ids'),V('i')))],
- C('build',V('tiles'),V('ids'),add(V('i'),I(1)),mput('I64 I64',V('cache'),sub(I(-1024),V('id')),add(C('code',V('tiles'),V('id')),I(1))))),
- mput('I64 I64',V('cache'),I(-258),I(2))))
+ IF(lt(V('i'),llen('I64',V('ids'))),LET([('id',at('I64',V('ids'),V('i'))),
+ ('base',IF(eq(V('i'),I(0)),mput('I64 I64',V('cache'),I(-259),I(1)),V('cache'))),
+ ('marked',IF(C('roads::oneway',read(V('tiles'),V('id'))),mput('I64 I64',V('base'),I(-259),I(2)),V('base')))],
+ C('build',V('tiles'),V('ids'),add(V('i'),I(1)),mput('I64 I64',V('marked'),sub(I(-1024),V('id')),add(C('code',V('tiles'),V('id')),I(1))))),
+ mput('I64 I64',IF(eq(V('i'),I(0)),mput('I64 I64',V('cache'),I(-259),I(1)),V('cache')),I(-258),I(2))))
 emit('roadcache','roadcache',D)

@@ -1,0 +1,1536 @@
+{
+  "status": "local-integration-gates-passed",
+  "deployment": "Not deployed by this work. GitHub checks and merge status belong to the containing commit/PR, not this local receipt.",
+  "verified_at_utc": "2026-10-08T13:34:12.047Z",
+  "runtime": "0.1.83",
+  "compiler_sha256": "8a92ff982e06c2ce1efafd90bf824242edfe782359ecf849036772befc261cf7",
+  "local_artifact_sha256": "15efe04181ac026cde80e72b178d9ce25eda572ade404ea3f9c674dc9806dccd",
+  "native_tests": 572,
+  "production_reference": "equal",
+  "selected_native_sources": {
+    "assets": "90b57e47338b25a545e427ccc504a78baa5d10362f551f95919a60df480767e5",
+    "roads": "28ccb33d4a78c45a3c693f0f7b2582be1d64a5b96ce52894b499892ae781ac81",
+    "roadcache": "30007059325e2fbef863f295ebf7f553f94c5320dd15390926a1caa1ebb88f6c",
+    "roadtests": "29fe5423a862b21fc74b8d8e585920462efa1d062e939e3cb8db310585936da1",
+    "core": "32c7d8e44846a43e0914c848a22dbef184bb4d892cf3d0bcfe210fd185c8080a",
+    "terrain": "7c086cc819429938486bc3a38773a98fb83c2526547a574df73d2e15284602a2",
+    "terrainbuild": "0a19317778c1dc42a4682df5c4002a15d4ea08baafaebe39ae7293c3b707fbee",
+    "terrainfixtures": "7c8d240b1c20eb42ffe8dca1b4a97b9bbdf7fb9a07f7e7d49282d1c5d07b81a7",
+    "terraintests": "9213c0f97884a96f6cc8aa4e4ecc6758aed5f4dbb9c3b75ad770245fc26f8e24",
+    "terrainprobe": "5a442242bcbde48f73fa39816614a10c1f25944d1eb33ac6411b065604276470",
+    "railpath": "9519a2bb0ac06fb2ed2ae2d44e6932d01078ad065b9322c46d026b49095ec0d4",
+    "rail": "4d1665c1672d6f7384d89ebb520932b6f1d381ae5e98cdb601a2ab2770b28e7a",
+    "railinfra": "d2ed4860853d373b03ac7566b6a7686883c4a64fb4ee779607f70693b9e3a87f",
+    "railbuild": "c6a19331b8f21e013bda664d1dddef9ba76c89b82515ff74a7c99eaa131f9a66",
+    "railplan": "f37d4737c1120fc9b78554c9f10991961461663d70204a8ff5e4604a66f23413",
+    "railqueue": "bbd7f0dfa50f26a31d65839c704b387a77fb222c9a7dbe9e4fc0768e0c31c467",
+    "railboarding": "6ed2d2d367ff51793241cf7ff8a581c1208bd8a36e6d3ad1f67572d9cc6a23ba",
+    "railtrain": "209202b4b045306066408c8b888e588b6700b1d1460723a724b287de0a1a93ee",
+    "railedit": "978316443d1f0f3e8e4a2fbee7d78f34add2c2537318d7c3cd4a84c1460ab6f5",
+    "money": "831a583dad33899fd2af9bbaa3cdda694168fa8c0ba8a2f774a43d4a65545d67",
+    "moneytrade": "3e52c7e6dc280b490eeaf3b9de1fbe9490ddfd14a52596d45499190af83c53aa",
+    "moneyflow": "ba8695d777d7a4b359cce8f212d72de5f9ff308dbe2a99a35784bdb3214f21fd",
+    "moneyedit": "42dd8e5e52201aed2f670f33a98d332f5f0fc6d53952b5d09ddf47e05ebb5b39",
+    "moneytests": "02c25ba07600600d0da3d9837bc15babbc95616b71c0ddf135e8d2fa3cf13c30",
+    "moneyedgecases": "8c009fc3ab5375d4e1d6449582a5ac527e2eb9e86dc792ca94972ceb32933ba0",
+    "people": "d4b66f23d8b7f56ca6aff22953c997a6fccceda99c718e573e7cf32ff475b935",
+    "facts": "51840cbedc3c1750e74820df94fea55fa6001f631dac490eba88583f6728689c",
+    "factfixtures": "b51f2c9498235f5a336267207b59f089a743f9800e06ce518d28fa1d9ebb227b",
+    "summarytests": "12362adb59ec1526ff9be4d76b0feaa536c22ed23009641c40a58bd29b2cf4c2",
+    "admissiontests": "380af330fc4f940a7df3b25dea15f84c4852dcfa148c551813296f3c5969338c",
+    "journeys": "ebf4c986e0572637120e5d5fe163b6dd37523d6370948c6ee33e0bd2b7adf006",
+    "planninggate": "3f042f37f7f57a0f1e5ba7f840fd7349314b45eae91d0389f644e30f799c3fcf",
+    "returnplan": "b8137a4cdbdcacbf6aba31862edd19fc9cace8dd58eb172e8b9d91bdf0c12159",
+    "modeplan": "28da8595d957266fa645848537f81f4105e1ce520d3bae2251601c224de5148b",
+    "cycles": "e37f5e700a6fd646deabf8b4271246ad1afb84a9e3de029c7de1d056d39e0eab",
+    "movement": "a829adf48379feb880a43bc657497bf3efaf5959bee789e051593a497621dd01",
+    "traffic": "537552681947125d92cd5ac231e4f515fa8c9fb3ef1885c0f3c30bbf23a80358",
+    "roadbuild": "c3a6f8eba2238e38ee53ec603388ad8603304e8907a4e6bc2967609fed2053a4",
+    "removal": "8f24b1a100fafee360731c0159e9bfac8eb8098d4ac4aade593e468205648e7d",
+    "city": "1d6e250533fe32e523ffa825caa1fa9625ac91bb1acc751dfa50d3c91227b452",
+    "waterfront": "816973b366b3b7942121b52cef1cd600f5593e3c7fef2cc928305a8f632382b6",
+    "scenarios": "f2be1a4ba2212934da2070db11bff2e172504b3fc98d5b924f181d512ccaa16c",
+    "migration4": "035b8562c81e62259627272478b50cce26d85ebcd3ee9304ca3b9bcec4c88891",
+    "migration6": "0ac6ed447cd2340b3ef119e28f248824df4474b96bdef6a7ec3d0582100649d1",
+    "migration": "ba3cb783c61b7cd1d6f768f2896e5dea9114c3df35c44337af5d68247125fd34",
+    "migration-tests": "b4060e6ee5561bc8caf96fa3d8c1412d6f76a2db305d93bd5486714569d228d0",
+    "roadintegration": "28f8154f4a71e790ff95cbb40081d690c9caa8e8c978216a0601de773610a1a6",
+    "atlassample": "882dc2ad9f8de96d1b9f6e578cdcdbbdeb60a12b14d916885fc55151e5ecb6e5",
+    "atlascohort": "18a6d30cad62f484bda82580e0ba8ebb568ece515ca4529ba335c5ef673c226e",
+    "atlasreport": "b7568fa33f3a9db3447d14404132161aa6b825f3fdc9aaae5628254c64d03fbd",
+    "atlasfixtures": "eec94bd9a495a4d461a4e70797f34609bc8277b25a9c0b42fcb8fa996fa7664e",
+    "atlasstatetests": "4c86fcb6f37f1f80d97b46270938090256345df0df3d7095e3f29fa9ab5a6cfb",
+    "atlaswaittests": "a9c1dd1d28e39ed93fb35e1f78f7588506df95f8e2aef50c605461451682b614",
+    "atlascohorttests": "794faf75f96fee12c18a2a290434f0191cc378c7f988bc53630dda3ae82a0484",
+    "atlasidentitytests": "396de144d27fc168a160fc81c07a852fc8ca51951b83d82ec2364158206ff210",
+    "atlastests": "1a7877e348a8829a9db3b281b0b1e8e5fa610477b44d6e2341437153e23c1b54",
+    "labmetrics": "6fd25922995f9a20d346812741fa4d8df7436b1e6134dc8971d92f8927e32792",
+    "labbase": "70b016d79f577d8c4fa9e0eee940787175a36ef52c2c1b1e58b383a27fe01d36",
+    "labstep": "126a9c573c9396a84fe557a7ed3d2b0954985257803c4ccc3ac60d9510cd26d2",
+    "labrun": "bacf1dd6d5f7cdec6c6f1458ae4aeefdc5a9712766c174d867290ae6d5ef34ba",
+    "labedit": "55866a957e5577ba1f806f00c00671aca88cfe86205c3cb4889ebe61234b6167",
+    "lab": "2311469416951ebf954a414ea5c4ea455fdcc8fd49378629658ced8d9304ca10",
+    "labfixtures": "f7147a520526280148ad4308d1254a7a0df30ccef3d49f19eea342d9fd9abc1e",
+    "labtests": "eea3bf0697e77af9d89c4388dcf2b93dade960ce3a25528fa5dd3e5f69b9ba54",
+    "actorpool": "8f62792b95a0727d2d9da50b0a3eecb064944e6b216cb8700a330a92d7fdf305",
+    "actorview": "1e1672754ac08e0f2606b92a3359778761138539b35ca103e3523aef5587bfa6",
+    "streettests": "8e36f348a79ac70e4037f42de6f10926fd3106bcba80d638a0505e8ef6391134",
+    "streetquotatests": "50af8c495c9ae859fce4a875db6d558f3f41194423234e2c91ed8db8f72f0cc4",
+    "streeteligibletests1": "49966f7185a0ed8e4eaf7d6cc9bd97614cecf31e84161e641e05bf17f8e0ea0f",
+    "streeteligibletests2": "b61771c6c8f1ef217172effc01934fa4912c396856c305bf575c81cb29aab3e4",
+    "streeteligibletests3": "4311b9f934779015f216777b10b39ced8035150222b5b37453747cb2c09118ac",
+    "streetsampletests1": "08382b1929a719e491af48fc9327917069f50120ec130adc2974f8283d4371ca",
+    "streetsampletests2": "9b69ee90382e06f6588f5bf99b27a1b526b48fc9bffac37ce42863d51aef37e7",
+    "streetsampletests3": "22bbb68b49a84f3881a77c45db02ffbaa8034d1a5346a256f51f5bfc06896efb",
+    "streetsampletests4": "69e64c8e0c5286f2fdef66f540d891238ca23cf1ae24083df87fc634c3e71580",
+    "viewdata": "3fc99abd3b24dcb96f5b5db834e37e705ae35a6d3ce07e3ff270f5f098b8ccfa",
+    "views": "5c2112514fa8c2f0f99c60dd8a89b5c5f7803840e50cffe2141ce43198eb67b3",
+    "session-capabilities": "488ad6ae1c3ad7b38d8940bf0168ebf9cf3bfad2783dd88509fdba172ac0dbf3",
+    "persistence": "7e1da3bb71731e01b3bbdd7f410cf4285ef6d7d6e6c3704ce8faa620246bfa1b",
+    "checkpoint": "949ea59d3e2e6127ce051ae0d714eef87803610606bf27237f5deb248ac0955d",
+    "replacement": "b24aee216bb424025d05926ea1e0db59b96be8d431f35d3db5750c24bdae552c",
+    "saving": "66bb3350f008dcd6b89c7fc79981dea878d2dc71ad336393473b5b6682c9ed50",
+    "removals": "84181aeed544d7eb0c2f122ce07a9a7c490a55284bd4037e49a1e34be31f7de7",
+    "reviews": "911af45d6ddd71d62ef2baf6638e5d8397ca65e8ff3ede9af5deff232746e98d",
+    "management": "26ffa142689db523ff0985bbd5e28f2d299d36ad4e4d587a5ec378827dda9c7c",
+    "labstore": "22790581d5dc119c3e301a675a3531ef19d4ed9ce893cdb3a60ec24ada0b3c84",
+    "laboratory": "9ddf3a3061a006bdd8add3b76799f11422089efd1e6e78710dba0636872b4960",
+    "session-origin": "f851f9f25ce55ff0057795dc374d577ae1cb106e571615233d7d58f81a754d03",
+    "session-reconnect": "92695a35c31d0ec9165af3a97405d258921d38f5d09d759a7e275974299847a7",
+    "session-heartbeat": "c4047a700af2d5bd76185a9303f3216713bd5d7ce432ef508e34ab1215a3f654",
+    "session-input": "9dfcfb99149669d71e73b0c207dfd054b651646e272fc009dd2cb5a26f788780",
+    "session": "894ac9df36eef136dfeb7ac36d99da7c92101d8e5324df9504d1416f858cb72c",
+    "tests": "a6ee226f0a385ae708e77038dcae44293a77ccd500fd4b73b3396f15d2c3148e",
+    "simulationtests": "7e66d1d79a54bc55e04f89454bca5aae23c5993f01e0a691991f93f327a5ded3",
+    "railpairtests": "a543d1cbe37d1dee2f204d2dedd171dcd09d0e7d1fbca3f0d167d543e9702e75",
+    "railboundtests": "490b48db5b3033a73434d10ad11992af04b5cd6a24ba7ddcbac3773dd1fd281e",
+    "planningmetertests": "ee49e3ac786dcbf815aaa122d94a94dc485bef6ce649f04a4d137a27d632a98c",
+    "atlasprobe": "96e642f5ea97e8e1e877fa385fc4e8e1f3027bc77b65eb695acd7e4fa214ad17",
+    "benchmark": "c983afcc32f5af29b0ef289c2729d90271deb9efb8ca298328c065bac01a79ee",
+    "planningproof": "f1f31f5724bb76d69578a2bfa5ecc781de618598c4fc09d5b1b4f1f14877c974",
+    "walktrace": "240d8d788ffbc9f6c4052650671c048427f671f8f86f91766c9814ba91e63767",
+    "http": "b311f0c1ce6d24098918522b1df3c4e32340e345fad828d3b0e63842a0ce4721"
+  },
+  "selected_source_digest": "3b5c52bb852db1e06566477ef794ada6dadf226662d1347cbdd860b6c9dc385b",
+  "source_reproduction": {
+    "files": 104,
+    "passes": 2
+  },
+  "groups": [
+    {
+      "name": "gameplay",
+      "checks": [
+        {
+          "command": [
+            "npm",
+            "test"
+          ],
+          "exit_code": 0,
+          "log_sha256": "7ce0ab2ac70b2c7389783d0c089e81bdd98dbec70dd55a19d4885bea4db3b7d2"
+        },
+        {
+          "command": [
+            "node",
+            "tests/return-planning.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "a476b42d96b901226dcd47795b64c31aa67bdcc3cddaf8dea549ce9350f21339"
+        },
+        {
+          "command": [
+            "node",
+            "tests/tunnel-journeys.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "a2005c9d7a7731a481ab08ee94c67bac36e047cc8623123c634d2011aa0de7eb"
+        },
+        {
+          "command": [
+            "node",
+            "tests/tunnel-edits.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "1af3ff785a52ee30caa05d14093a67251ff0a2013735cc1b57daf0aa1166b165"
+        },
+        {
+          "command": [
+            "node",
+            "tests/tunnel-portals.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "5fc06601a6584320f15b458cd0c7be18592d5cf3700db531a149d260614ccd68"
+        },
+        {
+          "command": [
+            "node",
+            "tests/tunnel-persistence.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "ae4adde33edfb5249597d283086d68ac9f6f62522e1118e97fcddf17279ee859"
+        },
+        {
+          "command": [
+            "node",
+            "tests/street-presentation.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "d3d728c9c3558f96611249b05bd1b185754191aec5c4ddc277826dcbef8e556f"
+        },
+        {
+          "command": [
+            "node",
+            "tests/viewport.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "d5c49db498c582078188d9bd392c2f719f8113e8af0e9980a908faa8b5820fc4"
+        },
+        {
+          "command": [
+            "node",
+            "tests/fixed-mode-routing.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "480ecc13e1dae4794bdacf8a35030e43f75006ea5ae088451064caa4dd3cd4f7"
+        },
+        {
+          "command": [
+            "node",
+            "tests/ground-replay.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "e30150a3a7040b9294c9918c75b00335cd07f7152845d3a761e0c6168b31e056"
+        }
+      ],
+      "resumed_successful_prefix": 0
+    },
+    {
+      "name": "systems",
+      "checks": [
+        {
+          "command": [
+            "node",
+            "tests/rail.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "68905a7003466211a649de418c51ca19d705efa35a1f68052f3ab4e3ace7967f"
+        },
+        {
+          "command": [
+            "node",
+            "tests/city-lab.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "463987d30a4b411cab46a4f10a5bd11ba7d7a745980b71642e046847ae3c7751"
+        },
+        {
+          "command": [
+            "node",
+            "tests/city-lab-metro.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "2ce9b0f8b33a7ebaa03e05dc66da0231d61614a836eaf315fa5bc11f96b5e525"
+        },
+        {
+          "command": [
+            "node",
+            "tests/delay-atlas.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "11a2e677f1ef8a0b866adb4cf50c7410d02e2a740459be0e2075ba4ce8e84222"
+        },
+        {
+          "command": [
+            "node",
+            "tests/waterfront.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "0f17b0fa3ca8db15396b5ec333c76901b4eb958fb6bdebe0562351bd23d3c870"
+        },
+        {
+          "command": [
+            "node",
+            "tests/save-capacity.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "311d7b35d1ab7106dcb26ac71617dc65fd9b3a8d720c27855bdfb0fa91e66fbb"
+        },
+        {
+          "command": [
+            "node",
+            "tests/planning-bounds.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "86ec3d4ef32d04ae9fedc09b7ede9536fe05ec825e175f2e98d8474636d33141"
+        },
+        {
+          "command": [
+            "node",
+            "tests/walkability.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "3a349b943c367e55c0822bba9aeeb766283a3727ee7baa23e1016dbe930cdf73"
+        },
+        {
+          "command": [
+            "node",
+            "tests/repair-regression.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "8e6d772b1c7db48be464f8a8b9bd0a842da95a1764b4cc1ac5fd6de84b1950de"
+        }
+      ],
+      "resumed_successful_prefix": 8
+    },
+    {
+      "name": "browser",
+      "checks": [
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/smoke.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "d74db57339e7e47cf4104a9399b7de48bb2fba8ab556d50381b773750874a09b"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/tunnel-ui.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "d93eff931f77f865a522afe954f4b934b6457aefce64287f2cc23afed0916cec"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/city-lab-ui.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "b3f4614f08b2f8580bf1fd2df88c6f38b5c9c02781cf330b70bc982a65a81714"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/delay-atlas-ui.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "12b760cf0676d62f41ae17b54328cb3448c545c3e92468ab68eb41248a633332"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/waterfront-ui.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "9f420899a1c0c966654ad8b05f8609d84f955119bceb8cc7e1a080ceabcbe731"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/planning-ui.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "0bd3f35b4c8ead565b6d4bf6bdbeac9b50846905123a8f822aac12de09c33d78"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/street-ui.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "b4fd3a13441dc198fd4edac1fb9d2951e79a087c3db373c096fb08f374a560f1"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/gestures.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "253584e5754c433ee16c80d1ab1c454236bd1456ccbc1ccc5f4b9ea144807b28"
+        },
+        {
+          "command": [
+            "node",
+            "tests/with-preview.mjs",
+            "tests/webkit.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "956535bee848e24999405fecfe3333521013339421b63ac6c8a63fde6d272487"
+        }
+      ],
+      "resumed_successful_prefix": 0
+    },
+    {
+      "name": "compatibility",
+      "checks": [
+        {
+          "command": [
+            "node",
+            "tests/migration.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "83313bd120b584b0cfc59a560b485f4b3086703a373ce82490e19eebdc71fb09"
+        },
+        {
+          "command": [
+            "node",
+            "tests/save-compatibility.mjs"
+          ],
+          "exit_code": 0,
+          "log_sha256": "417be71731a0cef392eb6d38b9c971e88cad649628b33add0ff118b591140d29"
+        }
+      ],
+      "resumed_successful_prefix": 0
+    }
+  ],
+  "observations": {
+    "return-planning": {
+      "passed": true,
+      "checks": [
+        "Two-search budget defers departure; the next tick shares one negative return result and chooses walking for all eight people",
+        "One-way-only route never strands a departing driver; real pedestrians finish outward and return trips",
+        "Missing predecessor symmetry metadata is unknown, never evidence that a car can return",
+        "Certified bidirectional topology uses the original two searches and does not add a return search",
+        "A valid directed circuit carries all eight cars out and home on the separate westbound return path",
+        "The dense adjacent-corridor fixture correctly chooses walking and completes journeys",
+        "One-way car-return admission preserves usable rail access, boarding, egress and completed journeys under the ordinary planning budget",
+        "Removing the last one-way restriction rebuilds the symmetry certificate and restores the original two-search admission",
+        "Breaking a return after departure retains the driver and vehicle; reconnecting the route restores travel without teleportation or cancellation"
+      ],
+      "outcomes": {
+        "oneway": {
+          "cars": 0,
+          "walk": 56,
+          "arrived": 50
+        },
+        "circuit": {
+          "cars": 32,
+          "walk": 32,
+          "arrived": 56
+        },
+        "adjacent": {
+          "cars": 0,
+          "walk": 56,
+          "arrived": 48
+        },
+        "recovered": 56
+      }
+    },
+    "tunnel-journeys": {
+      "passed": true,
+      "checks": [
+        "Complete kind 1 tunnel is atomic, fully charged, and preserves the park overhead",
+        "Kind 1 tunnel carries real residents, obeys vehicle directions, and preserves finite lane and money invariants",
+        "Complete kind 2 tunnel is atomic, fully charged, and preserves the park overhead",
+        "Kind 2 tunnel carries real residents, obeys vehicle directions, and preserves finite lane and money invariants",
+        "Complete kind 7 tunnel is atomic, fully charged, and preserves the park overhead",
+        "Kind 7 tunnel carries real residents, obeys vehicle directions, and preserves finite lane and money invariants",
+        "Complete kind 9 tunnel is atomic, fully charged, and preserves the park overhead",
+        "Kind 9 tunnel carries real residents, obeys vehicle directions, and preserves finite lane and money invariants",
+        "Complete kind 10 tunnel is atomic, fully charged, and preserves the park overhead",
+        "Complete kind 11 tunnel is atomic, fully charged, and preserves the park overhead",
+        "Kind 11 tunnel carries real residents, obeys vehicle directions, and preserves finite lane and money invariants",
+        "Complete kind 12 tunnel is atomic, fully charged, and preserves the park overhead",
+        "0 portal cannot connect the two isolated surface destinations",
+        "1 portal cannot connect the two isolated surface destinations",
+        "180 consecutive native ticks inspect every resident edge, both portal directions, all lane reservations, population and money",
+        "Invalid build-tunnel is a complete no-op",
+        "Invalid build-tunnel is a complete no-op",
+        "Invalid build-tunnel is a complete no-op",
+        "Invalid build-tunnel is a complete no-op",
+        "Invalid build-tunnel is a complete no-op",
+        "Invalid build-underground is a complete no-op",
+        "Invalid build-portal is a complete no-op"
+      ],
+      "trace": {
+        "ticks": 180,
+        "verticalSnapshots": 38,
+        "undergroundActorSnapshots": 703,
+        "residents": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      }
+    },
+    "tunnel-edits": {
+      "passed": true,
+      "checks": [
+        "Reversed drag over identical tunnel costs nothing and preserves the complete city",
+        "Protected endpoint/portal edit rejected without touching residents, tiles, money or routes",
+        "Protected endpoint/portal edit rejected without touching residents, tiles, money or routes",
+        "Protected endpoint/portal edit rejected without touching residents, tiles, money or routes",
+        "Protected endpoint/portal edit rejected without touching residents, tiles, money or routes",
+        "Insufficient total budget cannot create a partial tunnel or one paid entrance",
+        "Underground review/refund/removal leaves every surface tile, park, track and household intact",
+        "Captured demolition review expires after any intervening topology change",
+        "Removing a ground portal disconnects but does not demolish its underground counterpart",
+        "Changing an occupied underground road direction is rejected, including the native traveller and its reservations",
+        "Confirmed underground demolition cancels affected journeys without inventing arrivals, income or lost residents",
+        "The selected format-8 city migrates with every non-derived city/resident/rail/money field exact; only static metadata and obsolete lookup keys change",
+        "Layered moving city is an exact current-format roundtrip, migration is idempotent, and future formats are refused"
+      ]
+    },
+    "tunnel-portals": {
+      "passed": true,
+      "checks": [
+        "Opposing surface/underground arrivals (ordinary resident priority) serialize at one conflict domain and both complete",
+        "Opposing surface/underground arrivals (reversed resident priority) serialize at one conflict domain and both complete",
+        "Actual movement rechecks the live one-way edge even when handed a stale cached path"
+      ]
+    },
+    "tunnel-persistence": {
+      "passed": true,
+      "checks": [
+        "Underground view is a pure camera action and contains underground native cell IDs only",
+        "Layered topology, funds, trip statistics and all 32 travelling residents survive an actual native process restart exactly",
+        "Older format-8 release refuses the layered city; retrying the new release proves that no record was replaced",
+        "Reviewed underground removal is durable and retains ground portals and households",
+        "Reset/restore backup uses the new typed format and restores the reviewed city exactly"
+      ]
+    },
+    "tunnel-lab": {
+      "passed": true,
+      "checks": [
+        "An underground tunnel plan is compared through both native futures and commits at the original cycle with only its construction cost",
+        "Saving and restarting during an experiment retain the committed tunnel but discard the uncommitted directed extension",
+        "Layer-specific experimental demolition preserves surface portals and discarding restores the exact committed topology and accounts"
+      ]
+    },
+    "street-presentation": {
+      "passed": true,
+      "checks": [
+        {
+          "name": "0-0",
+          "walking": 0,
+          "driving": 0,
+          "shownWalking": 0,
+          "shownDriving": 0,
+          "input_sha256": "3b312a5356da814c0b5341946034de25f1ab1a2217bc1ca4ced698b87f97b4eb",
+          "result_sha256": "c7ee68a0a7a731482bd53119bc48f472db5f1bd0ebdacac59b63dc8650e9de91"
+        },
+        {
+          "name": "1-200",
+          "walking": 1,
+          "driving": 200,
+          "shownWalking": 1,
+          "shownDriving": 127,
+          "input_sha256": "2374878ac1b564f15920dc35280950ca9f5f3148ee520a396396a71538b6d9a4",
+          "result_sha256": "5c8e549b90ce8106b9670181b918a109ff8cd125634267cbb62202876076953b"
+        },
+        {
+          "name": "200-1",
+          "walking": 200,
+          "driving": 1,
+          "shownWalking": 127,
+          "shownDriving": 1,
+          "input_sha256": "0565c5b5561e4555047419e03ea02b5dff5954bcf293ca993b0f8a6d56e77978",
+          "result_sha256": "05288458477f2fbce9107dbb6c38ba4e9a3a0b21d874e2a7b77ac3edf939bccc"
+        },
+        {
+          "name": "160-160",
+          "walking": 160,
+          "driving": 160,
+          "shownWalking": 64,
+          "shownDriving": 64,
+          "input_sha256": "313d89523109b2e06c0c3fb06fefe83bba5d13528b7a2b4e29383f47753e7989",
+          "result_sha256": "0233882bfa1606a6d6ee70fea0ead8ed32e521fd82db65c6d1c6541391015cec"
+        },
+        {
+          "name": "17-8",
+          "walking": 17,
+          "driving": 8,
+          "shownWalking": 17,
+          "shownDriving": 8,
+          "input_sha256": "640d7683d5b7ca3a3204a8e0f8aacb7e31333d807d6e9c2f20ba40fb5db22ceb",
+          "result_sha256": "fbaea87ef44533bf5cabdb8ed18c4b3512951815b25a844ae3d52c0ca3f05982"
+        },
+        {
+          "name": "512-512",
+          "walking": 512,
+          "driving": 512,
+          "shownWalking": 64,
+          "shownDriving": 64,
+          "input_sha256": "2e34caa15a005154c2fc677b1a3d951efb8dff9506f08830361a0c7cb924763a",
+          "result_sha256": "4dc2d9bd83967e543be95d9fe75209b3b426e221fb5b1ed9485f555a2584c9e4"
+        },
+        {
+          "name": "cropped",
+          "walking": 0,
+          "driving": 36,
+          "shownWalking": 0,
+          "shownDriving": 36,
+          "input_sha256": "6b36832463751673923c776ea8ca1e057e34b187add3e8e91fea7f49467f7670",
+          "result_sha256": "51dd92595143c1f46cdceb6ff8e1bc901d0d850c1e734507a5b2881878925c67"
+        },
+        {
+          "name": "resting-planning-platform-riders-and-facility-occupants",
+          "walking": 120,
+          "driving": 173,
+          "shownWalking": 64,
+          "shownDriving": 64,
+          "input_sha256": "b806451b810850527c0ca70f6ddd6192d09b429d26800114c37ec6352a27c458",
+          "result_sha256": "525741f40a3cf840671b175efb12e7852b913d367b7518382565864f1d1c150e"
+        },
+        {
+          "name": "ground-only",
+          "walking": 40,
+          "driving": 40,
+          "shownWalking": 40,
+          "shownDriving": 40,
+          "input_sha256": "d9206d183cbb0d82d3d10ca8bc9c0ed32ee7fe61799bead94f0de9ff683a010f",
+          "result_sha256": "c3eea2fbc25771e63c4fa44077d2934463447f48533f307e643c250d12b92863"
+        },
+        {
+          "name": "underground-only",
+          "walking": 40,
+          "driving": 40,
+          "shownWalking": 40,
+          "shownDriving": 40,
+          "input_sha256": "36e7af8c77327afd311992d5183eca867635aaa8f7a0357696b3c0115ef661a2",
+          "result_sha256": "d7bf0e4cf04f453e7de7e7f214bc538c0739359c0865ce4bd7a5abb3b94fe590"
+        },
+        {
+          "name": "layer-queue-namespace",
+          "walking": 0,
+          "driving": 2,
+          "ranks": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    "viewport": {
+      "passed": true,
+      "checks": [
+        "8,192 static tiles on topology frame only",
+        "viewport detail capped at 1,024 cells and 128 actors",
+        "full-world overview retains a bounded actor sample without per-tile detail",
+        "native frame limit respected"
+      ]
+    },
+    "ground-replay": {
+      "passed": true,
+      "checks": [
+        {
+          "name": "starter-through-route-cache-expiry",
+          "target": "workload",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "88b60bd8355db93ee3c5e5b1aa3cbce00133326276b8c619ddd8336c3d3ae1b2",
+          "baseline_full_sha256": "88b60bd8355db93ee3c5e5b1aa3cbce00133326276b8c619ddd8336c3d3ae1b2",
+          "candidate_full_sha256": "4c0f7f28a4369998d6e48983273b2450a5e7f262259978addbd53bab6c298332"
+        },
+        {
+          "name": "grid",
+          "target": "workload",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "bb450755d0995dd2548031ada84fedfb68a56cc83e91fa686b806bee1ee7e5de",
+          "baseline_full_sha256": "bb450755d0995dd2548031ada84fedfb68a56cc83e91fa686b806bee1ee7e5de",
+          "candidate_full_sha256": "b1d6a768ece3e876526fe44f75d1b05f67fc94ad600b9145ca2f6b9533d957eb"
+        },
+        {
+          "name": "scenario-1",
+          "target": "scenario-seed",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "c9b28843ef0777c8a702427b5df64313161dbed84d7412592d95384d2f700e38",
+          "baseline_full_sha256": "c9b28843ef0777c8a702427b5df64313161dbed84d7412592d95384d2f700e38",
+          "candidate_full_sha256": "67b4cefbf153d7d5475b0ffe897ca429192964dde17ed58db06f2437a27f67f1"
+        },
+        {
+          "name": "scenario-life-1",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "a149f1d6c4088391de86153a07427d9e1a3eb962709dbcae73ebfa5a454f44f8"
+        },
+        {
+          "name": "scenario-3",
+          "target": "scenario-seed",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "f3b8968b786968aede124f60348ac750ba6e2479648479d24ca74fa2adca95c8",
+          "baseline_full_sha256": "f3b8968b786968aede124f60348ac750ba6e2479648479d24ca74fa2adca95c8",
+          "candidate_full_sha256": "6cef52fda0c037386aeff04d15d9fad8c57ed680b8d803fad3cc48f8caa14470"
+        },
+        {
+          "name": "scenario-life-3",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "d4784ab62fe11a5906f2f549b881f1721e2d0ddc02bd06e5c939c75b6ef857be"
+        },
+        {
+          "name": "scenario-4",
+          "target": "scenario-seed",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "89deb07ca6cc362bb94b4b2e42ff6954a017c7dd45c95e5d5ea74ac47dad97a0",
+          "baseline_full_sha256": "89deb07ca6cc362bb94b4b2e42ff6954a017c7dd45c95e5d5ea74ac47dad97a0",
+          "candidate_full_sha256": "9d5c185171b1f13c842cd252cb5be02f1168d4ae4614a07dc17829470a5aaba0"
+        },
+        {
+          "name": "scenario-life-4",
+          "excluded": "world.junctions[-259] only",
+          "result_sha256": "f81ebc4d1e82f8b733d0edc0c97834d77333db97a53e667dc087b85aa0787891"
+        }
+      ]
+    },
+    "repair-regression": {
+      "passed": true,
+      "checks": [
+        {
+          "name": "full-lane-cycle-recovers",
+          "ticks": 80,
+          "arrived": 12,
+          "moving": 12,
+          "max_wait": 0,
+          "wall_ms": 2351.180708,
+          "input_sha256": "c762161db998a78bf5883744e15d8d38229a3fb12f4f91c7c78beb69b9064b96",
+          "result_sha256": "362ce983ce094c5ca7223b0cbbe387da950cf086992c5a5a8de43397fb2f9dc9",
+          "exact_predecessor_state_equal": true
+        },
+        {
+          "name": "adjacent-junctions-release-crossing",
+          "ticks": 80,
+          "arrived": 8,
+          "moving": 0,
+          "max_wait": 8,
+          "wall_ms": 2128.348667,
+          "input_sha256": "d88cf56c46d91ec6b6cb4a745d58720c1583831724697330f1d3ea65cf1ba7fa",
+          "result_sha256": "60020c35fd090f053ab108000ef7ce4c766872f0ef674e57d2548d9a2bcce4cb",
+          "exact_predecessor_state_equal": true
+        },
+        {
+          "name": "old-sustained-jam-resumes",
+          "ticks": 100,
+          "arrived": 12,
+          "moving": 0,
+          "max_wait": 0,
+          "wall_ms": 2383.667539,
+          "input_sha256": "de01190902b5e45e41598222c845a1eea010ec209ef8a74d21c881d819827faa",
+          "result_sha256": "670c525ec52af5f3fff49b81133252c1f6ae55887215614f853d89923df6c4ff",
+          "exact_predecessor_state_equal": true
+        },
+        {
+          "name": "cycle-replay",
+          "ticks": 80,
+          "arrived": 12,
+          "moving": 12,
+          "max_wait": 0,
+          "wall_ms": 2242.6769760000025,
+          "input_sha256": "c762161db998a78bf5883744e15d8d38229a3fb12f4f91c7c78beb69b9064b96",
+          "result_sha256": "362ce983ce094c5ca7223b0cbbe387da950cf086992c5a5a8de43397fb2f9dc9",
+          "exact_predecessor_state_equal": true
+        },
+        {
+          "name": "stable-heads-after-lifetime-turnover",
+          "ticks": 80,
+          "arrived": 12,
+          "moving": 12,
+          "max_wait": 0,
+          "wall_ms": 2313.7138379999997,
+          "input_sha256": "407ab9e2d50067649ce469b18f649258f86036fcc00b672699db8e29f0b0f536",
+          "result_sha256": "3034fce0a767d913119609209f621395860a725893d05352dd4153e13b05eb9e",
+          "exact_predecessor_state_equal": true
+        }
+      ]
+    },
+    "waterfront": {
+      "passed": true,
+      "checks": [
+        "Native water classification and projected banks agree at every bend boundary and map edge.",
+        "Road, avenue and footbridge construction is atomic, priced by water tiles, idempotent, bank-to-bank, funded and upgradeable.",
+        "Native seed creates 1,024 residents, 1,024 jobs, sixteen dry stations and four enabled four-stop services.",
+        "Compact native observer matches the complete ordinary eight-cycle state; all 128 cycles retain full city/routes, two-cycle conservation checks, all resident IDs and finite train capacity while producing visits and completed rail journeys.",
+        "Mature-city evidence writes and round-trips inside this invocation's fresh native directory."
+      ],
+      "population": 1024
+    },
+    "planning-bounds": {
+      "passed": true,
+      "checks": 260,
+      "queries": 260,
+      "reference_searches": 462,
+      "bounded_searches": 412
+    }
+  },
+  "kernel": {
+    "artifact_sha256": "bd0b1362c244f6435f1547bd51127c8a3769b6cbd9b924905785ce726f898fc8",
+    "core_sources_identical": true,
+    "directed_paths": 180,
+    "cache_comparisons": 17664,
+    "cache_assertions": 35328
+  },
+  "performance": {
+    "baseline": {
+      "artifact_sha256": "64ee2d28c4692280b5f3333762776ba288728b02764e0df57484efd3bcbca022"
+    },
+    "method": "Three serial counterbalanced repetitions per case. Same runtime; complete game targets. Fresh grids include preparation; the River Boroughs continuation uses each implementation's own prepared but otherwise exactly equal seed. Native instruction work is deterministic. Wall-clock timings include process/input/output overhead on a shared host and are not isolated FPS or universal speedup claims. Allocation is cumulative native modeled allocation, not RSS. Route tie-breaking and cache identities may differ, so state hashes and selected outcomes are retained separately.",
+    "comparison": [
+      {
+        "name": "starter-64",
+        "population": 32,
+        "repetitions": 3,
+        "before": {
+          "instructions": 4816181,
+          "cumulative_allocated_bytes": 407267898,
+          "median_invocation_ms": 717.789347
+        },
+        "after": {
+          "instructions": 5101006,
+          "cumulative_allocated_bytes": 419715288,
+          "median_invocation_ms": 700.675
+        },
+        "instruction_change_percent": 5.913918102330462,
+        "reported_outcomes_equal": true,
+        "baseline_full_result_sha256": "bf3a1e3b1b81686c9dd8f8e24517a5af6347bd4e8e367583e6c2936ae84b8e29",
+        "candidate_full_result_sha256": "4649ef3eaccb6d2c8a5bbd5c27e4ac9cb3d1f7bacd882f9eec1bdda3ab1840ba"
+      },
+      {
+        "name": "rows16-32",
+        "population": 64,
+        "repetitions": 3,
+        "before": {
+          "instructions": 12945839,
+          "cumulative_allocated_bytes": 933411153,
+          "median_invocation_ms": 2135.689744
+        },
+        "after": {
+          "instructions": 13912106,
+          "cumulative_allocated_bytes": 960286411,
+          "median_invocation_ms": 2140.473982
+        },
+        "instruction_change_percent": 7.463919487952841,
+        "reported_outcomes_equal": true,
+        "baseline_full_result_sha256": "7745be05037fb2a6e508c9cd5b84ca2fba786d55ce648b78ae7d78519fcdeb99",
+        "candidate_full_result_sha256": "b1d6a768ece3e876526fe44f75d1b05f67fc94ad600b9145ca2f6b9533d957eb"
+      },
+      {
+        "name": "river1024-4",
+        "population": 1024,
+        "repetitions": 3,
+        "before": {
+          "instructions": 6112648,
+          "cumulative_allocated_bytes": 563131734,
+          "median_invocation_ms": 942.218377
+        },
+        "after": {
+          "instructions": 6133058,
+          "cumulative_allocated_bytes": 563529263,
+          "median_invocation_ms": 875.599679
+        },
+        "instruction_change_percent": 0.3338978459090036,
+        "reported_outcomes_equal": true,
+        "baseline_full_result_sha256": "06cec44bb62ecbdc94aca001ecd73f9c169862c1abf73338cde0e985cfc3cee2",
+        "candidate_full_result_sha256": "5bd2456ff1f29f75f20b4bb5452c3bb0443ea3cbc475a183ee0d013ef06405a3"
+      }
+    ],
+    "samples": [
+      {
+        "case": "starter-64",
+        "label": "before",
+        "repetition": 0,
+        "position": 0,
+        "input_sha256": "43eaf3671c8ed121a14842f9ebf683161616ee36c6915664212f49ebcb416926",
+        "full_result_sha256": "bf3a1e3b1b81686c9dd8f8e24517a5af6347bd4e8e367583e6c2936ae84b8e29",
+        "wall_ms": 2873.306874,
+        "instructions": 4816181,
+        "allocated_bytes": 407267898,
+        "calls": 770978,
+        "invocation_ms": 803.804158,
+        "outcome": {
+          "tick": 64,
+          "population": 32,
+          "requested": 32,
+          "arrived": 3,
+          "waiting": 13,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 32
+        }
+      },
+      {
+        "case": "starter-64",
+        "label": "after",
+        "repetition": 0,
+        "position": 1,
+        "input_sha256": "43eaf3671c8ed121a14842f9ebf683161616ee36c6915664212f49ebcb416926",
+        "full_result_sha256": "4649ef3eaccb6d2c8a5bbd5c27e4ac9cb3d1f7bacd882f9eec1bdda3ab1840ba",
+        "wall_ms": 2614.964968,
+        "instructions": 5101006,
+        "allocated_bytes": 419715288,
+        "calls": 862084,
+        "invocation_ms": 694.453817,
+        "outcome": {
+          "tick": 64,
+          "population": 32,
+          "requested": 32,
+          "arrived": 3,
+          "waiting": 13,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 32
+        }
+      },
+      {
+        "case": "starter-64",
+        "label": "after",
+        "repetition": 1,
+        "position": 0,
+        "input_sha256": "43eaf3671c8ed121a14842f9ebf683161616ee36c6915664212f49ebcb416926",
+        "full_result_sha256": "4649ef3eaccb6d2c8a5bbd5c27e4ac9cb3d1f7bacd882f9eec1bdda3ab1840ba",
+        "wall_ms": 2661.79766,
+        "instructions": 5101006,
+        "allocated_bytes": 419715288,
+        "calls": 862084,
+        "invocation_ms": 700.675,
+        "outcome": {
+          "tick": 64,
+          "population": 32,
+          "requested": 32,
+          "arrived": 3,
+          "waiting": 13,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 32
+        }
+      },
+      {
+        "case": "starter-64",
+        "label": "before",
+        "repetition": 1,
+        "position": 1,
+        "input_sha256": "43eaf3671c8ed121a14842f9ebf683161616ee36c6915664212f49ebcb416926",
+        "full_result_sha256": "bf3a1e3b1b81686c9dd8f8e24517a5af6347bd4e8e367583e6c2936ae84b8e29",
+        "wall_ms": 2601.2195859999993,
+        "instructions": 4816181,
+        "allocated_bytes": 407267898,
+        "calls": 770978,
+        "invocation_ms": 695.833782,
+        "outcome": {
+          "tick": 64,
+          "population": 32,
+          "requested": 32,
+          "arrived": 3,
+          "waiting": 13,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 32
+        }
+      },
+      {
+        "case": "starter-64",
+        "label": "before",
+        "repetition": 2,
+        "position": 0,
+        "input_sha256": "43eaf3671c8ed121a14842f9ebf683161616ee36c6915664212f49ebcb416926",
+        "full_result_sha256": "bf3a1e3b1b81686c9dd8f8e24517a5af6347bd4e8e367583e6c2936ae84b8e29",
+        "wall_ms": 2684.008916999999,
+        "instructions": 4816181,
+        "allocated_bytes": 407267898,
+        "calls": 770978,
+        "invocation_ms": 717.789347,
+        "outcome": {
+          "tick": 64,
+          "population": 32,
+          "requested": 32,
+          "arrived": 3,
+          "waiting": 13,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 32
+        }
+      },
+      {
+        "case": "starter-64",
+        "label": "after",
+        "repetition": 2,
+        "position": 1,
+        "input_sha256": "43eaf3671c8ed121a14842f9ebf683161616ee36c6915664212f49ebcb416926",
+        "full_result_sha256": "4649ef3eaccb6d2c8a5bbd5c27e4ac9cb3d1f7bacd882f9eec1bdda3ab1840ba",
+        "wall_ms": 2792.1279460000005,
+        "instructions": 5101006,
+        "allocated_bytes": 419715288,
+        "calls": 862084,
+        "invocation_ms": 758.433587,
+        "outcome": {
+          "tick": 64,
+          "population": 32,
+          "requested": 32,
+          "arrived": 3,
+          "waiting": 13,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 32
+        }
+      },
+      {
+        "case": "rows16-32",
+        "label": "before",
+        "repetition": 0,
+        "position": 0,
+        "input_sha256": "c9e6ae2e0c5382c22caa81ecf0187cbcc09fd195892bc1b2bb14e17181c334d0",
+        "full_result_sha256": "7745be05037fb2a6e508c9cd5b84ca2fba786d55ce648b78ae7d78519fcdeb99",
+        "wall_ms": 4068.631114,
+        "instructions": 12945839,
+        "allocated_bytes": 933411153,
+        "calls": 3048292,
+        "invocation_ms": 2116.634273,
+        "outcome": {
+          "tick": 32,
+          "population": 64,
+          "requested": 64,
+          "arrived": 0,
+          "waiting": 1,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 64
+        }
+      },
+      {
+        "case": "rows16-32",
+        "label": "after",
+        "repetition": 0,
+        "position": 1,
+        "input_sha256": "c9e6ae2e0c5382c22caa81ecf0187cbcc09fd195892bc1b2bb14e17181c334d0",
+        "full_result_sha256": "b1d6a768ece3e876526fe44f75d1b05f67fc94ad600b9145ca2f6b9533d957eb",
+        "wall_ms": 4195.998701,
+        "instructions": 13912106,
+        "allocated_bytes": 960286411,
+        "calls": 3369114,
+        "invocation_ms": 2143.526008,
+        "outcome": {
+          "tick": 32,
+          "population": 64,
+          "requested": 64,
+          "arrived": 0,
+          "waiting": 1,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 64
+        }
+      },
+      {
+        "case": "rows16-32",
+        "label": "after",
+        "repetition": 1,
+        "position": 0,
+        "input_sha256": "c9e6ae2e0c5382c22caa81ecf0187cbcc09fd195892bc1b2bb14e17181c334d0",
+        "full_result_sha256": "b1d6a768ece3e876526fe44f75d1b05f67fc94ad600b9145ca2f6b9533d957eb",
+        "wall_ms": 4105.223082999997,
+        "instructions": 13912106,
+        "allocated_bytes": 960286411,
+        "calls": 3369114,
+        "invocation_ms": 2140.473982,
+        "outcome": {
+          "tick": 32,
+          "population": 64,
+          "requested": 64,
+          "arrived": 0,
+          "waiting": 1,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 64
+        }
+      },
+      {
+        "case": "rows16-32",
+        "label": "before",
+        "repetition": 1,
+        "position": 1,
+        "input_sha256": "c9e6ae2e0c5382c22caa81ecf0187cbcc09fd195892bc1b2bb14e17181c334d0",
+        "full_result_sha256": "7745be05037fb2a6e508c9cd5b84ca2fba786d55ce648b78ae7d78519fcdeb99",
+        "wall_ms": 4257.869991,
+        "instructions": 12945839,
+        "allocated_bytes": 933411153,
+        "calls": 3048292,
+        "invocation_ms": 2244.909177,
+        "outcome": {
+          "tick": 32,
+          "population": 64,
+          "requested": 64,
+          "arrived": 0,
+          "waiting": 1,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 64
+        }
+      },
+      {
+        "case": "rows16-32",
+        "label": "before",
+        "repetition": 2,
+        "position": 0,
+        "input_sha256": "c9e6ae2e0c5382c22caa81ecf0187cbcc09fd195892bc1b2bb14e17181c334d0",
+        "full_result_sha256": "7745be05037fb2a6e508c9cd5b84ca2fba786d55ce648b78ae7d78519fcdeb99",
+        "wall_ms": 4064.634459999994,
+        "instructions": 12945839,
+        "allocated_bytes": 933411153,
+        "calls": 3048292,
+        "invocation_ms": 2135.689744,
+        "outcome": {
+          "tick": 32,
+          "population": 64,
+          "requested": 64,
+          "arrived": 0,
+          "waiting": 1,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 64
+        }
+      },
+      {
+        "case": "rows16-32",
+        "label": "after",
+        "repetition": 2,
+        "position": 1,
+        "input_sha256": "c9e6ae2e0c5382c22caa81ecf0187cbcc09fd195892bc1b2bb14e17181c334d0",
+        "full_result_sha256": "b1d6a768ece3e876526fe44f75d1b05f67fc94ad600b9145ca2f6b9533d957eb",
+        "wall_ms": 4020.9239240000024,
+        "instructions": 13912106,
+        "allocated_bytes": 960286411,
+        "calls": 3369114,
+        "invocation_ms": 2040.96679,
+        "outcome": {
+          "tick": 32,
+          "population": 64,
+          "requested": 64,
+          "arrived": 0,
+          "waiting": 1,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 64
+        }
+      },
+      {
+        "case": "river1024-4",
+        "label": "before",
+        "repetition": 0,
+        "position": 0,
+        "input_sha256": "e92fe2eb929e8859e1f2915e62dea6b196a59456c1ce00242e45e489b73d6ed8",
+        "full_result_sha256": "06cec44bb62ecbdc94aca001ecd73f9c169862c1abf73338cde0e985cfc3cee2",
+        "wall_ms": 3100.7930449999985,
+        "instructions": 6112648,
+        "allocated_bytes": 563131734,
+        "calls": 812992,
+        "invocation_ms": 942.218377,
+        "outcome": {
+          "tick": 4,
+          "population": 1024,
+          "requested": 320,
+          "arrived": 0,
+          "waiting": 0,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 5
+        }
+      },
+      {
+        "case": "river1024-4",
+        "label": "after",
+        "repetition": 0,
+        "position": 1,
+        "input_sha256": "6e6a5f7d39cef88996b17bc200c420c6056cd00a555886c5a0010acdac2ec9b1",
+        "full_result_sha256": "5bd2456ff1f29f75f20b4bb5452c3bb0443ea3cbc475a183ee0d013ef06405a3",
+        "wall_ms": 2980.1896819999965,
+        "instructions": 6133058,
+        "allocated_bytes": 563529263,
+        "calls": 818562,
+        "invocation_ms": 928.230781,
+        "outcome": {
+          "tick": 4,
+          "population": 1024,
+          "requested": 320,
+          "arrived": 0,
+          "waiting": 0,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 5
+        }
+      },
+      {
+        "case": "river1024-4",
+        "label": "after",
+        "repetition": 1,
+        "position": 0,
+        "input_sha256": "6e6a5f7d39cef88996b17bc200c420c6056cd00a555886c5a0010acdac2ec9b1",
+        "full_result_sha256": "5bd2456ff1f29f75f20b4bb5452c3bb0443ea3cbc475a183ee0d013ef06405a3",
+        "wall_ms": 2910.317433000004,
+        "instructions": 6133058,
+        "allocated_bytes": 563529263,
+        "calls": 818562,
+        "invocation_ms": 875.599679,
+        "outcome": {
+          "tick": 4,
+          "population": 1024,
+          "requested": 320,
+          "arrived": 0,
+          "waiting": 0,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 5
+        }
+      },
+      {
+        "case": "river1024-4",
+        "label": "before",
+        "repetition": 1,
+        "position": 1,
+        "input_sha256": "e92fe2eb929e8859e1f2915e62dea6b196a59456c1ce00242e45e489b73d6ed8",
+        "full_result_sha256": "06cec44bb62ecbdc94aca001ecd73f9c169862c1abf73338cde0e985cfc3cee2",
+        "wall_ms": 3116.7859959999987,
+        "instructions": 6112648,
+        "allocated_bytes": 563131734,
+        "calls": 812992,
+        "invocation_ms": 996.97884,
+        "outcome": {
+          "tick": 4,
+          "population": 1024,
+          "requested": 320,
+          "arrived": 0,
+          "waiting": 0,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 5
+        }
+      },
+      {
+        "case": "river1024-4",
+        "label": "before",
+        "repetition": 2,
+        "position": 0,
+        "input_sha256": "e92fe2eb929e8859e1f2915e62dea6b196a59456c1ce00242e45e489b73d6ed8",
+        "full_result_sha256": "06cec44bb62ecbdc94aca001ecd73f9c169862c1abf73338cde0e985cfc3cee2",
+        "wall_ms": 2895.174227999996,
+        "instructions": 6112648,
+        "allocated_bytes": 563131734,
+        "calls": 812992,
+        "invocation_ms": 937.173303,
+        "outcome": {
+          "tick": 4,
+          "population": 1024,
+          "requested": 320,
+          "arrived": 0,
+          "waiting": 0,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 5
+        }
+      },
+      {
+        "case": "river1024-4",
+        "label": "after",
+        "repetition": 2,
+        "position": 1,
+        "input_sha256": "6e6a5f7d39cef88996b17bc200c420c6056cd00a555886c5a0010acdac2ec9b1",
+        "full_result_sha256": "5bd2456ff1f29f75f20b4bb5452c3bb0443ea3cbc475a183ee0d013ef06405a3",
+        "wall_ms": 2888.380336999995,
+        "instructions": 6133058,
+        "allocated_bytes": 563529263,
+        "calls": 818562,
+        "invocation_ms": 851.267009,
+        "outcome": {
+          "tick": 4,
+          "population": 1024,
+          "requested": 320,
+          "arrived": 0,
+          "waiting": 0,
+          "disconnected": 0,
+          "walkTrips": 0,
+          "carTrips": 5
+        }
+      }
+    ]
+  },
+  "live": {
+    "baseline_artifact_sha256": "01e1300f0365a4d4f26b2fb61c76850479c03ad953d762b048bb620637f88e07",
+    "candidate_artifact_sha256": "15efe04181ac026cde80e72b178d9ce25eda572ade404ea3f9c674dc9806dccd",
+    "method": "Serial predecessor/candidate sessions on a shared host; 500 ms requested native timer, 1024-cell detail view, per-browser native save path and autosave enabled. Exact per-cycle gameplay frames, excluding scheduling/command metadata. Not rendering FPS or an isolated hardware benchmark.",
+    "cases": [
+      {
+        "name": "Garden City",
+        "population": 384,
+        "cycles": 64,
+        "full_frames_equal": true,
+        "baseline": {
+          "cycles_per_second": 1.9846253079033114,
+          "median_interval_ms": 504.7572919999984,
+          "p95_interval_ms": 544.4948710000026,
+          "maximum_interval_ms": 604.6689740000002,
+          "maximum_payload_bytes": 15628,
+          "manual_save_ms": 130.62158099999942,
+          "rss_kib": 75668,
+          "peak_rss_kib": 124316
+        },
+        "candidate": {
+          "cycles_per_second": 1.9891790739751694,
+          "median_interval_ms": 500.7947320000021,
+          "p95_interval_ms": 537.2718999999997,
+          "maximum_interval_ms": 569.3636160000024,
+          "maximum_payload_bytes": 15628,
+          "manual_save_ms": 133.65978400000313,
+          "rss_kib": 75864,
+          "peak_rss_kib": 124940
+        },
+        "frame_hashes": [
+          "d35715ff2ba34aeceac7da36eee8ea8e0b193d3145105013247582db36ae017e",
+          "77623eddc629d2ebf5bdd1fd4c33e5c86ebadd83553e0ef3de7610eafb0fc109",
+          "692c8f4a633220fb2fb644eb1d0de803081400085a5ab14d182f6d78036667b4",
+          "6b556f2823ddd5ddd334062f56a72fbeb05c1ecbe3e3ba697ad4bb285418be4d",
+          "ecebe5d32ae59a02090d03d3b6e4f7324c4289e303c3f3413f8025d4cc10112a",
+          "5cad17043b4374d0afe17ebb1b96e3afef4d0a196202217e4ffb2939479a7796",
+          "399a55f3cac6f4d194d4f5ff3fb46436cc4d6e6210976798980f074ce34b63fa",
+          "a58cdad0474b8b2cb9b55db003838242538b935d3225451319ef19e6ca5d9630",
+          "640d55f7c28625bb6e6352938bab7373aba5df1a967cf41542c0189e23fdb437",
+          "4e33c210f3694571fd59d978c1e009fcaa908ea7372a58d67bff5b25f33f7629",
+          "b80eafa585245d3739cadbfd059c58af0f91008765b29eb65c2a4c597962e083",
+          "a5a5b1ff8d13d75bea8f53a5580555178d2da3552ac0dbfd1f96f6aeafd2c73c",
+          "e6888871c233403aa2c5c3f59b672b55a2912a44812c8935109833ab656dbaa1",
+          "ef4ae198c68d5dda39808ae0ba54d55f88da56998cb4b355af7e660d314e596d",
+          "1dfef2e7b6c99ca6384584d363fc434c5fdaa6876a5c714a7feee1aa01ac2aa9",
+          "0cc15e1f35674f9dcd6f83705f7d5b7b78a56082822bc88eeb22c619a4b7b697",
+          "5943db30d2e0ebc4270d6d21b7c58f87977c08f00f1647ecbf6f908a92575b72",
+          "c37066ad656e604092d335032ce8d6bb1ea23401cdc1f944eb286fd055d8956e",
+          "c07183fd5815cf64210d70110141f11d2b94f3b15146397c753bdc8f80415edd",
+          "0a4a56b493472ac386f72ea8a1a334c760344033ffac98618466516fa8233bef",
+          "f0c5cc454b233216c75230b6b3c40c71a5b146c547f8b7376eb3e10772b0db0e",
+          "8a7e4427bb6051092a8da46740388c52d71cd024e22df94bf151a94e538042af",
+          "ef2374a699d1cea2f2ea9fc8d956e9442d037ad1481c11b5382722f11de2b340",
+          "cd6901d3714710dc3a3ce4b6823a0225f46601a8e2291ea3ae5e9ed5a9d79bce",
+          "c71eca04a4684ba2ef057b9744133c06f9f2a1a02d746c9430e0e1120542121d",
+          "4d585a4bd8c592c995a289dd92bed4652205f2198c0e7cf9a15b4adbfc28685c",
+          "1cf360624b0560faab01daaf8a3df8e1f6f4557dc76029106a0660d0375d4fac",
+          "1a06b52df2566c0e4a666e997cc9bedf7bbe72bc39964198818d7e6f83450e4d",
+          "a0b821622298d7b297984d4a9575bda3b4e87d1184e54673aeebecea5af21076",
+          "804fcdc52484bbba3515d705e0c461715d0bda3948218c9f3f761f174579a9cd",
+          "152208d89ea732c7d44d0de4ded35857b9a4ef79c51cecb997a1404b66706326",
+          "e29c6d9c601f579e98b5a9de65c65327131471b33d093ca563bea472e41d5262",
+          "88d5619363b8fb283bdb4c482064d7d3395c1fc2be58643b538650fa46dd8cde",
+          "bb50e7715d577b64a18dc165f0a7aff662c23ecf35f34112d8faa1bd43c0a4cc",
+          "0f1f3401be2a059a124166923b96efea97bb745e213a578c346bf40ac847a72d",
+          "79066a65f49b2fe0da16d29dc3caa9c60776bd3dbfa1cd218387d7533097526c",
+          "6dbf3ca7b857240c4d843fda3e7774bb36baf536d397a269857884e4276a0c65",
+          "2bb027797dfdb9c6acde5f10b2bfdc181d0b4f9c5eedd2f3af7c4e77ed0021af",
+          "6ff8ab325fe5726a394e36bafb2019b8125b3409e0bd0aafba8bb0c1fb001a7e",
+          "3de2ecfc8acdd97e070de5273f2e5d23c06584d21da3c3b14231d02d4c27bb26",
+          "d79fc83bea92ca9c66302b97ce0e93dd0e0fc47adad3c9038e82ca16a6ca5f6e",
+          "e7623d402a72ad76d7f61a57dfffa5283440f241c0a8014623282ec05f7a2bbf",
+          "24133c4c4f96237555147ca563d46d6fc39b269c2c15e9d1d515cf50484f63a5",
+          "b15314cbb871d27df462f78023137ae2e0aaa1419eed5b57ec4adaae9bff97d5",
+          "6258f27abc0ca57218e8bde15c21b2f0f8e47718ba5571f0d979d92a1c13fbcd",
+          "dcb038e21e0e0deccd0d0a29a1d061db35e4c1556b3a4e5c9502a92e84942dfd",
+          "0b5b85abde0622a015ac130932cbe1079629750250911b2c645537ae83e5aad4",
+          "6c2cac11597886bd700968ccf78762f2e37db200b24d4083272810aaf43e72ff",
+          "3bb6a5b81d32b1c6479ab8b90abf70b458c3481abaf5cfe1917cbfde86e191ab",
+          "ff9cd1c66e2771a7f43a49700fc57bc0f9d3abfd19a1501837f835b7ac4e18d8",
+          "152469df58c1a7cc5c84ba270947c3a0c32ff17451e875768a77be4e738a69a4",
+          "0030be70c98f21e5e3a7a7b43b76093385b53dcc564d32af52460ab365dbc27b",
+          "1f6b8d7de3ae72c6a868168d1e24f823437458e5c63fd6fa4f7f1c7e1eb52769",
+          "30482e3bf0542de1cd4161c1e465374d739f4293c5eaec4687c28b3fdc0f9868",
+          "bd4d1462a6af205130594d7a013b4c2d5c2cd708d902d1ac3c90219b6a238360",
+          "76dd583d1d3d4ab803e0944582b7beefdcc60bfb3183b478f2b80d7d10c52b6a",
+          "7452929a5f84a1ef740348d2b7252703ad90057171c22722ccb41673514d4669",
+          "a75fa0a47cd82d45b5cc59512112a935f1dcd1a5d5f207ab38701a8901ea97e3",
+          "f2f2d1eb16cb65a61ebe2ea11b94d855d7cf6492a1b81aee9d725dedc6732bfd",
+          "d9b1a38f4a7b5622d828d0e1e342f5ac71199bee87d5c0e43f86b1b8633257bb",
+          "33af419b98eef46bc2d1834e226271cb0c3bbbc42da7510157cff2070dec08ae",
+          "9fef12edc3c348ddea9fdb9c1467619d476ef9dff2a39737a864bba5c53eea86",
+          "2ad45d1dee73a9b4e9273f569471f5df0ecc74b264a57ca43b6ff9653c706002",
+          "23ae80e0fba440a0c0339d10f47270d4fe42fb51ff3b8ce686d5a2ea46504b0d"
+        ]
+      },
+      {
+        "name": "Crossing Challenge",
+        "population": 256,
+        "cycles": 64,
+        "full_frames_equal": true,
+        "baseline": {
+          "cycles_per_second": 1.9877336770529306,
+          "median_interval_ms": 500.64638099999866,
+          "p95_interval_ms": 541.1334260000003,
+          "maximum_interval_ms": 687.8280130000057,
+          "maximum_payload_bytes": 33603,
+          "manual_save_ms": 194.0810679999995,
+          "rss_kib": 75540,
+          "peak_rss_kib": 123160
+        },
+        "candidate": {
+          "cycles_per_second": 1.9877331679275145,
+          "median_interval_ms": 503.2492590000038,
+          "p95_interval_ms": 538.6275519999908,
+          "maximum_interval_ms": 677.3056399999914,
+          "maximum_payload_bytes": 33603,
+          "manual_save_ms": 126.52970399998594,
+          "rss_kib": 75656,
+          "peak_rss_kib": 124868
+        },
+        "frame_hashes": [
+          "09384dcd9a5aee4727dd035e23f93530c8608b1aad41822cd861a06db9d2926b",
+          "e5c6e88b151e09ef5f3af21b2cd8411cb5feb2b2825f7650b5ed604318d52845",
+          "7d9b656ba437a95abe4789ea5c921417b9212fa2d4a58044987d661d15b59274",
+          "d6124131b2b427da9fc9ad921aff37140c87d510f92a6f390ed928127a872c36",
+          "b7d6a78e3fc8655bc65af25f4319282d27a1854d96ed45d6522b2b8c775d1507",
+          "c4a591bdc5435c9c5300900a97fe0655fc9ec2b5e2abf7dd0d45f99650d791cf",
+          "3d660320961ac777cddbe90cf6bc6a14bcf908f582fbcdf4564cb3eabac98c40",
+          "e95f21fe6248e66b2eb2e4373d07825efb71643b0a74545bfda4ce0ebcbb1c60",
+          "629f9fda3668c9b2504431fbfe4ec1318c0352cbab05bc3f663af315fe1d570b",
+          "8267c58891fc5ec10e47952fe60723242674417217a49c0ec91b1b583aadae4e",
+          "0109db3b57110634739eb0e8deddf2226a36058bb9c54642af3950140171e326",
+          "dd857af2a34ecde5c85975055e7595b1a55ab9df722fceceada3f7df9f6ea382",
+          "6047b8a5a30e05f32046c2d68de92aee764bfe3af4e47c5ac4c77446f3acfcc9",
+          "f2a4880a0efea3b17d381a1bf8c640ba1e4e0381264f376acb0222d6ab882e5b",
+          "02b83be138768ecd5849afb7c0b1be41da5b44fc702ad429c360ebc367f362f3",
+          "7ee2861c88378015eda220d9df86f91a68f86ef4c9deb70c15612e479d60d075",
+          "7c95f126fc0e6398d664ec24bee16184aa3f94ab910f0021a56514b2a5ee1d2b",
+          "ea97a9b690b05429d42697c004b2330ce9ead34d83489681dcf9426b7271c2a2",
+          "46320e5955c7808e2e68c6e85927e90a80e792c3c38f6cea328a6a5473b2e443",
+          "baf87f8563ae279e5f693329245bd83a4f05ec5f82636767bcc5e4acb00499d6",
+          "da4db0400fd99a9db95d23416f89ecb80a88dc5eb799dda69e42dc4db1f89242",
+          "e16419f2e36080a1ec8ee525682393f8f5d57758731cef1aea759e8ef7073de0",
+          "d992d66d00198e8f11e52447ed43ad75d143e67fa5c86134ad24db8cc3b28d67",
+          "a9fc469cd037b7bc76b74a68332b78c9782ccf66a05166befe3c9334ab6b3907",
+          "38f6ff456934d704e1e848e895d7b09ef6945dde1c2131a9b8922dd0135e9dc9",
+          "fbb10b1f94357f12417a755f15efb6b142b6a50ec63386f03c6aeb05c1080da6",
+          "de2ffc6820461f1285e8570796c97744b5e55746493fb69a621b6f6bff1512bf",
+          "73abcc9352511de051b73f2274db96569eed18d16115d523f1dd73fa14fa48b6",
+          "2c043cb86ff53cca1e8bc7e520d2e930515613dd71800f25f8c2ebb829a98a97",
+          "e52906824af88952b44c4e1c26bc4309af56a69a635e0a88a3ca4cac89d5f64e",
+          "bbd6bb72d395f485c14b5e8f90f039c4b68eb22fcf1a657e9089a5e39747e337",
+          "1a52679cf557d9b6b3f21bfa8674ef8c561b13aa56f7e00f0370c2272742055b",
+          "af3e00b2267f7175e4f9af7839ca9e217a295ed57bf607bbae506942b7a6e0b4",
+          "932a955c125e063e277f3c757202f0edc6e4ae07be2964fb1e94498878057bcc",
+          "9edc1c8036250bbdfd97e1d76c391a65871e9f7d1bd1ecbf9486b17b70406040",
+          "6301232fac1adb82d48aa1c6d1ece1b38fe8cbe6c82d35424608d6f074dfd679",
+          "bbadb4858c60b73c91c14c6faeb05244e458df7e9ed00aa58193692c9bc51f85",
+          "2eec4e37494a374d65701191c8093afb56d2cadb595f46327a214ad40113dda0",
+          "914dd503701ed7b8401660eb19831405bfcd559591028634d4dc5473725b9d09",
+          "0c37f412d57bec4870eb22270e43e4263574544d5211e2bb01fb68a6146c62d9",
+          "5ac3b586011eb20e95077a34385830f0ef1b7d9306b1d83f7ead05d9636c4fbf",
+          "db68fdf42160361600e226f26f0ffdbba179af4c84a8c17ee3235cf1b236c3c2",
+          "a07a5b756968f0a6eb83d149c344a383c95cf86277f002b3e27c0504c1b97544",
+          "64a5d3e92e5afeb14de4de4f78aa069711e42d12cbbb5e198e3d972ca59f152f",
+          "2f3ccd5f415bc876b553e805c4ab9ae3aae5d0d5aecc55e0927cba82158f8453",
+          "3baacc7ca85e517229ed160140533029b853ef04b68a40f4db8571bf2e478943",
+          "edcdddd96e6e029e63ac727d749b86e6608ff6c321c644c9372dd31748b6a4f8",
+          "6d3aceea57d9cf6cdd925200a7a3e130c9fd3fd0242fcbe285695671f93f25ef",
+          "28fddf19a3a292e443a30b3d797e03d3007466b538935a5a1fdf0149d3f2b810",
+          "94112f780379e9fb63f9634e50e55ae8b541106648e9c7a127716e1cfa717299",
+          "d74d10cc6799c9bc6792bf4af13084b3257bf394c43a9a8274efcaa4c844eeb9",
+          "5ae31ed781d5b15cd3b31ae0f62eeaf8db094a176c54d1e993e20725a4847717",
+          "028a8e127fdd7eec8a273fe2b1aa3f8d10189ac3c3ce468416fb6f117b6b66b4",
+          "477bba658c07adf27ec67f24f1121bd63354172eee92dbb9ba47240e7aa879a8",
+          "388fd8b2e03e1363ccedcac47ef10a1ad6d798e64edb19d19226f040c79b521e",
+          "4df32b992fb718bf577d5282ad3ec2ad14349686fd261f5f6d0bbf173c5d2987",
+          "23cb41bc092e0f5004906752147c6312c48e903bbb62bc133d846c3016db9115",
+          "3a6b627df49fd865d1666169f0cbb9220bb7bfced80083e5b374e2654cb71e1a",
+          "a18d8a921225fb97cfe767fa9c0bfb06f866cd9e28d6dfe9a60725a9baf08516",
+          "15f06abb7164cc41e3769fc44a2029fe17f7e1877ebc3337ed585208d1ad2bfe",
+          "f980f1e72441eb37b9016eab555722ef1afe799400665f2288a489c1c0783615",
+          "94ff58b72f4588ce870305ad7ab680e7fb690bcc5628c7f10c1afa1a0e4d4f50",
+          "e42c14b0c93359e404584a9c4105be97328eb863b53702be7b2c2d0225ea0d60",
+          "31cbfe614ef1d145a5ad23f9a839f68ff3338bd8bdc9f110f89cfbe4c46e44e5"
+        ]
+      },
+      {
+        "name": "Willow Metro",
+        "population": 512,
+        "cycles": 64,
+        "full_frames_equal": true,
+        "baseline": {
+          "cycles_per_second": 1.9855175133531302,
+          "median_interval_ms": 508.0982920000097,
+          "p95_interval_ms": 551.0126340000133,
+          "maximum_interval_ms": 578.8535090000078,
+          "maximum_payload_bytes": 13584,
+          "manual_save_ms": 279.40875199998845,
+          "rss_kib": 77292,
+          "peak_rss_kib": 122872
+        },
+        "candidate": {
+          "cycles_per_second": 1.9847714141892223,
+          "median_interval_ms": 504.41753400000744,
+          "p95_interval_ms": 555.9271920000028,
+          "maximum_interval_ms": 574.844763000001,
+          "maximum_payload_bytes": 13584,
+          "manual_save_ms": 256.2934419999947,
+          "rss_kib": 77432,
+          "peak_rss_kib": 124780
+        },
+        "frame_hashes": [
+          "5779df8c5a677f403095383366a3c2ab5329c8f111092d1d975c225d8fba3470",
+          "980617ab6d9b7637a94a68459c3589438a63a50ad0b1b93d28099e90a90f79e9",
+          "e71071daa73660dd33f9f38ff1276fd71f24eb14342a353dbbb80701bb3249d9",
+          "a2114e5d943c0729cf8bc614afe6d715f29f0f70e6b0d25856c2e683a4b9e1c4",
+          "c22d1667396a8350a65f093b780be386900bc56639512781efda529076f0aa39",
+          "240ea520b9d4c7a9b6a8f17a8dc8b73bf12bce3b3cf855dce471fb75690c9205",
+          "fb9c87c247c37e7117daa4be60097e72bf56f612958b0b0b29dcf2b41a6c0f2c",
+          "25aa81d2a3d361f9d0f206655e70b2bf2a9c956e64b11d0351d7c42e0c44894f",
+          "60240491912a69d346f1793b42c5f81a7c10dc8735b8121faba706f889d39d07",
+          "88abe908cfe95c020c8bb77f50bbd988fbc3b936f8b472cc94e61098125335bc",
+          "c43afd76ac69c85d7742b0698012b737334e7b0a8d93618eee638dc908e148dd",
+          "f61bff7b55bc3722b84ef72f4ff797485cb77b079e85d80bcfef9cdefbc8a158",
+          "339c9d4527e0a962f44b8d1170407a54521065565b3364247271250a5d933bbc",
+          "f9e7694ae99e2fa742223d0afbcc9eb296c25071d5c037da4e609793620a11a0",
+          "9fba4e8984e10b65379f3eb7351f2dc16586350c79d0466a8415cc5bc00557ff",
+          "d71416d6bd6397a4ce14cd62b7b11cd397b3220a15f4980e51a265ce528c5232",
+          "4714f23d95c21016045bed75cae8c1e0054549e639e1f21c6d5a88ca014ab0a9",
+          "f97ba7c660f27b41c5c148e46b7953bd963e3bf1d07c4dcf25014b088bfadd15",
+          "1b31c1e76377584a55ce0b98d73ff6177023969afceb9355a87ddb525136517a",
+          "6028102f105b36c54cd68f71965dc22c407a26c1e90b72409d0f9badd993deeb",
+          "cd6cf0c66fd64c7fb611821976ad6256f55bb89b2a0c3b52fbe0dfd50f025c19",
+          "80eef1fd89b4e506a9ab9f9cfad7bfe1b52c1ef783a6247a14024de73df229d3",
+          "9b278485c4d395a08461a15e81d1b7a5a202de81dcb7a2b4294ce51bb715c487",
+          "c3658ba5e5a056fa97ccf1bf41c3506aa785da9cca9f78a9569e7b3454b5aab1",
+          "94dd003b324cb38b26196525d0a13112be1a74c6c0241870b303dc588032bac9",
+          "ac252f31e305e22af9edf140fe45ed815e03af74f4f9a47ae81d0b05e1c67491",
+          "7c28298b34908cefd017aafcd9759661514f875450ae9aa667a5a88fe8b0574c",
+          "d61b1633cb1ec033275961b59daaabe4b75956a95401ea7a5673c1bbdb5757b0",
+          "1b53666dd820429b643dbea694809916f0e3665fb0ef80b0cf8b50e410373cd0",
+          "5a1d9529be3b4fd49573a3682ba7b62b49803ae5106c17765f318df5d831d1b4",
+          "7ebbcc07ef7e8571b13f64be825d37fc2b7ef16abd6db603e2e7e82e381ef1b3",
+          "7d41dbd79a11609514a1f952816cbf9eb5b5e4f21e26da4620b064133f9d9114",
+          "5b5d1c9196a7ead826bc9d16e4e702bf90ba74772cfe761d7b8cf5b9a733b57c",
+          "c5a73da73dd3452ed287d5e0f4f7f68adf3c9f341d7ed733127341828dea213f",
+          "c7372454bdbaa577419e14820ae85ed184d11fad0f7066628a2428f70276403a",
+          "c630bcadf2b7b64fea0d86897c533b43c29f6fa98bc843d1eb1c37d899eda9d0",
+          "644f355114743f5865bfe3bea3de93c24b657849cadd60c4e5cdfafca7263ac1",
+          "41f204bafc806967b9f00319fc4973e6e4527c7c62917506258800d7d30c5d38",
+          "639678a01bdea791306f3666909504228996e0e97462d684917f805a81425c8a",
+          "9fce268ed8c90a0c8f3469a82b2957cb3eb617ae6ed21011d5cb3e8d4a8d92ac",
+          "571dd7e2993ac29a9815d257091375131e7fe62b7c6a23f34137adb81cbbfe47",
+          "62c12e673e0f15aa293ee6df5cfca4b1debf8434d1167b748b09311594cbffb1",
+          "d5c75d35ad3c1b0ebc2c65b548d9b6c9c2e6a83e5a5fc21ea00e02269c78edf6",
+          "829332ecb676a8f696a344721d02c6f2fdb88566e8f53dfa0b2005829963f404",
+          "cbbee8d7d97daccef23e9e6a2cbbf5337681451ca17fa68eeac5a3f7631b23c2",
+          "78c687e54c18e540d91981d27d1fcf521d81f2f9ce8529d5cb79cd9cac2f308f",
+          "9595ef7a7ad865f98a54d6a68e7b36d158d035b93bc240b8348a22b8d15d06b2",
+          "57ca006075e04e12f66f0708f27150816c32df4b94529e311af8a834f70b1ecf",
+          "685344b81ca184d8cfabb0c8ebbe04ae311946f524d698ded6af15d04a4053db",
+          "3b145660e3b1ed132f136471bdc3ad3ace8ac78f249f43c15828ac822b015a7e",
+          "828bf2a5c1e1efb354ead832b42991cfa3207b1f3a7928fbd76981dbafc7ab48",
+          "8f1d2502e8632b323b341f9cf7b3b2bd4da2872112fd143a1531428c605d3968",
+          "238444263968ed5e7fffb6b12ed240c3177f35fc92621a151aa88b0abb024b99",
+          "28969b911298f18e725777c80943bc40d5c6b6159a5066a614b4ec6be4ac4777",
+          "7ae4a5d6494bd63438e340ec8781ad3b48af49e81f1079ed29cf590251ac3411",
+          "eb099f6fbc2392bba3187b9579478ec971a9fe2033c7d5dc04038cb8671bfe0d",
+          "a0f8d84a830b9275508a01e98e61b0ddd5df9c60d372f9991f60f2efc375c44b",
+          "4d2ad290f004365bb81c8e18d549093334c9c29f36d93fc715638fe7be5722b9",
+          "f4c00d1dabce61927bc5f8f1c6c5dcfe13eaf24b0897bf7f1636a4f8b23314da",
+          "1c224fff5a598ec174180cdbc3c4fba6a5f67116162fb064605a3aefe0b0834f",
+          "a1ec30acccd2d947b2d0643e554a2d143eb44932a4ec852192a4feba367d2c3d",
+          "feda0e823d73e9f1ffba1967b334b30ef7a4c297a618c5d2d3994e29428cc39b",
+          "c933e03eebcc10d1b449d1ffd6da3da05046051e8620595ded3131aa49d94597",
+          "569586f2c362681907faba1f06a64171e1545b8c63fdb8762c40cc9f81b564e0"
+        ]
+      }
+    ]
+  }
+}

@@ -26,4 +26,11 @@ for(let i=0;i<7;i++){const a=mixed.sim.agents[i][1];a.state=i;}
 Object.assign(mixed.sim.agents[8][1],{state:2,from:0,to:0,cell:0});
 check(mixed,all,'resting-planning-platform-riders-and-facility-occupants');
 const layered=fixture(80,80);for(let i=0;i<layered.sim.agents.length;i+=2){const a=layered.sim.agents[i][1];for(const k of ['from','to','cell'])a[k]+=16384;}check(layered,all,'ground-only');check(layered,{...all,layer:1},'underground-only');
+// Former namespace collision: facility 0 was key 200000, equal to lane
+// (underground node 25000, east, lane 0). Invisible pickup cars must not rank it.
+const namespaceCity=structuredClone(template),resident=namespaceCity.sim.agents[0][1];
+namespaceCity.world.tiles=[[0,3],[24999,1],[25000,1]];namespaceCity.sim.ids=[1,2,3];namespaceCity.sim.agents=[1,2,3].map(id=>[id,{...resident,id,state:2,mode:2,home:0,from:id===1?0:24999,to:id===1?0:25000,cell:id===1?0:25000,dir:0,prior:0,lane:0,route:0,step:0,ready:id===1?0:10+id,elapsed:1,duration:2}]);
+const separated=runCase({city:namespaceCity,view:{...all,layer:1}},'street-layer-queue-namespace','street-probe').result;
+assert.equal(separated.driving,2);assert.deepEqual(separated.actors.map(a=>[a.id,a.rank]),[[2,0],[3,1]],'Ground pickup and underground lane namespaces must be disjoint');
+checks.push({name:'layer-queue-namespace',walking:0,driving:2,ranks:separated.actors.map(a=>a.rank)});
 fs.writeFileSync('evidence/street-presentation.json',JSON.stringify({passed:true,artifact_sha256:selection.artifact_sha256,checks},null,2));console.log(JSON.stringify({passed:true,checks},null,2));

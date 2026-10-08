@@ -16,7 +16,7 @@ for(const reverse of [false,true]){
  const entrants=r.agents.filter(a=>a.id<=2&&[g,U+g].includes(a.cell));assert.equal(entrants.length,1,'Both layers admitted a conflicting portal movement in one cycle');assert(r.agents.some(a=>a.id<=2&&a.reason===5));assert.equal(new Map(r.busy).get(g),15);assert(!new Map(r.busy).has(U+g));
  for(let i=0;i<48;i++){
   assert.equal(r.conservation,0);for(const [,count]of r.lanes)assert(count>=0&&count<=3);for(const [,mask]of r.busy)assert(mask>=0&&mask<=15,'Conflicting masks overlapped');
-  for(const a of r.agents.filter(a=>a.id<=2&&a.from!==a.to&&a.from%U===a.to%U)){assert.equal(a.dir,a.prior,'Vertical movement rotated a driver arbitrarily');assert.equal(a.from%U,g);}
+  for(const a of r.agents.filter(a=>a.id<=2&&a.from!==a.to&&a.from%U===a.to%U)){assert.equal(a.dir,a.prior,'Vertical movement rotated a driver arbitrarily');assert([g,g+2].includes(a.from%U));assert.equal(new Map(r.city.world.tiles).get(a.from%U),13);}
   samples.push({reverse,tick:r.city.sim.tick,people:r.agents.filter(a=>a.id<=2).map(a=>({id:a.id,cell:a.cell,from:a.from,dir:a.dir,zone:a.zone,reason:a.reason,journeys:a.journeys}))});city=r.city;r=runCase({city,ticks:1,commands:[],after:[]},'portal-step-'+reverse+'-'+i,'continuation').result;
  }
  assert(r.agents.filter(a=>a.id<=2).every(a=>a.journeys>0),'Portal reservation deadlocked one of the opposing drivers');checks.push(`Opposing surface/underground arrivals (${reverse?'reversed':'ordinary'} resident priority) serialize at one conflict domain and both complete`);

@@ -3,7 +3,7 @@ import {runCase,selection} from './run-case.mjs';
 import {assertMoney} from './rail-accounting.mjs';
 import {riverPoints,waterAt} from '../web/geometry.js';
 const checks=[],id=(x,y)=>x+128*y,command=(op,x=0,y=0,x2=x,y2=y,kind=0)=>({op,x,y,x2,y2,kind});
-function invariants(r){assert.equal(r.conservation,0);assertMoney(r.city);const s=r.city.sim;assert.equal(s.population,1024);assert.equal(s.population,s.born-s.removed);assert.equal(s.requested,s.arrived+s.cancelled+r.agents.filter(a=>[1,2,4,5,6].includes(a.state)).length);for(const[,line]of s.transit.lines){assert(line.passengers.length<=line.capacity);assert.equal(new Set(line.passengers).size,line.passengers.length)}}
+function invariants(city){assertMoney(city);const s=city.sim,agents=s.agents.map(([,a])=>a);assert.equal(s.population,1024);assert.equal(agents.length,s.population);assert.equal(new Set(agents.map(a=>a.id)).size,s.population);assert.equal(s.population,s.born-s.removed);assert.equal(s.requested,s.arrived+s.cancelled+agents.filter(a=>[1,2,4,5,6].includes(a.state)).length);for(const[,line]of s.transit.lines){assert(line.passengers.length<=line.capacity);assert.equal(new Set(line.passengers).size,line.passengers.length)}}
 const initial=runCase({rows:-1,tiles:[],ticks:0,commands:[],after:[]},'waterfront-initial').result.city;
 const apply=(city,commands,name)=>runCase({city,ticks:0,commands,after:[]},name,'continuation').result;
 assert.equal(initial.landscape,1);
@@ -20,9 +20,22 @@ assert.equal(city.landscape,1);assert.equal(city.sim.population,1024);assert.equ
 const tiles=new Map(city.world.tiles),stations=[...tiles].filter(([,k])=>k===8);assert.equal(stations.length,16);
 for(const[cell,kind]of tiles)if(kind>=3&&kind<=6||kind===8)assert(!waterAt(points,6,cell),'Facility on water '+cell);
 checks.push('Native seed creates 1,024 residents, 1,024 jobs, sixteen dry stations and four enabled four-stop services.');
-const samples=[];let maxWait=0;for(let i=0;i<16;i++){const run=runCase({city,ticks:8,commands:[],after:[]},'waterfront-advance-'+i,'continuation');invariants(run.result);city=run.result.city;maxWait=Math.max(maxWait,city.sim.waiting);samples.push({tick:city.sim.tick,visits:city.sim.visits,arrived:city.sim.arrived,waiting:city.sim.waiting,disconnected:city.sim.disconnected,boardings:city.sim.transit.boardings,completed:city.sim.transit.completed,wall_ms:run.wall_ms});console.log("Native city",samples.at(-1))}
+// The generic continuation result duplicates the complete residents and routes
+// already inside City. At 1,024 residents that duplicate output exceeds typed
+// JSON admission before cycle 128. Use the existing compact native observer,
+// retain the full City, and strengthen conservation checks to every two cycles.
+// No route is trimmed and no native admission or simulation limit is raised.
+city={...city,paused:false};const ordinary8=runCase({city,ticks:8,commands:[],after:[]},'waterfront-observer-reference','continuation').result.city;
+const samples=[];let maxWait=0;
+for(let i=0;i<64;i++){
+ const run=runCase({city,ticks:2},'waterfront-compact-'+i,'atlas-probe');city=run.result.city;invariants(city);
+ assert.equal(run.result.frames.length,2);assert.equal(run.result.frames[0].tick,city.sim.tick-1);assert.equal(run.result.frames[1].tick,city.sim.tick);
+ for(const f of run.result.frames){assert.equal(f.residents.length,1024);assert.equal(new Set(f.residents.map(a=>a.id)).size,1024)}
+ if(city.sim.tick===8)assert.deepEqual(city,ordinary8,'Compact observer must preserve the complete ordinary simulation state');
+ maxWait=Math.max(maxWait,city.sim.waiting);samples.push({tick:city.sim.tick,visits:city.sim.visits,arrived:city.sim.arrived,waiting:city.sim.waiting,disconnected:city.sim.disconnected,boardings:city.sim.transit.boardings,completed:city.sim.transit.completed,wall_ms:run.wall_ms});if(city.sim.tick%8===0)console.log('Native city',samples.at(-1));
+}
 assert(city.sim.visits>0);assert(city.sim.transit.boardings>0);assert(city.sim.transit.completed>0);
-checks.push('128 native cycles preserve residents, requests, money and train capacity while producing actual visits and completed rail journeys.');
+checks.push('Compact native observer matches the complete ordinary eight-cycle state; all 128 cycles retain full city/routes, two-cycle conservation checks, all resident IDs and finite train capacity while producing visits and completed rail journeys.');
 // runCase already owns a fresh directory. Do not rely on a dated local directory
 // or overwrite the fixture from another invocation of this integration test.
 const fixture=seeded.dir+'/mature-city.json';

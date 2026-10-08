@@ -1,13 +1,13 @@
 # Prepared directed-routing kernel (experimental)
 
 This document records the earlier command-only routing-kernel experiments.
-The kernel is now wired into the ordinary game pipeline together with layered
-construction, removal, migration, and browser controls. The integrated candidate
-is **not release-approved**: directed-trip gates remain unresolved, and paired
-whole-game measurements do not establish an overall performance improvement.
-See [the integration checkpoint](DIRECTED-TUNNELS-STATUS.md) for the exact tested
-artifact and outstanding failures. Do not infer game speedups from the kernel
-measurements below.
+The kernel is integrated with construction, actual movement, bounded car-return
+admission, layer-specific removal, typed saves and browser controls. See the
+[current integration verification](DIRECTED-TUNNELS-STATUS.md) and
+[source-bound whole-game results](DIRECTED-TUNNELS-RESULTS.json).
+Kernel measurements below do not establish a whole-game speedup. The integrated
+game's measured instruction overhead and real-session behavior are reported
+separately; source integration is not a deployment.
 
 ## Native representation
 

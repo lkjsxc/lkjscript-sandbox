@@ -4,7 +4,7 @@ A browser city-building experiment using **lkjscript 0.1.83**. Native lkjscript 
 
 This is one independent project in [lkjscript-sandbox](../../README.md). It starts with a fresh local store; it does not connect to or replace an existing hosted city.
 
-**This branch is an unreleased directed-roads/tunnels integration checkpoint.** Construction, layered views, and save migration are implemented, but directed-trip release gates and whole-game performance improvement remain unresolved. See [the exact validation status](docs/DIRECTED-TUNNELS-STATUS.md). Do not deploy this checkpoint over a hosted city.
+Ground and underground roads, explicit tunnel portals and one-way driving are integrated. Before taking a car onto a directed network, residents also need a connected car route home. See [the model, verification and measured costs](docs/DIRECTED-TUNNELS-STATUS.md) and [source-bound results](docs/DIRECTED-TUNNELS-RESULTS.json). Building or updating this checkout does not deploy it over an existing hosted city.
 
 ## Build and run
 
