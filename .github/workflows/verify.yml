@@ -23,7 +23,9 @@ jobs:
       - run: node scripts/check-repository.mjs
   traffic-city:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    # Native build plus all existing suites and the added directed-trip traces.
+    # This outer CI budget does not change game/runtime or test admission limits.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -34,15 +36,23 @@ jobs:
           cache: npm
           cache-dependency-path: projects/traffic-city/package-lock.json
       - run: ./sandbox traffic-city setup
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
         working-directory: projects/traffic-city
       - run: ./sandbox traffic-city build
       - run: ./sandbox traffic-city test
+      - run: npm run test:tunnels
+        working-directory: projects/traffic-city
+      - run: npm run test:tunnel-ui
+        working-directory: projects/traffic-city
+      - run: npm run test:city-lab-ui
+        working-directory: projects/traffic-city
       - run: npm run test:rail
         working-directory: projects/traffic-city
       - run: npm run test:repair
         working-directory: projects/traffic-city
       - run: ./sandbox traffic-city smoke
+      - run: npm run test:webkit
+        working-directory: projects/traffic-city
       - run: npm run test:delay-atlas
         working-directory: projects/traffic-city
       - run: npm run test:delay-atlas-ui

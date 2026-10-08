@@ -13,7 +13,7 @@ fn('water',[('city','City'),('id','I64')],'Bool',LET([('a',C('center',V('city'),
 # Packed half-tile X and integer Y, bounded to 129 vertices per topology frame.
 fn('spine',[('city','City'),('y','I64'),('out','(list I64)')],'(list I64)',IF(le(V('y'),I(128)),C('spine',V('city'),add(V('y'),I(1)),append('I64',V('out'),add(C('center',V('city'),mul(V('y'),I(2))),mul(V('y'),I(512))))),V('out')))
 fn('surface',[('kind','I64')],'Bool',OR(C('game::road',V('kind')),eq(V('kind'),I(7))))
-fn('tile-price',[('city','City'),('id','I64'),('kind','I64')],'I64',IF(C('water',V('city'),V('id')),IF(eq(V('kind'),I(2)),I(72),IF(eq(V('kind'),I(1)),I(32),IF(eq(V('kind'),I(7)),I(16),C('game::price',V('kind'))))),C('game::price',V('kind'))))
+fn('tile-price',[('city','City'),('id','I64'),('kind','I64')],'I64',IF(C('water',V('city'),V('id')),IF(eq(V('kind'),I(2)),I(72),IF(eq(V('kind'),I(1)),I(32),IF(C('roads::oneway',V('kind')),I(48),IF(eq(V('kind'),I(7)),I(16),C('game::price',V('kind')))))),C('game::price',V('kind'))))
 fn('cost',[('city','City'),('x','I64'),('y','I64'),('x2','I64'),('y2','I64'),('kind','I64')],'I64',add(IF(eq(get(V('city.world.tiles'),C('game::id',V('x'),V('y'))),V('kind')),I(0),C('tile-price',V('city'),C('game::id',V('x'),V('y')),V('kind'))),IF(lt(V('x'),V('x2')),C('cost',V('city'),add(V('x'),I(1)),V('y'),V('x2'),V('y2'),V('kind')),IF(lt(V('y'),V('y2')),C('cost',V('city'),V('x'),add(V('y'),I(1)),V('x2'),V('y2'),V('kind')),I(0)))))
 fn('new-water',[('city','City'),('x','I64'),('y','I64'),('x2','I64'),('y2','I64')],'Bool',LET([('id',C('game::id',V('x'),V('y')))],OR(AND(C('water',V('city'),V('id')),NOT(C('surface',get(V('city.world.tiles'),V('id'))))),IF(lt(V('x'),V('x2')),C('new-water',V('city'),add(V('x'),I(1)),V('y'),V('x2'),V('y2')),IF(lt(V('y'),V('y2')),C('new-water',V('city'),V('x'),add(V('y'),I(1)),V('x2'),V('y2')),B(False))))))
 fn('bridge-error',[('city','City'),('x','I64'),('y','I64'),('x2','I64'),('y2','I64'),('kind','I64')],'Text',IF(AND(C('surface',V('kind')),C('new-water',V('city'),V('x'),V('y'),V('x2'),V('y2')),OR(C('water',V('city'),C('game::id',V('x'),V('y'))),C('water',V('city'),C('game::id',V('x2'),V('y2'))))),T('A new bridge must reach dry land at both ends. Drag a complete bank-to-bank road or footpath.'),T('')))
@@ -24,7 +24,7 @@ for x,expected in [(61,False),(62,True),(64,True),(67,True),(68,False)]:test('br
 for y,x in [(20,58),(36,70),(51,65),(71,65),(81,75),(93,75),(102,66)]:test('river-bend-'+str(y),C('center',fixture,I(2*y)),I(2*x))
 test('static-spine-bounded',llen('I64',C('spine',fixture,I(0),LS('I64'))),I(129))
 test('legacy-river-retains-footprint',C('width',ZERO('City')),I(2))
-for kind,total in [(1,208),(2,480),(7,104)]:test('bridge-full-price-'+str(kind),C('cost',fixture,I(61),I(64),I(68),I(64),I(kind)),I(total))
+for kind,total in [(1,208),(2,480),(7,104),(9,312),(10,312),(11,312),(12,312)]:test('bridge-full-price-'+str(kind),C('cost',fixture,I(61),I(64),I(68),I(64),I(kind)),I(total))
 test('bank-to-bank-accepted',C('bridge-error',fixture,I(61),I(64),I(68),I(64),I(1)),T(''))
 test('partial-bridge-refused',C('bridge-error',fixture,I(61),I(64),I(65),I(64),I(7)),T('A new bridge must reach dry land at both ends. Drag a complete bank-to-bank road or footpath.'))
 

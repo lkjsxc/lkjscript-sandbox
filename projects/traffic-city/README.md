@@ -1,8 +1,10 @@
 # Traffic City
 
-A browser city-building experiment using **lkjscript 0.1.77**. Native lkjscript owns simulation, travel, rail, money, persistence, HTTP, and interactive sessions. Browser JavaScript handles input, drawing, and interpolation. There is no Node, Python, or Rust game server.
+A browser city-building experiment using **lkjscript 0.1.83**. Native lkjscript owns simulation, travel, rail, money, persistence, HTTP, and interactive sessions. Browser JavaScript handles input, drawing, and interpolation. There is no Node, Python, or Rust game server.
 
 This is one independent project in [lkjscript-sandbox](../../README.md). It starts with a fresh local store; it does not connect to or replace an existing hosted city.
+
+Ground and underground roads, explicit tunnel portals and one-way driving are integrated. Before taking a car onto a directed network, residents also need a connected car route home. See [the model, verification and measured costs](docs/DIRECTED-TUNNELS-STATUS.md) and [source-bound results](docs/DIRECTED-TUNNELS-RESULTS.json). Building or updating this checkout does not deploy it over an existing hosted city.
 
 ## Build and run
 
@@ -52,7 +54,7 @@ Only the latest tab to resume a city may save it. Earlier tabs become inactive a
 
 **Menu → Example cities** offers Garden City (384 residents), Crossing Challenge (256), and Willow Metro (512, two bent three-stop services). Each has a different traffic challenge. These are authored layouts with native-generated residents, never player saves. Loading requires confirmation and makes the current city the one recoverable backup; loading another example replaces the older backup. Cancel leaves the city unchanged.
 
-Menu also contains Save, Guide, Preferences and Manage city. Reset requires a review and keeps one native backup of the previous city under the same private key. Restore previous city recovers that backup once; resetting does not consume another city slot. Format 8 records a landscape identity and explicitly reads published format-4 through format-7 saves, retaining coordinates and resident state. Legacy rail services gain explicit geometry and stops; the monetary ledger records opening balances without rewriting earlier income.
+Menu also contains Save, Guide, Preferences and Manage city. Reset requires a review and keeps one native backup of the previous city under the same private key. Restore previous city recovers that backup once; resetting does not consume another city slot. Format 9 supports layered roads and explicitly reads format-8 saves while retaining the existing typed predecessor readers. Migration preserves the landscape identity, coordinates and resident state; it rebuilds static routing metadata and clears the obsolete route lookup. Older releases refuse the new record format rather than interpreting underground coordinates as ground cells. Legacy rail services gain explicit geometry and stops; the monetary ledger records opening balances without rewriting earlier income.
 
 The supplied host descriptor allows **1,024 saved cities**, four simultaneous sessions, a 4 MiB value limit, and no automatic city eviction. The saved-city limit is configurable from 1 to 4,096 with `configuration.saved_city_limit`; it is independent of simultaneous sessions. Each slot can also hold one previous-city backup. Native backup/restore compacts physical history at the greater of 64 MiB or twice its last compacted size. This is a maintenance threshold, not a hard OS quota; in-flight writes can exceed it temporarily. Old checkpoint directories remain untouched.
 

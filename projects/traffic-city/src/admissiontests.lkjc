@@ -21,7 +21,7 @@ declarations.begin
  (type-alias City (record (world World) (sim Sim) (cash I64) (level I64) (permits I64) (paused Bool) (milestone I64) (originX I64) (originY I64) (economy Economy) (landscape I64)))
  (type-alias Command (record (op Text) (x I64) (y I64) (x2 I64) (y2 I64) (kind I64)))
  (type-alias Outcome (record (city City) (notice Text)))
- (type-alias EditQuote (record (id I64) (version I64) (x I64) (y I64) (x2 I64) (y2 I64) (tiles I64) (homes I64) (moveouts I64) (relocated I64) (cancelled I64) (refund I64) (rails I64) (valid Bool)))
+ (type-alias EditQuote (record (id I64) (version I64) (x I64) (y I64) (x2 I64) (y2 I64) (tiles I64) (homes I64) (moveouts I64) (relocated I64) (cancelled I64) (refund I64) (rails I64) (layer I64) (valid Bool)))
  (type-alias Removal (record (tiles Numbers) (signals Numbers) (selected Numbers) (count I64) (homes I64) (refund I64) (rails I64) (railIds Numbers) (tracks Numbers)))
  (type-alias Relocation (record (agents Residents) (ids (list I64)) (moveouts I64) (relocated I64) (cancelled I64)))
  (type-alias Buckets (map I64 (list I64)))

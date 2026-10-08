@@ -4,7 +4,7 @@ This project is a lkjscript capability experiment inside the public lkjscript-sa
 
 Authoritative simulation, validation, routing, traffic conservation, economics, demand, views, and persistence belong to ordinary lkjscript declarations. Browser JavaScript owns input, drawing, and interpolation only. Native HTTP and interactive targets serve the game; no Node or Python game server or relay.
 
-Use pinned lkjscript 0.1.77. src/*.lkjc are literal proposals replayed into a fresh accepted graph by scripts/author.mjs through change plan/apply, check, and build. Never edit accepted graph internals. .build/selection.json binds the selected source, executable, and artifact. Python proposal generators are optional development tooling, not runtime code.
+Use pinned lkjscript 0.1.83. src/*.lkjc are literal proposals replayed into a fresh accepted graph by scripts/author.mjs through change plan/apply, check, and build. Never edit accepted graph internals. .build/selection.json binds the selected source, executable, and artifact. Python proposal generators are optional development tooling, not runtime code.
 
 Preserve requested = arrived + explicitly cancelled + outstanding journeys. Road storage and receiving reservations are finite. Invalid edits must reject atomically. Reviewed removal must explicitly count cancelled journeys and moveouts and cannot earn arrival income. Invalidate routes on topology changes. Preserve save formats and typed predecessor readers, browser-owned city keys, autosave, single-tab ownership, and bounded storage.
 

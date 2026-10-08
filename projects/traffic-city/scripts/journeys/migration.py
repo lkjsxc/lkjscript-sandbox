@@ -24,7 +24,8 @@ exec((Path(__file__).parent/'migration_v6.py').read_text())
 TYPES['Legacy7City']={k:v for k,v in TYPES['City'].items() if k!='landscape'}
 TYPES['Legacy7Saved']={'format':'I64','owner':'Text','serial':'I64','city':'Legacy7City'}
 fn('decode-v7',[('bytes','Bytes')],'Saved',LET([('old7',G('std::data-decode-or','Legacy7Saved',V('bytes'),ZERO('Legacy7Saved',format=I(-1))))],IF(eq(V('old7.format'),I(7)),R(format=I(8),owner=V('old7.owner'),serial=V('old7.serial'),city=R(**{k:V('old7.city.'+k) for k in TYPES['Legacy7City']},landscape=I(0))),C('decode-v6',V('bytes')))))
-fn('decode',[('bytes','Bytes')],'Saved',LET([('current',G('std::data-decode-or','Saved',V('bytes'),C('invalid')))],IF(eq(V('current.format'),I(8)),V('current'),C('decode-v7',V('bytes')))))
+fn('prepare',[('saved','Saved')],'Saved',IF(eq(V('saved.format'),I(8)),PATCH('Saved',V('saved'),format=I(9),city=PATCH('City',V('saved.city'),world=C('game::world',V('saved.city.world.tiles'),V('saved.city.world.signals'),V('saved.city.world.version')),sim=PATCH('Sim',V('saved.city.sim'),lookup=MP()))),V('saved')))
+fn('decode',[('bytes','Bytes')],'Saved',LET([('current',G('std::data-decode-or','Saved',V('bytes'),C('invalid')))],IF(eq(V('current.format'),I(9)),V('current'),C('prepare',IF(eq(V('current.format'),I(8)),V('current'),C('decode-v7',V('bytes')))))))
 legacy=ZERO('LegacySaved',format=I(4),owner=T('test-owner'),serial=I(17),city=ZERO('LegacyCity',cash=I(719),level=I(3),permits=I(5),paused=B(True),milestone=I(61),sim=ZERO('LegacySim',nextId=I(5033),requested=I(53),arrived=I(48))))
 D.append(TEST('v4-explicit-cash-preserved',F(F(C('decode',G('std::data-encode','LegacySaved',legacy)),'city'),'cash'),I(719)))
 D.append(TEST('v4-explicit-id-preserved',F(F(F(C('decode',G('std::data-encode','LegacySaved',legacy)),'city'),'sim'),'nextId'),I(5033)))
@@ -35,7 +36,7 @@ D.append(TEST('v5-centered-origin-preserved',F(F(C('decode',G('std::data-encode'
 D.append(TEST('unknown-save-refused',F(C('decode',G('std::data-encode','LegacySaved',ZERO('LegacySaved',format=I(99)))),'format'),I(-1)))
 # Keep version readers independently reviewable within normal proposal budgets.
 import re
-groups={'migration4':('migrate4',{'choices','city-v4','city-v5'}),'migration6':('migrate6',{'line-v6','lines-v6','transit-v6','city-v6'}),'migration':('migrate',{'invalid','decode-v4','decode-v5','decode-v6','decode-v7','decode'}),'migration-tests':('migratetests',{'v6-example','v6-train-example'})}
+groups={'migration4':('migrate4',{'choices','city-v4','city-v5'}),'migration6':('migrate6',{'line-v6','lines-v6','transit-v6','city-v6'}),'migration':('migrate',{'invalid','decode-v4','decode-v5','decode-v6','decode-v7','prepare','decode'}),'migration-tests':('migratetests',{'v6-example','v6-train-example'})}
 owners={name:module for _,(module,names) in groups.items() for name in names}
 for file,(module,names) in groups.items():
  out=[]

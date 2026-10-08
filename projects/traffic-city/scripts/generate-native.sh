@@ -2,7 +2,11 @@
 # Optional development step; Python emits proposals and never runs the simulation.
 set -eu
 cd "$(dirname "$0")/.."
+python3 scripts/journeys/roads.py
+python3 scripts/journeys/roadcache.py
+python3 scripts/journeys/roadbuild.py
 python3 scripts/journeys/planning_gate.py
+python3 scripts/journeys/returnplan.py
 python3 scripts/journeys/simulation.py
 python3 scripts/journeys/terrain.py
 python3 scripts/journeys/rail.py
@@ -27,3 +31,5 @@ python3 scripts/journeys/planning_proof.py
 python3 scripts/journeys/planning_checks.py
 python3 scripts/journeys/street_tests.py
 python3 scripts/journeys/walk_trace.py
+
+python3 scripts/journeys/roadintegration.py

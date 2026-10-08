@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {Script} from 'node:vm';
+import {layerOf} from '../web/geometry.js';
 import {actorPath,actorPose,transitionPose,TrafficMotion,pedestrianSize,streetCaption} from '../web/motion.js';
 const directions=[[1,0],[0,1],[-1,0],[0,-1]], center=50+50*128, cells=new Map();
 for(let y=46;y<55;y++)for(let x=46;x<55;x++)cells.set(x+y*128,{kind:2});
@@ -38,7 +39,7 @@ assert(begin>=0&&end>begin);const draw=new Script(app.slice(begin,end)+';drawRes
 let dotCases=0;
 for(const mode of[1,3])for(const id of[0,1,2,1330])for(const scale of[2,15.9,16,48,240]){
  const calls=[],paints=[],context=new Proxy({}, {get:(_,name)=>(...args)=>calls.push({name,args}),set:(_,name,value)=>(paints.push({name,value}),true)});
- draw.runInNewContext({ctx:context,camera:{scale},pedestrianSize,trafficMotion:{sample:()=>[{id,mode,x:7,y:11,angle:.7}]},motionReduced:()=>false});
+ draw.runInNewContext({ctx:context,camera:{scale},layer:0,layerOf,pedestrianSize,trafficMotion:{sample:()=>[{id,mode,from:1287,to:1415,x:7,y:11,angle:.7}]},motionReduced:()=>false});
  assert.deepEqual(calls.map(c=>c.name),['save','translate','rotate','beginPath','arc','fill','restore']);
  assert.deepEqual(calls.find(c=>c.name==='arc').args,[0,0,pedestrianSize(scale).radius,0,Math.PI*2]);
  assert.deepEqual(paints,[{name:'fillStyle',value:['#466957','#be7e58','#826f99'][id%3]}]);dotCases++;
