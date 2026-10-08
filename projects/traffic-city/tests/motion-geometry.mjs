@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {actorPath,actorPose,transitionPose,TrafficMotion} from '../web/motion.js';
+import {actorPath,actorPose,transitionPose,TrafficMotion,pedestrianSize,streetCaption} from '../web/motion.js';
 const directions=[[1,0],[0,1],[-1,0],[0,-1]], center=50+50*128, cells=new Map();
 for(let y=46;y<55;y++)for(let x=46;x<55;x++)cells.set(x+y*128,{kind:2});
 const error=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y), angle=(a,b)=>Math.abs(Math.atan2(Math.sin(a-b),Math.cos(a-b)));
@@ -26,4 +26,12 @@ m.receive(frame(11,a,{detail:false,actors:[]}),1100,cells);assert.deepEqual(m.sa
 m.receive(frame(11,{...a,elapsed:1}),1250,cells);assert.equal(m.sample(1300).length,1);
 m.receive(frame(3,a,{stats:{tick:3,version:2,paused:true}}),1400,cells);assert.equal(m.time,3);assert.equal(m.frames.size,1);
 const birth=new TrafficMotion();birth.receive(frame(1,a),0,cells);birth.receive({...frame(2,a),actors:[a,{...a,id:4}]},500,cells);assert.equal(birth.sample(700).length,1);assert.equal(birth.sample(1000).length,2);
+// Overview packets carrying real people are drawn, not thrown away.
+const overviewMotion=new TrafficMotion();overviewMotion.receive(frame(4,a,{detail:false}),0,cells);assert.equal(overviewMotion.sample(0).length,1);
+overviewMotion.receive(frame(5,a,{detail:false,mapChanged:true}),500,cells);assert.deepEqual(overviewMotion.sample(500),[]);
+for(const scale of[.5,2,5,12,20,48,96,240]){const g=pedestrianSize(scale);assert(g.radius*scale>=1.5);assert(Math.abs(g.outline*scale-.7)<1e-9);assert.equal(g.detailed,scale>=16)}
+for(const scale of[0,-1,NaN,Infinity])assert.throws(()=>pedestrianSize(scale),RangeError);
+assert.deepEqual(streetCaption({streetWalkers:81,streetDrivers:200,actors:Array(128)}),{counts:'In view · 81 on foot · 200 in cars',sample:'128 of 281 shown · zoom for detail'});
+assert.equal(streetCaption({mapChanged:true}).counts,'Updating street view…');
+assert.equal(streetCaption({streetWalkers:2,streetDrivers:0,actors:[{},{}]}).sample,'2 street travellers shown');
 const report={passed:true,geometries:cases,maxStepPerHundredth:maxStep,maxHeadingPerHundredth:maxHeading,checks:['C1 adjacent edge joins','arc length movement','opposite lanes','three FIFO ranks despite duplicate stored slots','same-tick view/save reply continuity','pause settles without teleport','overview/detail return','authoritative reset']};fs.writeFileSync('evidence/motion-geometry.json',JSON.stringify(report,null,2));console.log(report);

@@ -44,7 +44,7 @@ fn('plan-choice',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'
  PATCH('Resident',V('planned'),state=I(2),step=I(0),exitKey=I(0),zone=I(0),
  route=IF(V('byRail'),V('search.choice.accessRoute'),IF(eq(V('mode'),I(1)),V('walk.id'),V('car.id'))),mode=V('mode'),
  eta=IF(V('byRail'),V('search.choice.eta'),IF(eq(V('mode'),I(1)),V('etaWalk'),V('etaCar'))),elapsed=I(0),
- duration=IF(AND(eq(V('mode'),I(2)),V('origin')),I(6),I(0)),**{'from':V('r.cell'),'to':V('r.cell')},wait=I(0),reason=IF(eq(V('mode'),I(2)),I(6),I(0)),lane=I(0),ready=V('tick'))))))))))
+ duration=IF(AND(eq(V('mode'),I(2)),V('origin')),C('game::car-access-time'),I(0)),**{'from':V('r.cell'),'to':V('r.cell')},wait=I(0),reason=IF(eq(V('mode'),I(2)),I(6),I(0)),lane=I(0),ready=V('tick'))))))))))
 # A zero-budget planning turn cannot allocate or alter a route. At a facility,
 # a missing required surface route forces the original planner to wait before
 # committing any rail choice. Preserve its destination and ETA observations,

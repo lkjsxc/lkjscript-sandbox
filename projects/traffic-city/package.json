@@ -67,7 +67,11 @@
     "test:planning-bounds": "node tests/planning-bounds.mjs",
     "test:planning-ui": "node tests/with-preview.mjs tests/planning-ui.mjs",
     "test:planning-delivery": "node tests/planning-delivery.mjs",
-    "test:planning-profile": "node tests/planning-profile.mjs"
+    "test:planning-profile": "node tests/planning-profile.mjs",
+    "test:street-presentation": "node tests/street-presentation.mjs",
+    "test:walkability": "node tests/walkability.mjs",
+    "test:street-ui": "node tests/with-preview.mjs tests/street-ui.mjs",
+    "test:walking-profile": "node tests/walking-profile.mjs"
   },
   "engines": {
     "node": ">=22"

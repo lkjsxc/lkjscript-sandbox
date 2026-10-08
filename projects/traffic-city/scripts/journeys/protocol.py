@@ -56,3 +56,8 @@ TYPES['AtlasWire']={**TYPES['AtlasView'],'homes':'(list AtlasWireHome)'}
 TYPES['Lab']['atlasSent']='Bool'
 TYPES['LabView']['atlas']='AtlasWire'
 TYPES['LabView']['atlasChanged']='Bool'
+
+# Read-only viewport projections, absent from City/Saved.
+TYPES['StreetPool']={'walk':'(list I64)','cars':'(list I64)'}
+TYPES['StreetSample']={'actors':'(list Actor)','walking':'I64','driving':'I64'}
+TYPES['Frame'].update({'streetWalkers':'I64','streetDrivers':'I64'})

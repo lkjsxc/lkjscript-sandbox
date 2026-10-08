@@ -12,6 +12,7 @@ python3 scripts/journeys/city.py
 python3 scripts/journeys/waterfront.py
 python3 scripts/journeys/scenarios.py
 python3 scripts/journeys/migration.py
+python3 scripts/journeys/actorpool.py
 python3 scripts/journeys/actorview.py
 python3 scripts/journeys/lab_atlas.py
 python3 scripts/journeys/lab_atlas_tests.py
@@ -24,3 +25,5 @@ python3 scripts/journeys/tests.py
 python3 scripts/journeys/benchmark.py
 python3 scripts/journeys/planning_proof.py
 python3 scripts/journeys/planning_checks.py
+python3 scripts/journeys/street_tests.py
+python3 scripts/journeys/walk_trace.py

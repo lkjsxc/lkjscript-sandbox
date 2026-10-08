@@ -44,7 +44,7 @@ declarations.begin
  (type-alias Claim (record (status I64) (saved Saved)))
  (type-alias State (record (city City) (view View) (seen Seen) (seq I64) (ack I64) (saved I64) (token Text) (owner Text) (status I64) (mapVersion I64) (selection I64) (quote EditQuote) (management I64) (confirmation I64) (undo Bool) (lab Lab)))
  (type-alias Stats (record (tick I64) (cash I64) (level I64) (permits I64) (requested I64) (arrived I64) (population I64) (visits I64) (workVisits I64) (shopVisits I64) (leisureVisits I64) (moving I64) (waiting I64) (disconnected I64) (walkTrips I64) (carTrips I64) (average I64) (growthTarget I64) (growthCost I64) (progress I64) (healthy I64) (version I64) (tiles I64) (phase I64) (routes I64) (originX I64) (originY I64) (cancelled I64) (railLines I64) (railBoardings I64) (railCompleted I64) (railSpent I64) (railWaiting I64) (paused Bool) (growth Bool) (ecoHouseholds I64) (ecoBusinesses I64) (ecoOpening I64) (ecoGrants I64) (ecoExports I64) (ecoSalvage I64) (ecoConstruction I64) (ecoOperating I64) (ecoWithdrawn I64) (ecoWages I64) (ecoSales I64) (ecoTaxes I64) (ecoFares I64) (ecoConcessions I64) (ecoUpkeepDue I64) (ecoPeriodTaxes I64) (ecoPeriodFares I64) (ecoPeriodOperating I64) (ecoLastTaxes I64) (ecoLastFares I64) (ecoLastOperating I64) (wealthError I64) (planning I64) (planningLong I64)))
- (type-alias Frame (record (view View) (persistent Bool) (seq I64) (ack I64) (reset Bool) (cells (list Cell)) (actors (list Actor)) (overview (list I64)) (mapChanged Bool) (heat (list I64)) (stats Stats) (notice Text) (saved I64) (status I64) (inspect Resident) (detail Bool) (actorLimit I64) (quote EditQuote) (management I64) (confirmation I64) (undo Bool) (rails (list RailView)) (inspectRail RailPlan) (inspectFunds I64) (tracks (list I64)) (river (list I64)) (riverWidth I64) (lab LabView)))
+ (type-alias Frame (record (view View) (persistent Bool) (seq I64) (ack I64) (reset Bool) (cells (list Cell)) (actors (list Actor)) (overview (list I64)) (mapChanged Bool) (heat (list I64)) (stats Stats) (notice Text) (saved I64) (status I64) (inspect Resident) (detail Bool) (actorLimit I64) (quote EditQuote) (management I64) (confirmation I64) (undo Bool) (rails (list RailView)) (inspectRail RailPlan) (inspectFunds I64) (tracks (list I64)) (river (list I64)) (riverWidth I64) (lab LabView) (streetWalkers I64) (streetDrivers I64)))
  (type-alias Input (record (id I64) (action Command) (token Text) (owner Text)))
  (type-alias Header (record (name Text) (value Bytes)))
  (type-alias HeaderValue (record (count I64) (value Text)))
@@ -66,6 +66,8 @@ declarations.begin
  (type-alias AtlasView (record (homes (list AtlasHome)) (same I64) (less I64) (more I64) (equal I64) (removed I64) (added I64) (baseTime I64) (planTime I64) (baseWait I64) (planWait I64) (baseLost I64) (planLost I64)))
  (type-alias AtlasWireHome (list I64))
  (type-alias AtlasWire (record (homes (list AtlasWireHome)) (same I64) (less I64) (more I64) (equal I64) (removed I64) (added I64) (baseTime I64) (planTime I64) (baseWait I64) (planWait I64) (baseLost I64) (planLost I64)))
+ (type-alias StreetPool (record (walk (list I64)) (cars (list I64))))
+ (type-alias StreetSample (record (actors (list Actor)) (walking I64) (driving I64)))
  (module create atlascohorttests
   (test create atlas-matched-same (visibility private) (actual (field (call atlasfixtures::report) (name same))) (expected (i64 3)))
   (test create atlas-matched-less (visibility private) (actual (field (call atlasfixtures::report) (name less))) (expected (i64 1)))
