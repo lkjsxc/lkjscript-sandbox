@@ -57,3 +57,9 @@ jobs:
         working-directory: projects/traffic-city
       - run: npm run test:planning-ui
         working-directory: projects/traffic-city
+      - run: npm run test:street-presentation
+        working-directory: projects/traffic-city
+      - run: npm run test:walkability
+        working-directory: projects/traffic-city
+      - run: npm run test:street-ui
+        working-directory: projects/traffic-city

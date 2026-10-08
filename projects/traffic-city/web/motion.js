@@ -46,7 +46,7 @@ export class TrafficMotion{
  receive(frame,now,cells){this.cells=cells;const tick=frame.stats.tick;
   if(this.latest<0||tick<this.latest||frame.stats.version!==this.version){this.frames.clear();this.latest=tick;this.time=tick;this.at=now;this.version=frame.stats.version}
   this.clock(now);this.latest=tick;
-  if(!frame.detail||frame.mapChanged){this.visible=false;this.rendered=[];return}
+  if(frame.mapChanged){this.visible=false;this.rendered=[];return}
   this.visible=true;
   const current=this.time>=tick?new Map():this.frames.get(tick)||new Map();
   // Same-tick view/inspect/save replies revise this snapshot without changing
@@ -69,4 +69,15 @@ export class TrafficMotion{
   }
   return this.rendered=poses;
  }
+}
+
+// Schematic screen-space minimum; positions and time remain native-authoritative.
+export function pedestrianSize(scale){
+ if(!Number.isFinite(scale)||scale<=0)throw new RangeError('Positive camera scale required');
+ return {radius:Math.max(1.5,scale*.06)/scale,outline:.7/scale,detailed:scale>=16};
+}
+export function streetCaption(frame){
+ if(frame.mapChanged)return {counts:'Updating street view…',sample:''};
+ const walking=frame.streetWalkers||0,driving=frame.streetDrivers||0,shown=frame.actors?.length||0,total=walking+driving;
+ return {counts:`In view · ${walking.toLocaleString('en-US')} on foot · ${driving.toLocaleString('en-US')} in cars`,sample:shown<total?`${shown} of ${total.toLocaleString('en-US')} shown · zoom for detail`:`${shown} street travellers shown`};
 }

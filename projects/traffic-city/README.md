@@ -98,3 +98,7 @@ The fourth example has 1,024 residents in sixteen mixed neighbourhoods, four fou
 ## Bounded modal planning
 
 Rail alternatives which cannot beat an available surface or rail option no longer consume route-search budget. Long waits now distinguish native route planning from other causes, without changing the saved city schema or hiding those waits. See [the decision rule and verification contracts](docs/BOUNDED-PLANNING.md).
+
+## Walkable streets
+
+Real pedestrians are sampled at every zoom, with readable glyphs and separate full-viewport counts. Car access and parking each take twelve actual cycles, making short connected trips competitive on foot. See [Walkable streets](docs/WALKABLE-STREETS.md) for sampling semantics, mode boundaries and regression tests.

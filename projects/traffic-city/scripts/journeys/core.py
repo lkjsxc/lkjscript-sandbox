@@ -45,6 +45,8 @@ fn('route',[('routes','Routes'),('id','I64')],'Route',mget('I64 Route',V('routes
 fn('empty-sim',[],'Sim',ZERO('Sim',nextId=I(1),nextRoute=I(1)))
 # Weighted shortest paths with integer A* buckets. No per-car global search each tick.
 fn('passable',[('tiles','Numbers'),('id','I64'),('origin','I64'),('dest','I64'),('mode','I64')],'Bool',LET([('kind',get(V('tiles'),V('id')))],AND(le(I(0),V('id')),lt(V('id'),I(16384)),OR(eq(V('id'),V('origin')),eq(V('id'),V('dest')),C('road',V('kind')),AND(eq(V('mode'),I(1)),eq(V('kind'),I(7)))))))
+# Door-to-door car access and parking are actual timed phases.
+fn('car-access-time',[],'I64',I(12))
 fn('edge-time',[('world','World'),('cell','I64'),('mode','I64')],'I64',IF(eq(V('mode'),I(1)),I(4),IF(eq(get(V('world.tiles'),V('cell')),I(1)),I(2),I(1))))
 fn('edge-estimate',[('world','World'),('q','Numbers'),('cell','I64'),('mode','I64')],'I64',add(C('edge-time',V('world'),V('cell'),V('mode')),IF(eq(V('mode'),I(2)),add(IF(eq(get(V('world.junctions'),V('cell')),I(1)),I(2),I(0)),mn(I(8),div(get(V('q'),V('cell')),mx(I(1),C('capacity',get(V('world.tiles'),V('cell'))))))),I(0))))
 # Per-query admissible axis bounds: every horizontal/vertical crossing must pay
@@ -75,7 +77,7 @@ fn('route-signature',[('origin','I64'),('dest','I64'),('mode','I64')],'I64',add(
 fn('ensure-route',[('world','World'),('q','Numbers'),('origin','I64'),('dest','I64'),('mode','I64'),('p','Plan')],'Plan',LET([('signature',C('route-signature',V('origin'),V('dest'),V('mode'))),('known',get(V('p.lookup'),V('signature'))),('route',C('route',V('p.routes'),V('known')))],IF(AND(lt(I(0),V('known')),eq(V('route.version'),V('world.version'))),PATCH('Plan',V('p'),id=V('known')),IF(le(V('p.budget'),I(0)),PATCH('Plan',V('p'),id=I(0)),LET([('route2',C('find-route',V('world'),V('q'),V('origin'),V('dest'),V('mode'))),('bound',PATCH('Route',V('route2'),version=V('world.version'),origin=V('origin'),dest=V('dest'),mode=V('mode')))],PATCH('Plan',V('p'),routes=mput('I64 Route',V('p.routes'),V('p.nextRoute'),V('bound')),lookup=put(V('p.lookup'),V('signature'),V('p.nextRoute')),nextRoute=add(V('p.nextRoute'),I(1)),budget=sub(V('p.budget'),I(1)),id=V('p.nextRoute')))))))
 fn('estimate-loop',[('world','World'),('q','Numbers'),('route','Route'),('index','I64'),('cost','I64')],'I64',IF(lt(V('index'),llen('I64',V('route.path'))),C('estimate-loop',V('world'),V('q'),V('route'),add(V('index'),I(1)),add(V('cost'),C('edge-estimate',V('world'),V('q'),at('I64',V('route.path'),V('index')),V('route.mode')))),V('cost')))
 # Walking edges always cost four cycles; do not rescan a whole cached path.
-fn('estimate',[('world','World'),('q','Numbers'),('route','Route')],'I64',IF(lt(V('route.cost'),I(0)),I(-1),IF(eq(V('route.mode'),I(1)),mul(mx(I(0),sub(llen('I64',V('route.path')),I(1))),I(4)),C('estimate-loop',V('world'),V('q'),V('route'),I(1),IF(eq(V('route.mode'),I(2)),I(12),I(0))))))
+fn('estimate',[('world','World'),('q','Numbers'),('route','Route')],'I64',IF(lt(V('route.cost'),I(0)),I(-1),IF(eq(V('route.mode'),I(1)),mul(mx(I(0),sub(llen('I64',V('route.path')),I(1))),I(4)),C('estimate-loop',V('world'),V('q'),V('route'),I(1),IF(eq(V('route.mode'),I(2)),mul(I(2),C('car-access-time')),I(0))))))
 fn('choose-mode',[('walk','I64'),('car','I64')],'I64',IF(lt(V('walk'),I(0)),IF(lt(V('car'),I(0)),I(0),I(2)),IF(OR(lt(V('car'),I(0)),le(V('walk'),V('car'))),I(1),I(2))))
 # Tests for topology boundaries, directional conflict and mode choice.
 test('no-row-wrap',C('neighbor',I(127),I(0)),I(-1));test('north-boundary',C('neighbor',I(1),I(3)),I(-1))
