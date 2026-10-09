@@ -38,9 +38,9 @@ On land, roads cost $8 per tile, avenues $24 and footpaths $4. Over water the pr
 
 Rail has three separate tools: **Track → Station → Service**. Drag straight or bent track; the bend-order control and preview show its shape. New track costs $12 per tile, or $36 over water. A $90 station needs empty dry track beside a road or footpath. Select two connected stations to create a $120, 16-seat service. Its inspector opens with the service suspended: add stops, then enable departures.
 
-Pause traffic and suspend an empty train at a station before adding stops. Add intermediate stations on the existing path or extend beyond the last stop along connected track. Each service supports eight stops and a 256-tile route; the city supports four services and 2,048 track tiles. Track strokes are limited to 128 tiles. Residents walk to their chosen station, queue for capacity, alight at their own stop and finish on foot. Shared moving sections wait until clear. There is one train per service and no transfers between services.
+Open **Lines** to see every service, ordered stop, waiting platform and operating state. Stop only the line you want to edit and let its train and platforms empty before adding stops; the rest of the city keeps running. Add intermediate stations on the existing path or extend beyond the last stop along connected track. Each service supports eight stops and a 256-tile route; the city supports four services and 2,048 track tiles. Track strokes are limited to 128 tiles. Residents walk to their chosen station, queue for capacity, alight at their own stop and finish on foot. Shared moving sections wait until clear. There is one train per service and no transfers between services.
 
-Remove selects a real rectangle of up to 256 cells. The review states the salvage, households moving out and journeys explicitly cancelled before anything changes. Selecting track used by a service reviews cancellation of that service; inspect the affected stations, selected tiles, journeys and salvage before confirming. Cancel leaves the city intact. Confirmed affected journeys return home without earning income; removed homes return their permits. Ordinary traffic recovery never deletes or teleports trips.
+Remove selects a real rectangle of up to 256 cells. The review previews salvage, households moving out and affected journeys. Traffic keeps its current running setting during review. Confirmation recomputes journey effects against the current city and rejects a changed topology. Selecting track used by a service reviews cancellation of that service; inspect the affected stations, selected tiles, journeys and salvage before confirming. Cancel leaves the city intact. Confirmed affected journeys return home without earning income; removed homes return their permits. Ordinary traffic recovery never deletes or teleports trips.
 
 The starting district has a long commute across a constrained crossing. Observe both the crossing and the western junctions. Nearby connected workplaces and services shorten journeys; walking shortcuts or a useful river-crossing shuttle can remove car trips. Junction priority and signals affect conflicting movements. More road capacity alone cannot fix every delay. New cities start in the center of the 128 × 128 map.
 
@@ -61,7 +61,7 @@ The supplied host descriptor allows **1,024 saved cities**, four simultaneous se
 
 ## Source layout
 
-`src/*.lkjc` contains the native declaration proposals. `web/` is browser presentation; `examples/` holds three authored city layouts. `scripts/author.mjs` replays proposals through `change plan`, `change apply`, `check`, and `build`. `scripts/serve-native.sh` and `scripts/maintain-saves.sh` only supervise processes and maintain the native data store. Optional Python expression builders under `scripts/journeys/` regenerate proposals; they never execute the simulation.
+`src/*.lkjc` contains the native declaration proposals. `web/` is browser presentation; `examples/` holds authored city layouts. `scripts/author.mjs` replays proposals through `change plan`, `change apply`, `check`, and `build`. `scripts/serve-native.sh` and `scripts/maintain-saves.sh` only supervise processes and maintain the native data store. Optional Python expression builders under `scripts/journeys/` regenerate proposals; they never execute the simulation.
 
 All local saves, test stores, downloaded tools, accepted graphs, and evidence are ignored. Do not delete `runtime/` to clean a project with a city you need to keep. Browser city keys and native stores must be preserved together.
 
@@ -106,3 +106,9 @@ Rail alternatives which cannot beat an available surface or rail option no longe
 ## Walkable streets
 
 Real pedestrians are sampled at every zoom, with readable glyphs and separate full-viewport counts. Car access and parking each take twelve actual cycles, making short connected trips competitive on foot. See [Walkable streets](docs/WALKABLE-STREETS.md) for sampling semantics, mode boundaries and regression tests.
+
+## Continuous city controls
+
+Construction strokes are queued in release order and acknowledged one at a time by the native server. Pending map edits remain outlined. Reconnection reports uncertain edits rather than automatically repeating paid actions. Menu navigation preserves whether the city is running.
+
+**Commuter Boroughs**, the sixth example, has 2,048 residents and jobs, sixteen station-centred districts, and four four-stop services. Its 64-seat trains are authored scenario settings; there is no player capacity upgrade. Every building requires a street or path connection. See [city flow changes and verification](docs/CITY-FLOW.md).

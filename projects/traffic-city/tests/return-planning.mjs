@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import {runCase,selection} from './run-case.mjs';
 const U=16384,base=20*128,checks=[];
 const cmd=(op,x,y,x2=x,y2=y,kind=0)=>({op,x,y,x2,y2,kind});
-const cells=[[base,3],[base+40,4],[base-128,5],[base+128,6]].map(([id,kind])=>({id,kind,q:0}));
+// Shops and parks need actual path access; facilities are not through-links.
+const cells=[[base,3],[base+40,4],[base-128,5],[base-128+1,7],[base-128+2,6]].map(([id,kind])=>({id,kind,q:0}));
 function run(name,input,target='continuation'){
  const measured=runCase(input,'return-'+name,target),r=measured.result,s=r.city.sim,e=r.city.economy;
  assert.equal(r.conservation,0,name);assert.equal(s.population,r.agents.length);

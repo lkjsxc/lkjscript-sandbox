@@ -16,8 +16,9 @@ for(const kind of [3,4,5,6,8])for(const mode of [1,2])for(let dir=0;dir<4;dir++)
  close(out.at(0),exit);close(actorPose(departure,cells),exit);
  close(entranceLinks(cells.get(base),cells).find(p=>p.dir===dir).door,exit);exits++;
 }
-// Consecutive facilities use their facing doors, not road lanes or the far walls.
-for(let dir=0;dir<4;dir++){const next=neighborId(base,dir),cells=new Map([[base,{kind:3,id:base}],[next,{kind:4,id:next}]]),p=actorPath({id:2,mode:1,from:base,to:next,dir,out:dir,elapsed:0,duration:4},cells);close(p.at(0),facilityPort(base,dir,3));close(p.at(p.length),facilityPort(next,(dir+2)%4,4))}
+// Legacy in-flight facility hops retain continuous drawing after save migration.
+// New topology never paints a direct facility-to-facility entrance.
+for(let dir=0;dir<4;dir++){const next=neighborId(base,dir),cells=new Map([[base,{kind:3,id:base}],[next,{kind:4,id:next}]]),p=actorPath({id:2,mode:1,from:base,to:next,dir,out:dir,elapsed:0,duration:4},cells);close(p.at(0),facilityPort(base,dir,3));close(p.at(p.length),facilityPort(next,(dir+2)%4,4));assert.deepEqual(entranceLinks(cells.get(base),cells),[]);assert.deepEqual(entranceLinks(cells.get(next),cells),[])}
 for(const dirs of [[0,2],[1,3],[0,1],[0,1,2],[0,1,2,3],[]]){const c={id:base,kind:1},cells=new Map([[base,c],...dirs.map(d=>[neighborId(base,d),{id:neighborId(base,d),kind:1}])]);const arms=roadHeatSegments(c,cells);assert.equal(arms.length,dirs.length);arms.forEach(([a,b],i)=>{const d=DIRECTIONS[dirs[i]];assert.equal(b.x-a.x,d[0]*.5);assert.equal(b.y-a.y,d[1]*.5)})}
 // Walking turns must remain positive-length arcs on avenues as well as paths.
 for(const mode of [1,2])for(const kind of mode===1?[1,2,7]:[1,2])for(let dir=0;dir<4;dir++)for(let out=0;out<4;out++){
@@ -29,4 +30,4 @@ for(const kind of [3,4,5,6,8])for(let dir=0;dir<4;dir++)for(const rank of [0,1,2
 }
 assert.equal(neighborId(127,0),-1);assert.equal(neighborId(0,2),-1);assert.equal(neighborId(0,3),-1);assert.equal(neighborId(16383,1),-1);
 const spine=riverPoints(Array.from({length:129},(_,y)=>130+y*512));for(let x=0;x<128;x++)assert.equal(Boolean(waterAt(spine,6,x+64*128)),x>=62&&x<=67);
-const report={passed:true,entries,exits,checks:['all cardinal facility entrances and exits share painter coordinates','no travel through building roofs','pedestrian and car starts are at thresholds','adjacent facilities face each other','heat follows straight, corner, T and cross topology','no row wrap','projected river occupancy']};fs.writeFileSync('evidence/waterfront-geometry.json',JSON.stringify(report,null,2));console.log(report);
+const report={passed:true,entries,exits,checks:['all cardinal facility entrances and exits share painter coordinates','no travel through building roofs','pedestrian and car starts are at thresholds','no painted links between facilities; legacy in-flight geometry remains continuous','heat follows straight, corner, T and cross topology','no row wrap','projected river occupancy']};fs.writeFileSync('evidence/waterfront-geometry.json',JSON.stringify(report,null,2));console.log(report);

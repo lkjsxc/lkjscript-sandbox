@@ -35,7 +35,7 @@ for direction in reversed(range(4)):
  val=IF(eq(mod(sub(add(V('outgoing'),I(4)),V('incoming')),I(4)),I(1)),I(right),IF(eq(V('incoming'),V('outgoing')),I(straight),IF(eq(mod(sub(add(V('outgoing'),I(4)),V('incoming')),I(4)),I(3)),I(left),I(15))))
  mask=IF(eq(V('incoming'),I(direction)),val,mask)
 fn('movement-mask',[('incoming','I64'),('outgoing','I64')],'I64',mask)
-fn('signal-allows',[('control','I64'),('direction','I64'),('wait','I64'),('tick','I64')],'Bool',IF(eq(V('control'),I(0)),le(I(1),V('wait')),IF(eq(V('control'),I(1)),eq(mod(V('direction'),I(2)),C('phase',V('tick'))),OR(eq(mod(V('direction'),I(2)),sub(V('control'),I(2))),le(I(4),V('wait'))))))
+fn('signal-allows',[('control','I64'),('direction','I64'),('wait','I64'),('tick','I64')],'Bool',IF(eq(V('control'),I(0)),B(True),IF(eq(V('control'),I(1)),eq(mod(V('direction'),I(2)),C('phase',V('tick'))),OR(eq(mod(V('direction'),I(2)),sub(V('control'),I(2))),le(I(4),V('wait'))))))
 # A topology pass caches static lists and the compact overview, never traffic per frame.
 fn('world-loop',[('world','World'),('entries','(list Pair)'),('index','I64')],'World',IF(lt(V('index'),llen('Pair',V('entries'))),LET([('entry',at('Pair',V('entries'),V('index'))),('id',V('entry.key')),('kind',V('entry.value'))],C('world-loop',PATCH('World',V('world'),ids=append('I64',V('world.ids'),V('id')),homes=IF(eq(V('kind'),I(3)),append('I64',V('world.homes'),V('id')),V('world.homes')),jobs=IF(eq(V('kind'),I(4)),append('I64',V('world.jobs'),V('id')),V('world.jobs')),shops=IF(eq(V('kind'),I(5)),append('I64',V('world.shops'),V('id')),V('world.shops')),parks=IF(eq(V('kind'),I(6)),append('I64',V('world.parks'),V('id')),V('world.parks')),junctions=IF(C('roads::junction',V('world.tiles'),V('id')),put(V('world.junctions'),V('id'),I(1)),V('world.junctions')),overview=append('I64',V('world.overview'),add(mul(V('id'),I(16)),V('kind')))),V('entries'),add(V('index'),I(1)))),V('world')))
 fn('world',[('tiles','Numbers'),('signals','Numbers'),('version','I64')],'World',C('cache-world',C('world-loop',ZERO('World',tiles=V('tiles'),signals=V('signals'),version=V('version')),G('std::map-entries','I64 I64',V('tiles')),I(0))))
@@ -52,7 +52,7 @@ fn('edge-time',[('world','World'),('cell','I64'),('mode','I64')],'I64',IF(eq(V('
 fn('edge-estimate-uncached',[('world','World'),('q','Numbers'),('cell','I64'),('mode','I64')],'I64',add(C('edge-time',V('world'),V('cell'),V('mode')),IF(eq(V('mode'),I(2)),add(IF(eq(get(V('world.junctions'),V('cell')),I(1)),I(2),I(0)),mn(I(8),div(get(V('q'),V('cell')),mx(I(1),C('capacity',get(V('world.tiles'),V('cell'))))))),I(0))))
 fn('edge-estimate',[('world','World'),('q','Numbers'),('cell','I64'),('mode','I64')],'I64',
  IF(eq(V('mode'),I(1)),I(4),LET([('entry',get(V('world.junctions'),sub(I(-1024),V('cell'))))],
- IF(AND(lt(I(0),V('entry')),eq(get(V('world.junctions'),I(-258)),I(2))),
+ IF(AND(lt(I(0),V('entry')),eq(get(V('world.junctions'),I(-258)),I(3))),
  LET([('meta',div(sub(V('entry'),I(1)),I(1048576)))],
  add(mod(V('meta'),I(16)),mn(I(8),div(get(V('q'),V('cell')),div(V('meta'),I(16)))))),
  C('edge-estimate-uncached',V('world'),V('q'),V('cell'),V('mode'))))))
@@ -66,7 +66,7 @@ fn('axis-prefix',[('values','Numbers'),('index','I64'),('sum','I64'),('result','
 # marks their presence. These derived entries never enter the tile/view protocol.
 fn('cache-pack',[('x','Numbers'),('y','Numbers'),('index','I64'),('cache','Numbers')],'Numbers',IF(lt(V('index'),I(128)),C('cache-pack',V('x'),V('y'),add(V('index'),I(1)),put(put(V('cache'),sub(I(-1),V('index')),get(V('x'),V('index'))),sub(I(-129),V('index')),get(V('y'),V('index')))),put(V('cache'),I(-257),I(1))))
 fn('cache-world',[('world','World')],'World',
- IF(AND(eq(get(V('world.junctions'),I(-257)),I(1)),eq(get(V('world.junctions'),I(-258)),I(2))),V('world'),
+ IF(AND(eq(get(V('world.junctions'),I(-257)),I(1)),eq(get(V('world.junctions'),I(-258)),I(3))),V('world'),
  LET([('axis',C('axis-scan',V('world'),I(0),ZERO('Axis'))),
       ('hx',C('axis-prefix',V('axis.columns'),I(0),I(0),MP())),('hy',C('axis-prefix',V('axis.rows'),I(0),I(0),MP()))],
  PATCH('World',V('world'),junctions=C('roadcache::build',V('world.tiles'),V('world.ids'),I(0),C('cache-pack',V('hx'),V('hy'),I(0),V('world.junctions')))))))
@@ -97,3 +97,7 @@ for label,path,cost,expected in [('empty',[],0,0),('singleton',[7],0,0),('path',
 fn('mask-union',[('a','I64'),('b','I64'),('bit','I64')],'I64',IF(lt(V('bit'),I(16)),add(IF(OR(eq(mod(div(V('a'),V('bit')),I(2)),I(1)),eq(mod(div(V('b'),V('bit')),I(2)),I(1))),V('bit'),I(0)),C('mask-union',V('a'),V('b'),mul(V('bit'),I(2)))),I(0)))
 fn('mask-union-put',[('values','Numbers'),('key','I64'),('mask','I64')],'Numbers',put(V('values'),V('key'),C('mask-union',get(V('values'),V('key')),V('mask'),I(1))))
 fn('reserve-space',[('values','Numbers'),('source','I64'),('target','I64'),('oldExit','I64'),('newExit','I64')],'Numbers',LET([('a',C('bump',C('bump',V('values'),V('source'),I(-1)),V('target'),I(1))),('b',IF(lt(I(0),V('oldExit')),C('bump',V('a'),sub(V('oldExit'),I(1)),I(-1)),V('a')))],IF(lt(I(0),V('newExit')),C('bump',V('b'),sub(V('newExit'),I(1)),I(1)),V('b'))))
+
+junction_start = len(D)
+from junction_flow import add_junction_flow
+add_junction_flow(fn, test)

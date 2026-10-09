@@ -7,7 +7,7 @@ export const layerOf=id=>Math.floor(id/16384);
 export const gridY=id=>Math.floor(id/128)%128;
 export const center=id=>({x:id%128+.5,y:gridY(id)+.5});
 export function neighborId(id,dir){const [dx,dy]=DIRECTIONS[dir],x=id%128+dx,y=gridY(id)+dy;return x<0||x>=128||y<0||y>=128?-1:layerOf(id)*16384+x+y*128}
-export function connections(c,cells){return DIRECTIONS.flatMap((d,dir)=>{const id=neighborId(c.id,dir),next=cells.get(id);return next?.kind>0?[{dir,id,next,d}]:[]})}
+export function connections(c,cells){return DIRECTIONS.flatMap((d,dir)=>{const id=neighborId(c.id,dir),next=cells.get(id);return next?.kind>0&&!(isFacility(c.kind)&&isFacility(next.kind))?[{dir,id,next,d}]:[]})}
 export function facilityPort(id,dir,kind){const p=center(id),d=DIRECTIONS[dir],radius=kind===3?.31:kind===4?.36:kind===5?.35:kind===8?.36:.32;return{x:p.x+d[0]*radius,y:p.y+d[1]*radius,angle:Math.atan2(d[1],d[0])}}
 export function entranceLinks(c,cells){return connections(c,cells).map(({dir,id,d})=>({dir,id,door:facilityPort(c.id,dir,c.kind),edge:{x:c.id%128+.5+d[0]*.5,y:gridY(c.id)+.5+d[1]*.5}}))}
 export function roadHeatSegments(c,cells){const p=center(c.id);return connections(c,cells).map(({d})=>[p,{x:p.x+d[0]*.5,y:p.y+d[1]*.5}])}

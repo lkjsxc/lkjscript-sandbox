@@ -52,7 +52,7 @@ declarations.begin
   (function create classic-seed (visibility public) (effect pure) (parameter create id (type I64)) (returns City)
    (body (if (call std::i64-equal (local id) (i64 1)) (call garden-base) (if (call std::i64-equal (local id) (i64 2)) (call crossing-base) (call metro-seed)))))
   (function create seed (visibility public) (effect pure) (parameter create id (type I64)) (returns City)
-   (body (if (call std::i64-equal (local id) (i64 5)) (call region::seed) (if (call std::i64-equal (local id) (i64 4)) (call waterfront::seed) (call classic-seed (local id))))))
+   (body (if (call std::i64-equal (local id) (i64 6)) (call commuter::seed) (if (call std::i64-equal (local id) (i64 5)) (call region::seed) (if (call std::i64-equal (local id) (i64 4)) (call waterfront::seed) (call classic-seed (local id)))))))
   (function create garden-saved (visibility public) (effect pure)  (returns City)
    (body (call seed (i64 1))))
   (function create crossing-saved (visibility public) (effect pure)  (returns City)
@@ -62,7 +62,7 @@ declarations.begin
   (function create classic-load (visibility public) (effect pure) (parameter create id (type I64)) (returns City)
    (body (if (call std::i64-equal (local id) (i64 1)) (call garden-saved) (if (call std::i64-equal (local id) (i64 2)) (call crossing-saved) (call metro-saved)))))
   (function create load (visibility public) (effect pure) (parameter create id (type I64)) (returns City)
-   (body (if (call std::i64-equal (local id) (i64 5)) (call region::seed) (if (call std::i64-equal (local id) (i64 4)) (call waterfront::seed) (call classic-load (local id))))))
+   (body (if (call std::i64-equal (local id) (i64 6)) (call commuter::seed) (if (call std::i64-equal (local id) (i64 5)) (call region::seed) (if (call std::i64-equal (local id) (i64 4)) (call waterfront::seed) (call classic-load (local id)))))))
 (component create factory (visibility private) (port create run (type (function (I64) City)) (function seed))))
  (target create scenario-seed (component scenarios::factory) (runner command) (port scenarios::factory::run)))
 declarations.end
