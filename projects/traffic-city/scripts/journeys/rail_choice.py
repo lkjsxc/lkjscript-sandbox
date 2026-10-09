@@ -2,7 +2,8 @@
 
 The existing stop-pair heuristic and strict tie order are unchanged. A service
 can be pruned only when its cheapest possible access + ride + wait + egress
-cannot beat an already available alternative. Production search fuel stays two.
+cannot beat an already available alternative. The population-scaled production
+search allowance is owned by traffic::planning-budget, never by this module.
 """
 fn('boarding-cost',[('l','RailLine'),('board','I64'),('alight','I64')],'I64',LET([
  ('queue',llen('I64',C('platform',V('l'),V('board'),C('travel-direction',V('l'),V('board'),V('alight')))))],

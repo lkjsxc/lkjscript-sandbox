@@ -8,6 +8,7 @@ python3 scripts/journeys/roadbuild.py
 python3 scripts/journeys/planning_gate.py
 python3 scripts/journeys/returnplan.py
 python3 scripts/journeys/simulation.py
+python3 scripts/journeys/employment.py
 python3 scripts/journeys/money_probe.py
 python3 scripts/journeys/scale_tests.py
 python3 scripts/journeys/terrain.py

@@ -112,3 +112,11 @@ Real pedestrians are sampled at every zoom, with readable glyphs and separate fu
 Construction strokes are queued in release order and acknowledged one at a time by the native server. Pending map edits remain outlined. Reconnection reports uncertain edits rather than automatically repeating paid actions. Menu navigation preserves whether the city is running.
 
 **Commuter Boroughs**, the sixth example, has 2,048 residents and jobs, sixteen station-centred districts, and eight four-stop services: four east-west and four north-south, sharing sixteen stations. Its 64-seat trains are authored scenario settings; there is no player capacity upgrade. Every building requires a street or path connection. See [city flow changes and verification](docs/CITY-FLOW.md).
+
+
+Commuter Boroughs assigns work on the same direct east-west corridor as each
+home, so its commuters do not depend on unsupported passenger transfers. The
+route-planning allowance scales with population (up to sixteen exact searches per
+cycle), and infrastructure-only edits preserve existing jobs. Previously saved
+cities keep their assignments; load the example again to receive its repaired
+initial employment. See [the resident checks and save behavior](docs/COMMUTER-GRID.md#residents-leaving-home).

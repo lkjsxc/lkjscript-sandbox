@@ -31,14 +31,14 @@ for(const ticks of [0,observationTicks]) {
  assert.equal(tracks.size,664,'Eight 85-tile corridors share sixteen station tiles');
  const lanes=new Map(),employment=new Map();
  const add=(m,k)=>m.set(k,(m.get(k)||0)+1),road=k=>k===1||k===2||(k>=9&&k<=13);
- for(const a of people){assert.equal(tiles.get(a.home),3);assert.equal(tiles.get(a.job),4);add(employment,a.job);assert(a.elapsed<=a.duration);assert(a.wait>=0);
+ for(const a of people){assert.equal(tiles.get(a.home),3);assert.equal(tiles.get(a.job),4);add(employment,a.job);assert.equal(Math.floor(Math.floor(a.home/128)/28),Math.floor(Math.floor(a.job/128)/28),'No-transfer commuter job must share its home corridor');assert(a.elapsed<=a.duration);assert(a.wait>=0);
   if(a.mode===2&&(a.state===2||a.state===1&&road(tiles.get(a.cell)))){add(lanes,a.cell*8+a.dir*2+a.lane);if(a.exitKey>0)add(lanes,a.exitKey-1)}
  }
  assert([...employment.values()].every(n=>n<=16));
  for(const [lane,n]of lanes)if(road(tiles.get(Math.floor(lane/8))))assert(n<=3,'Finite receiving lane '+lane);
  assert.equal(r.frames.length,ticks+1);
  for(const [i,f]of r.frames.entries()){assert.equal(f.tick,i);assert.equal(f.population,2048);assert.equal(f.population,f.born-f.removed);assert.equal(f.requested,f.arrived+f.cancelled+f.active);assert.equal(f.cancelled,0);assert.equal(f.wealth,f.expected)}
- const last=r.frames.at(-1);assert.equal(last.active,people.filter(a=>[1,2,4,5,6].includes(a.state)).length);
+ const last=r.frames.at(-1);assert.equal(last.disconnected,0,'The authored rail city has no unreachable work assignments');assert.equal(last.active,people.filter(a=>[1,2,4,5,6].includes(a.state)).length);
  assert.equal(last.arrived,people.reduce((n,a)=>n+a.journeys,0));
  assert.equal(r.economy.wallets.reduce((n,[,v])=>n+v,0),r.economy.households);
  assert.equal(r.economy.firms.reduce((n,[,v])=>n+v,0),r.economy.businesses);
