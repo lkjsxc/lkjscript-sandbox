@@ -77,7 +77,12 @@
     "test:return-planning": "node tests/return-planning.mjs",
     "test:routing-performance": "node tests/integrated-routing-performance.mjs",
     "build:web": "node scripts/author-web.mjs",
-    "test:motion-cadence": "PREVIEW_TICK_MS=1000 node tests/with-preview.mjs tests/motion-cadence-ui.mjs"
+    "test:motion-cadence": "PREVIEW_TICK_MS=1000 node tests/with-preview.mjs tests/motion-cadence-ui.mjs",
+    "test:region": "node tests/region.mjs",
+    "test:region-live": "node tests/region-live.mjs",
+    "test:region-ui": "node tests/with-preview.mjs tests/region-ui.mjs",
+    "test:scale-comparison": "node tests/scale-comparison.mjs",
+    "test:money-events": "node tests/money-events.mjs"
   },
   "engines": {
     "node": ">=22"

@@ -61,6 +61,14 @@ jobs:
         working-directory: projects/traffic-city
       - run: npm run test:waterfront
         working-directory: projects/traffic-city
+      - run: npm run test:money-events
+        working-directory: projects/traffic-city
+      - run: npm run test:region
+        working-directory: projects/traffic-city
+      - run: npm run test:region-live
+        working-directory: projects/traffic-city
+      - run: npm run test:region-ui
+        working-directory: projects/traffic-city
       - run: npm run test:save-capacity
         working-directory: projects/traffic-city
       - run: npm run test:waterfront-ui

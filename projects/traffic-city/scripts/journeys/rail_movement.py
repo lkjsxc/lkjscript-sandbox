@@ -10,6 +10,15 @@ fn('rail-leg',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'),(
  C('apply-agent',V('next'),PATCH('Resident',V('r'),state=I(2),mode=I(3),step=I(0),route=V('search.id'),elapsed=I(0),duration=I(0),wait=I(0),reason=I(0),ready=V('tick'),**{'from':V('r.cell'),'to':V('r.cell')}))))))
 # Native modal choice is performed only at a journey origin. Mid-route replans
 # retain the current surface mode, and a car must return with its driver.
+# A phase-local cost projection, never a saved cache: route IDs are immutable
+# within the batch and every query observes the same topology/queue snapshot.
+TYPES['EstimateMemo']={'values':'Numbers','eta':'I64'}
+fn('car-estimate',[('world','World'),('q','Numbers'),('routes','Routes'),('id','I64'),('values','Numbers')],'EstimateMemo',
+ IF(le(V('id'),I(0)),R(values=V('values'),eta=I(-1)),
+ LET([('known',get(V('values'),V('id')))],
+ IF(lt(I(0),V('known')),R(values=V('values'),eta=sub(V('known'),I(2))),
+ LET([('eta',C('estimate',V('world'),V('q'),C('route',V('routes'),V('id'))))],
+ R(values=put(V('values'),V('id'),add(V('eta'),I(2))),eta=V('eta')))))))
 fn('plan-choice',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'),('m','Move')],'Move',LET([
  ('dest',C('destination',V('world'),V('r'))),('r2',PATCH('Resident',V('r'),dest=V('dest')))],
  IF(lt(V('dest'),I(0)),C('wait-agent',V('m'),V('r2'),I(9)),LET([
@@ -24,13 +33,14 @@ fn('plan-choice',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'
  ('walk',IF(V('needWalk'),C('ensure-route',V('world'),V('sim.q'),V('r.cell'),V('dest'),I(1),V('p0')),V('p0'))),
  ('car',IF(V('needCar'),C('ensure-route',V('world'),V('sim.q'),V('r.cell'),V('dest'),I(2),V('walk')),PATCH('Plan',V('walk'),id=I(0)))) ,
  ('etaWalk',IF(lt(I(0),V('walk.id')),C('estimate',V('world'),V('sim.q'),C('route',V('car.routes'),V('walk.id'))),I(-1))),
- ('outboundCar',IF(lt(I(0),V('car.id')),C('estimate',V('world'),V('sim.q'),C('route',V('car.routes'),V('car.id'))),I(-1))),
+ ('memo',C('car-estimate',V('world'),V('sim.q'),V('car.routes'),V('car.id'),V('m.estimates'))),
+ ('outboundCar',V('memo.eta')),
  ('returnCheck',C('returnplan::check',V('world'),V('sim.q'),V('r.cell'),V('dest'),V('etaWalk'),V('outboundCar'),V('car'),eq(V('fixedMode'),I(0)))),
  ('etaCar',V('returnCheck.car')),
  ('surface',IF(lt(I(0),V('fixedMode')),V('fixedMode'),C('choose-mode',V('etaWalk'),V('etaCar')))),
  ('surfaceEta',IF(eq(V('surface'),I(1)),V('etaWalk'),V('etaCar'))),
  ('search',IF(AND(V('origin'),NOT(V('returnCar')),V('returnCheck.complete')),C('railplan::search-bounded',V('world'),V('sim.q'),V('m.transit'),V('m.cash'),V('r.cell'),V('dest'),I(0),V('surfaceEta'),R(plan=V('returnCheck.plan'),choice=ZERO('RailPlan'),complete=V('returnCheck.complete'))),R(plan=V('returnCheck.plan'),choice=ZERO('RailPlan'),complete=V('returnCheck.complete')))),
- ('m2',PATCH('Move',V('m'),routes=V('search.plan.routes'),lookup=V('search.plan.lookup'),nextRoute=V('search.plan.nextRoute'),budget=V('search.plan.budget'))),
+ ('m2',PATCH('Move',V('m'),estimates=V('memo.values'),routes=V('search.plan.routes'),lookup=V('search.plan.lookup'),nextRoute=V('search.plan.nextRoute'),budget=V('search.plan.budget'))),
  ('byRail',AND(lt(I(0),V('search.choice.line')),OR(lt(V('surfaceEta'),I(0)),lt(V('search.choice.eta'),V('surfaceEta'))))),
  ('mode',IF(V('byRail'),I(3),V('surface'))),
  ('planned',PATCH('Resident',V('r2'),etaWalk=V('etaWalk'),etaCar=V('etaCar'))),
@@ -59,7 +69,7 @@ fn('plan-choice-fast',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resi
  ('walk',C('ensure-route',V('world'),V('sim.q'),V('r.cell'),V('dest'),I(1),V('p0'))),
  ('car',IF(V('needCar'),C('ensure-route',V('world'),V('sim.q'),V('r.cell'),V('dest'),I(2),V('walk')),PATCH('Plan',V('walk'),id=I(0))))],
  IF(C('planninggate::admitted',B(True),B(False),V('car.budget'),B(True),V('walk.id'),V('needCar'),V('car.id')),C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m')),
- LET([('etaWalk',IF(lt(I(0),V('walk.id')),C('estimate',V('world'),V('sim.q'),C('route',V('car.routes'),V('walk.id'))),I(-1))),('etaCar',IF(lt(I(0),V('car.id')),C('estimate',V('world'),V('sim.q'),C('route',V('car.routes'),V('car.id'))),I(-1)))],C('wait-agent',V('m'),PATCH('Resident',V('r'),dest=V('dest'),etaWalk=V('etaWalk'),etaCar=V('etaCar')),I(8))))))),C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m'))))
+ LET([('etaWalk',IF(lt(I(0),V('walk.id')),C('estimate',V('world'),V('sim.q'),C('route',V('car.routes'),V('walk.id'))),I(-1))),('memo',C('car-estimate',V('world'),V('sim.q'),V('car.routes'),V('car.id'),V('m.estimates'))),('etaCar',V('memo.eta'))],C('wait-agent',PATCH('Move',V('m'),estimates=V('memo.values')),PATCH('Resident',V('r'),dest=V('dest'),etaWalk=V('etaWalk'),etaCar=V('etaCar')),I(8))))))),C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m'))))
 fn('plan-agent',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'),('m','Move')],'Move',LET([
  ('p',C('rail::plan',V('m.transit'),V('r.id'))),('l',C('rail::line',V('m.transit'),V('p.line')))],
  IF(lt(I(0),V('p.line')),

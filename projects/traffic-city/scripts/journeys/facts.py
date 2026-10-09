@@ -36,9 +36,13 @@ def add_derived_facts(fn, test):
                ('junction', IF(lt(I(0), get(V('world.junctions'), V('r.cell'))), C('junction-key', V('world'), V('r.cell')), IF(AND(lt(V('r.elapsed'), V('r.duration')), lt(I(0), get(V('world.junctions'), V('r.from')))), C('junction-key', V('world'), V('r.from')), I(-1)))),
            ], PATCH('Facts', V('f'), **admission_fields)),
            PATCH('Facts', V('f'), inside=inside))))
+    # map-get-or is eager: construct its unchanged sentinel once per traversal,
+    # not once per resident. Keep original identity order and missing-ID meaning.
     for name in ['summary', 'admission']:
-        fn(name, [('world', 'World'), ('agents', 'Residents'), ('ids', '(list I64)'), ('index', 'I64'), ('f', 'Facts')], 'Facts',
-           IF(lt(V('index'), llen('I64', V('ids'))), C(name, V('world'), V('agents'), V('ids'), add(V('index'), I(1)), C(name + '-agent', V('world'), C('agent', V('agents'), at('I64', V('ids'), V('index'))), V('f'))), V('f')))
+        params = [('world', 'World'), ('agents', 'Residents'), ('ids', '(list I64)'), ('index', 'I64'), ('f', 'Facts')]
+        fn(name + '-scan', params + [('missing', 'Resident')], 'Facts',
+           IF(lt(V('index'), llen('I64', V('ids'))), C(name + '-scan', V('world'), V('agents'), V('ids'), add(V('index'), I(1)), C(name + '-agent', V('world'), mget('I64 Resident', V('agents'), at('I64', V('ids'), V('index')), V('missing')), V('f')), V('missing')), V('f')))
+        fn(name, params, 'Facts', C(name + '-scan', V('world'), V('agents'), V('ids'), V('index'), V('f'), C('empty-agent')))
 
     # Compare the complete projected result, not just a few counters. Cover all
     # resident states/modes and FIFO ties, lingering crossings, reservations,

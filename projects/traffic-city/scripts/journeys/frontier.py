@@ -8,7 +8,7 @@ are consumed immediately, avoiding the predecessor's breadth-first plateaus.
 from native import *
 
 SEARCH_TYPE = {'hx':'Numbers', 'hy':'Numbers', 'buckets':'Numbers',
-               'dist':'Numbers', 'parent':'Numbers', 'pending':'I64',
+               'dist':'Numbers', 'pending':'I64',
                'links':'(list I64)'}
 
 def state(value, **changes):
@@ -23,11 +23,10 @@ def add_frontier(fn):
     fn('relax', [('world','World'),('q','Numbers'),('origin','I64'),('dest','I64'),
                  ('mode','I64'),('from','I64'),('to','I64'),('cost','I64'),('s','Search')], 'Search',
        LET([('cost2',add(V('cost'),C('edge-estimate',V('world'),V('q'),V('to'),V('mode')))),
-               ('known',get(V('s.dist'),V('to')))],
+               ('known',div(get(V('s.dist'),V('to')),I(65536)))],
               IF(OR(eq(V('known'),I(0)),lt(add(V('cost2'),I(1)),V('known'))),
                  C('frontier-push',V('to'),add(V('cost2'),C('heuristic',V('to'),V('dest'),V('mode'),V('s.hx'),V('s.hy'))),
-                   state(V('s'),dist=put(V('s.dist'),V('to'),add(V('cost2'),I(1))),
-                         parent=put(V('s.parent'),V('to'),V('from')))),V('s'))))
+                   state(V('s'),dist=put(V('s.dist'),V('to'),add(mul(add(V('cost2'),I(1)),I(65536)),add(V('from'),I(1)))))),V('s'))))
     # Checked topology slots need only arithmetic offsets in the hot loop.
     offset = IF(eq(V('direction'),I(0)),add(V('from'),I(1)),
         IF(eq(V('direction'),I(1)),add(V('from'),I(128)),
@@ -58,17 +57,17 @@ def add_frontier(fn):
     fn('trace',[('parent','Numbers'),('origin','I64'),('cell','I64'),('result','(list I64)')],'(list I64)',
        LET([('result2',append('I64',V('result'),V('cell')))],
            IF(eq(V('cell'),V('origin')),C('reverse',V('result2'),sub(llen('I64',V('result2')),I(1)),LS('I64')),
-              C('trace',V('parent'),V('origin'),get(V('parent'),V('cell')),V('result2')))))
+              C('trace',V('parent'),V('origin'),sub(mod(get(V('parent'),V('cell')),I(65536)),I(1)),V('result2')))))
     args=[('world','World'),('q','Numbers'),('origin','I64'),('dest','I64'),('mode','I64'),('cost','I64'),('s','Search')]
     def loop(s, cost=None):
         return C('search-loop',V('world'),V('q'),V('origin'),V('dest'),V('mode'),cost or V('cost'),s)
     step=LET([('link',at('I64',V('s.links'),sub(V('head'),I(1)))),
               ('cell',mod(V('link'),I(65536))),('previous',div(V('link'),I(65536))),
-              ('g',sub(get(V('s.dist'),V('cell')),I(1))),
+              ('g',sub(div(get(V('s.dist'),V('cell')),I(65536)),I(1))),
               ('remaining',state(V('s'),buckets=C('qput',V('s.buckets'),V('cost'),V('previous')),pending=sub(V('s.pending'),I(1))))],
              IF(eq(add(V('g'),C('heuristic',V('cell'),V('dest'),V('mode'),V('s.hx'),V('s.hy'))),V('cost')),
                 IF(eq(V('cell'),V('dest')),
-                   R(path=C('trace',V('s.parent'),V('origin'),V('cell'),LS('I64')),cost=V('g'),
+                   R(path=C('trace',V('s.dist'),V('origin'),V('cell'),LS('I64')),cost=V('g'),
                      version=V('world.version'),origin=V('origin'),dest=V('dest'),mode=V('mode')),
                    loop(C('expand',V('world'),V('q'),V('origin'),V('dest'),V('mode'),V('cell'),V('g'),V('remaining')))),
                 loop(V('remaining'))))
@@ -79,5 +78,5 @@ def add_frontier(fn):
           LET([('cached',C('cache-world',V('world'))),
                ('priority',C('heuristic',V('origin'),V('dest'),V('mode'),V('cached.junctions'),V('cached.junctions'))),
                ('s',R(hx=V('cached.junctions'),hy=V('cached.junctions'),buckets=put(MP(),V('priority'),I(1)),
-                      dist=put(MP(),V('origin'),I(1)),parent=MP(),pending=I(1),links=LS('I64',V('origin'))))],
+                      dist=put(MP(),V('origin'),I(65536)),pending=I(1),links=LS('I64',V('origin'))))],
               C('search-loop',V('cached'),V('q'),V('origin'),V('dest'),V('mode'),V('priority'),V('s'))),C('empty-route')))

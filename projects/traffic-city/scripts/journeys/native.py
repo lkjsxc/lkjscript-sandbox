@@ -28,12 +28,14 @@ def eq(a,b):return C('std::i64-equal',a,b)
 def lt(a,b):return C('std::less',a,b)
 def le(a,b):return C('std::less-equal',a,b)
 def NOT(a):return C('std::bool-not',a)
+# Native conditional expressions short-circuit pure predicates. std::bool-and
+# and std::bool-or are ordinary eager calls, not control-flow operators.
 def AND(*a):
  if len(a)==1:return a[0]
- return C('std::bool-and',a[0],AND(*a[1:]))
+ return IF(a[0],AND(*a[1:]),B(False))
 def OR(*a):
  if len(a)==1:return a[0]
- return C('std::bool-or',a[0],OR(*a[1:]))
+ return IF(a[0],B(True),OR(*a[1:]))
 def mn(a,b):return C('game::min',a,b)
 def mx(a,b):return C('game::max',a,b)
 def llen(t,l):return G('std::list-length',t,l)
@@ -68,7 +70,8 @@ TYPES={
 'Search':{'hx':'Numbers','hy':'Numbers','buckets':'Buckets','dist':'Numbers','parent':'Numbers','pending':'I64'},
 'CycleScan':{'done':'Numbers','members':'Numbers'},
 'Facts':{'occ':'Numbers','heads':'Numbers','headReady':'Numbers','busy':'Numbers','q':'Numbers','walkq':'Numbers','inside':'Numbers','employment':'Numbers',**{k:'I64' for k in 'waiting disconnected moving'.split()}},
-'Move':{'agents':'Residents','routes':'Routes','lookup':'Numbers','nextRoute':'I64','occ':'Numbers','busy':'Numbers','flow':'Numbers','inside':'Numbers','budget':'I64','cash':'I64','transit':'Transit',**{k:'I64' for k in 'requested arrived visits workVisits shopVisits leisureVisits walkTrips carTrips waitTicks travelTicks totalDuration income'.split()}},
+'MovementStep':{'city':'City','arrivals':'(list I64)'},
+'Move':{'arrivals':'(list I64)','estimates':'Numbers','agents':'Residents','routes':'Routes','lookup':'Numbers','nextRoute':'I64','occ':'Numbers','busy':'Numbers','flow':'Numbers','inside':'Numbers','budget':'I64','cash':'I64','transit':'Transit',**{k:'I64' for k in 'requested arrived visits workVisits shopVisits leisureVisits walkTrips carTrips waitTicks travelTicks totalDuration income'.split()}},
 'Plan':{'routes':'Routes','lookup':'Numbers','nextRoute':'I64','budget':'I64','id':'I64'},
 }
 # Format 7: explicit household/business accounts and reusable rail infrastructure.

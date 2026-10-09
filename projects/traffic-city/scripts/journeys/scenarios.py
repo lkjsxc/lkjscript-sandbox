@@ -19,12 +19,12 @@ b=[('c0',C('metro-base'))]
 for i,(op,x,y,x2,y2,k) in enumerate(commands):b.append(('c'+str(i+1),C('action',V('c'+str(i)),T(op),I(x),I(y),I(x2),I(y2),I(k))))
 fn('metro-seed',[],'City',LET(b,V('c'+str(len(commands)))))
 fn('classic-seed',[('id','I64')],'City',IF(eq(V('id'),I(1)),C('garden-base'),IF(eq(V('id'),I(2)),C('crossing-base'),C('metro-seed'))))
-fn('seed',[('id','I64')],'City',IF(eq(V('id'),I(4)),C('waterfront::seed'),C('classic-seed',V('id'))))
+fn('seed',[('id','I64')],'City',IF(eq(V('id'),I(5)),C('region::seed'),IF(eq(V('id'),I(4)),C('waterfront::seed'),C('classic-seed',V('id')))))
 for i,key in enumerate(['garden','crossing','metro'],1):
  snapshot=ROOT/'examples'/f'{key}.json'
  body=F(G('std::json-decode-or','City',C('std::bytes-from-text',T(snapshot.read_text())),C('seed',I(i))),'value') if snapshot.exists() else C('seed',I(i))
  fn(key+'-saved',[],'City',body)
 fn('classic-load',[('id','I64')],'City',IF(eq(V('id'),I(1)),C('garden-saved'),IF(eq(V('id'),I(2)),C('crossing-saved'),C('metro-saved'))))
-fn('load',[('id','I64')],'City',IF(eq(V('id'),I(4)),C('waterfront::seed'),C('classic-load',V('id'))))
+fn('load',[('id','I64')],'City',IF(eq(V('id'),I(5)),C('region::seed'),IF(eq(V('id'),I(4)),C('waterfront::seed'),C('classic-load',V('id')))))
 D.append('(component create factory (visibility private) (port create run (type (function (I64) City)) (function seed)))')
 emit('scenarios','scenarios',D,tail=' (target create scenario-seed (component scenarios::factory) (runner command) (port scenarios::factory::run))')
