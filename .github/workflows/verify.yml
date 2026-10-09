@@ -48,6 +48,12 @@ jobs:
         working-directory: projects/traffic-city
       - run: npm run test:ui-management
         working-directory: projects/traffic-city
+      - run: npm run test:commuter-layout
+        working-directory: projects/traffic-city
+      - run: npm run test:rail-service-capacity
+        working-directory: projects/traffic-city
+      - run: npm run test:commuter-rail-flow
+        working-directory: projects/traffic-city
       - run: npm run test:commuter
         working-directory: projects/traffic-city
       - run: npm run test:commuter-ui

@@ -89,7 +89,10 @@
     "test:region-generation": "node tests/region-generation.mjs",
     "test:runtime-map-execution": "node tests/runtime-map-execution.mjs",
     "test:continuous-management": "node tests/continuous-management.mjs",
-    "test:junction-flow": "node tests/junction-flow.mjs"
+    "test:junction-flow": "node tests/junction-flow.mjs",
+    "test:commuter-layout": "node tests/commuter-layout.mjs",
+    "test:commuter-rail-flow": "node tests/commuter-rail-flow.mjs",
+    "test:rail-service-capacity": "node tests/rail-service-capacity.mjs"
   },
   "engines": {
     "node": ">=22"

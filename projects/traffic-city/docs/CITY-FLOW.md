@@ -8,7 +8,7 @@ Crossing reservations retain exact movement ownership in ephemeral busy facts. S
 
 Facilities no longer connect directly to one another. Cached adjacency epoch 3 causes predecessor saves to rebuild derived topology and clear route lookup; city, resident and save record layouts remain format 9. Existing in-flight hops retain continuous presentation.
 
-Commuter Boroughs is an independent static layout with 256 homes, 128 workplaces, 2,048 residents/jobs, sixteen stations, and four four-stop lines. Native declarations build all services and execute all journeys. Its 64-seat capacity is an authored scenario parameter, not a new upgrade control.
+Commuter Boroughs is an independent static layout with 256 homes, 128 workplaces, 2,048 residents/jobs, sixteen stations, and eight four-stop lines (four east-west and four north-south). Each station serves both axes; sixteen homes have moved within their original districts to keep both rail corridors clear. Native declarations build all services and execute all journeys. Its 64-seat capacity is an authored scenario parameter, not a new upgrade control.
 
 ## Verification
 
@@ -21,3 +21,5 @@ The commuter observer keeps the complete City within native execution and return
 `test:region-generation` needs `REGION_BASELINE_SELECTION` and `CITY_SELECTION`: independently built, different artifacts using the identical executable. It compares the regional diagnostic projection at construction, not complete saves or gameplay throughput.
 
 `test:runtime-map-execution` preserves the separate 0.1.88 versus 0.1.89 runtime experiment. It needs `CITY_SELECTION` built for the 0.1.88 executor and `MAP_RUNTIME` selecting the independently built 0.1.89 executable. It runs the identical artifact and full command results in both executors without touching player stores. It is not a release gate for this project's pinned 0.1.83 runtime and does not authorize a runtime upgrade or establish browser performance.
+
+See [the north-south grid and verification](COMMUTER-GRID.md) for the eight-line layout.

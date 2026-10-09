@@ -8,6 +8,7 @@ def plan(t,id):return C('plan',t,id)
 def setline(t,l):return PATCH('Transit',t,lines=mput('I64 RailLine',F(t,'lines'),F(l,'id'),l))
 def setplan(t,id,p):return PATCH('Transit',t,plans=mput('I64 RailPlan',F(t,'plans'),id,p))
 def rmplan(t,id):return PATCH('Transit',t,plans=G('std::map-remove','I64 RailPlan',F(t,'plans'),id))
+fn('service-limit',[],'I64',I(8))
 fn('line',[('t','Transit'),('id','I64')],'RailLine',mget('I64 RailLine',V('t.lines'),V('id'),ZERO('RailLine')))
 fn('plan',[('t','Transit'),('id','I64')],'RailPlan',mget('I64 RailPlan',V('t.plans'),V('id'),ZERO('RailPlan')))
 fn('period',[('l','RailLine')],'I64',mul(add(V('l.rideTicks'),mul(sub(llen('I64',C('stops',V('l'))),I(1)),I(3))),I(2)))
@@ -24,7 +25,7 @@ build=LET([
  ('a',C('game::id',V('c.x'),V('c.y'))),('b',C('game::id',V('c.x2'),V('c.y2'))),
  ('distance',C('game::manhattan',V('a'),V('b'))),('direction',IF(eq(V('c.y'),V('c.y2')),IF(lt(V('c.x'),V('c.x2')),I(0),I(2)),IF(lt(V('c.y'),V('c.y2')),I(1),I(3))))],
  IF(OR(lt(V('distance'),I(5)),lt(I(63),V('distance'))),R(city=V('city'),notice=T('Draw a straight rail line from 6 to 64 tiles.')),
- IF(le(I(4),llen('I64',V('city.sim.transit.ids'))),R(city=V('city'),notice=T('This preview supports four independent shuttle lines.')),
+ IF(le(C('rail::service-limit'),llen('I64',V('city.sim.transit.ids'))),R(city=V('city'),notice=T('This city supports eight independent rail services.')),
  IF(OR(NOT(eq(get(V('city.world.tiles'),V('a')),I(0))),NOT(eq(get(V('city.world.tiles'),V('b')),I(0))),C('water',V('city'),V('a')),C('water',V('city'),V('b'))),R(city=V('city'),notice=T('Both end stations need empty dry land.')),
  IF(NOT(AND(C('access',V('city.world'),V('a'),I(0)),C('access',V('city.world'),V('b'),I(0)))),R(city=V('city'),notice=T('Connect both end stations to an adjacent road or footpath.')),
  IF(NOT(C('corridor',V('city'),V('a'),V('b'),V('direction'))),R(city=V('city'),notice=T('Elevated rail can cross roads and water, but not buildings or other rail lines.')),
@@ -77,6 +78,7 @@ fn('finish',[('t','Transit'),('id','I64')],'Transit',LET([('cleaned',rmplan(V('t
 D=[d for d in D if not any(('(function create '+n+' ') in d for n in ['enqueue','riders','step-line','forget'])]
 exec((Path(__file__).parent/'rail_train_v2.py').read_text())
 # Generation witnesses for capacity, geometry and cost; movement integration has scenario tests.
+test('rail-service-limit',C('service-limit'),I(8))
 test('rail-operating-cost',C('expense',ZERO('RailLine',a=I(0),b=I(32))),I(4))
 test('rail-line-membership',C('on-line',ZERO('RailLine',a=I(128),b=I(148)),I(138)),B(True))
 test('rail-line-not-diagonal',C('on-line',ZERO('RailLine',a=I(128),b=I(148)),I(10)),B(False))
