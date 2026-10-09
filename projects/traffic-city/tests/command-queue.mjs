@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {CommandQueue, mapEdit, cityMutation} from '../web/commands.js';
+const sent = [], queue = new CommandQueue(item => sent.push(item), {limit: 4});
+const stroke = {op: 'build', x: 7, y: 8, x2: 30, y2: 8, kind: 1};
+assert.equal(queue.enqueue(stroke), 1); stroke.x2 = 1;
+assert.equal(queue.enqueue({op: 'review-remove', x: 40, y: 8, x2: 49, y2: 9}), 2);
+assert.equal(queue.enqueue({op: 'view', x: 0}), 3);
+assert.equal(queue.enqueue({op: 'build', x: 8}), 4);
+assert.equal(queue.enqueue({op: 'build', x: 9}), 0);
+assert.equal(sent.length, 1); assert.equal(sent[0].x2, 30); assert.equal(queue.size, 4);
+assert.equal(queue.acknowledge(0), null); assert.equal(queue.size, 4);
+assert.throws(() => queue.acknowledge(2), /sequence/); assert.equal(queue.size, 4);
+assert.equal(queue.acknowledge(1).op, 'build'); assert.equal(sent.length, 1);
+assert.equal(queue.acknowledge(1), null); queue.flush();
+assert.equal(sent.length, 2); assert.equal(sent[1].op, 'review-remove');
+for (const id of [2, 3, 4]) { queue.acknowledge(id); queue.flush(); }
+assert.deepEqual(sent.map(x => x.id), [1, 2, 3, 4]); assert.equal(queue.size, 0);
+assert.equal(queue.enqueue({op: 'rail-service', kind: 0}), 5);
+queue.enqueue({op: 'build', x: 12});
+const lost = queue.reset(); assert.deepEqual(lost.map(x => x.delivery), ['sent', 'queued']);
+assert.equal(queue.size, 0); queue.flush(); assert.equal(sent.length, 5);
+assert.equal(queue.enqueue({op: 'resume'}), 1); assert.equal(sent.at(-1).op, 'resume');
+assert.equal(mapEdit('review-remove'), true); assert.equal(mapEdit('view'), false);
+assert.equal(cityMutation('rail-service'), true); assert.equal(cityMutation('inspect'), false);
+assert.throws(() => queue.acknowledge(NaN), /Invalid/);
+console.log('PASS immutable fast strokes, bounded FIFO, one native flight, duplicate acknowledgements, sequence gaps, and no uncertain replay');

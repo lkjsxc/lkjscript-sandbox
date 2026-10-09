@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {lineEditable, lineState, lineWaiting} from '../web/lines.js';
+const line = {enabled: false, status: 3, elapsed: 0, duration: 0, occupancy: 0, platforms: [], expense: 7};
+assert(lineEditable(line)); assert.match(lineState(line).label, /ready to edit/);
+assert(!lineEditable({...line, enabled: true}));
+assert.match(lineState({...line, status: 1, elapsed: 1, duration: 4}).label, /Stopping at next station/);
+assert.match(lineState({...line, status: 1}, true).detail, /start traffic/);
+assert(!lineEditable({...line, status: 1})); assert(!lineEditable({...line, occupancy: 1}));
+const queued = {...line, platforms: [{forward: 3, reverse: 2}, {forward: 0, reverse: 1}]};
+assert.equal(lineWaiting(queued), 6); assert(!lineEditable(queued)); assert.match(lineState(queued).label, /Clearing/);
+assert.match(lineState({...line, enabled: true, status: 2}).label, /funds/);
+assert.match(lineState({...line, enabled: true, status: 4}).label, /clear track/);
+assert.match(lineState({...line, enabled: true, status: 1}).label, /^Running$/);
+assert.match(lineState({...line, enabled: true, status: 0}).label, /station/);
+console.log('PASS operating intent, in-flight stop, platform drain, paused clock, funds, shared track and stop-edit eligibility');

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/author.mjs",
     "start": "./play.sh",
-    "test": "node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/motion-timing.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
+    "test": "node tests/command-queue.mjs && node tests/line-status.mjs && node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/motion-timing.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
     "test:browser": "node tests/with-preview.mjs tests/browser.mjs",
     "test:scale": "node tests/scaling.mjs",
     "test:backpressure": "node tests/backpressure.mjs",
@@ -82,7 +82,14 @@
     "test:region-live": "node tests/region-live.mjs",
     "test:region-ui": "node tests/with-preview.mjs tests/region-ui.mjs",
     "test:scale-comparison": "node tests/scale-comparison.mjs",
-    "test:money-events": "node tests/money-events.mjs"
+    "test:money-events": "node tests/money-events.mjs",
+    "test:city-flow-ui": "node tests/with-preview.mjs tests/city-flow-ui.mjs",
+    "test:commuter": "node tests/commuter-example.mjs",
+    "test:commuter-ui": "node tests/with-preview.mjs tests/commuter-ui.mjs",
+    "test:region-generation": "node tests/region-generation.mjs",
+    "test:runtime-map-execution": "node tests/runtime-map-execution.mjs",
+    "test:continuous-management": "node tests/continuous-management.mjs",
+    "test:junction-flow": "node tests/junction-flow.mjs"
   },
   "engines": {
     "node": ">=22"

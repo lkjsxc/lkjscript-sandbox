@@ -18,6 +18,7 @@ fn('y',[('id','I64')],'I64',rem(div(V('id'),I(128)),I(128)))
 fn('oneway',[('kind','I64')],'Bool',AND(le(I(9),V('kind')),le(V('kind'),I(12))))
 fn('road',[('kind','I64')],'Bool',OR(eq(V('kind'),I(1)),eq(V('kind'),I(2)),AND(le(I(9),V('kind')),le(V('kind'),I(13)))))
 fn('building',[('kind','I64')],'Bool',AND(le(I(3),V('kind')),le(V('kind'),I(6))))
+fn('facility',[('kind','I64')],'Bool',OR(C('building',V('kind')),eq(V('kind'),I(8))))
 fn('slow',[('kind','I64')],'Bool',AND(C('road',V('kind')),NOT(eq(V('kind'),I(2)))))
 fn('neighbor',[('id','I64'),('direction','I64')],'I64',
  IF(eq(V('direction'),I(4)),IF(lt(V('id'),I(16384)),add(V('id'),I(16384)),sub(V('id'),I(16384))),
@@ -38,7 +39,7 @@ fn('can-step',[('tiles','Numbers'),('from','I64'),('to','I64'),('origin','I64'),
  IF(AND(le(I(0),V('from')),lt(V('from'),I(32768)),C('passable',V('tiles'),V('to'),V('origin'),V('dest'),V('mode'))),
  IF(eq(C('layer',V('from')),C('layer',V('to'))),
  LET([('d',C('direction',V('from'),V('to')))],
- IF(eq(C('neighbor',V('from'),V('d')),V('to')),
+ IF(AND(eq(C('neighbor',V('from'),V('d')),V('to')),NOT(AND(C('facility',read(V('tiles'),V('from'))),C('facility',read(V('tiles'),V('to')))))),
  IF(eq(V('mode'),I(2)),C('drive-edge',read(V('tiles'),V('from')),read(V('tiles'),V('to')),V('d')),B(True)),B(False))),
  AND(eq(C('ground',V('from')),C('ground',V('to'))),C('portal',V('tiles'),V('from')),
      lt(I(0),read(V('tiles'),V('from'))),lt(I(0),read(V('tiles'),V('to'))))),B(False)))
@@ -75,6 +76,9 @@ for label,pairs,mode,expected in [
 test('no-vertical-teleport',C('can-step',tiles([(129,13),(16514,1)]),I(129),I(16514),I(128),I(16515),I(2)),B(False))
 test('oneway-sidewalk-reverse',C('can-step',tiles([(129,9),(130,9)]),I(130),I(129),I(131),I(128),I(1)),B(True))
 test('oneway-car-reverse-blocked',C('can-step',tiles([(129,9),(130,9)]),I(130),I(129),I(131),I(128),I(2)),B(False))
+for a in [3,4,5,6,8]:
+ for b in [3,4,5,6,8]:
+  for mode in [1,2]:test(f'no-implicit-facility-link-{a}-{b}-{mode}',C('can-step',tiles([(129,a),(130,b)]),I(129),I(130),I(129),I(130),I(mode)),B(False))
 checks=[d for d in D if '(test create ' in d]
 emit('roads','roads',[d for d in D if d not in checks])
 import re

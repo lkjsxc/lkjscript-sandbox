@@ -13,9 +13,9 @@ function stage(reverseOrder=false){
 }
 for(const reverse of [false,true]){
  let city=stage(reverse),r=runCase({city,ticks:1,commands:[],after:[]},'portal-conflict-'+reverse,'continuation').result;
- const entrants=r.agents.filter(a=>a.id<=2&&[g,U+g].includes(a.cell));assert.equal(entrants.length,1,'Both layers admitted a conflicting portal movement in one cycle');assert(r.agents.some(a=>a.id<=2&&a.reason===5));assert.equal(new Map(r.busy).get(g),15);assert(!new Map(r.busy).has(U+g));
+ const entrants=r.agents.filter(a=>a.id<=2&&[g,U+g].includes(a.cell));assert.equal(entrants.length,1,'Both layers admitted a conflicting portal movement in one cycle');assert(r.agents.some(a=>a.id<=2&&a.reason===5));assert.equal(new Map(r.busy).get(g)%16,15);assert.equal(Math.floor(new Map(r.busy).get(g)/16),2**14,'Portal ownership is exclusive');assert(!new Map(r.busy).has(U+g));
  for(let i=0;i<48;i++){
-  assert.equal(r.conservation,0);for(const [,count]of r.lanes)assert(count>=0&&count<=3);for(const [,mask]of r.busy)assert(mask>=0&&mask<=15,'Conflicting masks overlapped');
+  assert.equal(r.conservation,0);for(const [,count]of r.lanes)assert(count>=0&&count<=3);for(const [,packed]of r.busy){const owners=Array.from({length:15},(_,i)=>i+1).filter(mask=>(Math.floor(packed/16)&2**(mask-1))!==0);assert.equal(owners.reduce((bits,mask)=>bits|mask,0),packed%16);for(let a=0;a<owners.length;a++)for(let b=a+1;b<owners.length;b++)assert.equal(owners[a]&owners[b],0,'Conflicting movement owners overlapped');}
   for(const a of r.agents.filter(a=>a.id<=2&&a.from!==a.to&&a.from%U===a.to%U)){assert.equal(a.dir,a.prior,'Vertical movement rotated a driver arbitrarily');assert([g,g+2].includes(a.from%U));assert.equal(new Map(r.city.world.tiles).get(a.from%U),13);}
   samples.push({reverse,tick:r.city.sim.tick,people:r.agents.filter(a=>a.id<=2).map(a=>({id:a.id,cell:a.cell,from:a.from,dir:a.dir,zone:a.zone,reason:a.reason,journeys:a.journeys}))});city=r.city;r=runCase({city,ticks:1,commands:[],after:[]},'portal-step-'+reverse+'-'+i,'continuation').result;
  }

@@ -40,6 +40,18 @@ jobs:
         working-directory: projects/traffic-city
       - run: ./sandbox traffic-city build
       - run: ./sandbox traffic-city test
+      - run: npm run test:junction-flow
+        working-directory: projects/traffic-city
+      - run: npm run test:continuous-management
+        working-directory: projects/traffic-city
+      - run: npm run test:city-flow-ui
+        working-directory: projects/traffic-city
+      - run: npm run test:ui-management
+        working-directory: projects/traffic-city
+      - run: npm run test:commuter
+        working-directory: projects/traffic-city
+      - run: npm run test:commuter-ui
+        working-directory: projects/traffic-city
       - run: npm run test:tunnels
         working-directory: projects/traffic-city
       - run: npm run test:tunnel-ui

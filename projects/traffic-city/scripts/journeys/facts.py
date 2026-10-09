@@ -25,7 +25,7 @@ def add_derived_facts(fn, test):
         occ=C('bump', IF(lt(I(0), V('r.exitKey')), C('bump', V('f.occ'), sub(V('r.exitKey'), I(1)), I(1)), V('f.occ')), V('key'), I(1)),
         heads=IF(OR(eq(V('oldhead'), I(0)), lt(V('r.ready'), get(V('f.headReady'), V('key'))), AND(eq(V('r.ready'), get(V('f.headReady'), V('key'))), lt(V('r.id'), V('oldhead')))), put(V('f.heads'), V('key'), V('r.id')), V('f.heads')),
         headReady=IF(OR(eq(V('oldhead'), I(0)), lt(V('r.ready'), get(V('f.headReady'), V('key')))), put(V('f.headReady'), V('key'), V('r.ready')), V('f.headReady')),
-        busy=IF(AND(le(I(0), V('junction')), lt(V('r.elapsed'), V('r.duration'))), C('mask-union-put', V('f.busy'), V('junction'), IF(lt(I(0), V('r.mask')), V('r.mask'), I(15))), V('f.busy')),
+        busy=IF(AND(le(I(0), V('junction')), lt(V('r.elapsed'), V('r.duration'))), C('flow-put', V('f.busy'), V('junction'), IF(lt(I(0), V('r.mask')), V('r.mask'), I(15))), V('f.busy')),
         inside=inside,
     )
     fn('admission-agent', [('world', 'World'), ('r', 'Resident'), ('f', 'Facts')], 'Facts',
