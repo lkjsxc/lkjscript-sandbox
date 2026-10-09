@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {runCase,selection} from './run-case.mjs';
+fs.mkdirSync('evidence/commuter-grid', {recursive: true});
 const ticks=128,measured=runCase(ticks,'commuter-rail-trace','commuter-rail-probe'),r=measured.result;
 assert.equal(r.paths.length,8);assert.equal(r.frames.length,ticks+1);
 const paths=new Map(r.paths.map(l=>[l.id,l.path])),directions=new Map(r.paths.map(l=>[l.id,new Set()])),movingTicks=new Map(r.paths.map(l=>[l.id,0]));

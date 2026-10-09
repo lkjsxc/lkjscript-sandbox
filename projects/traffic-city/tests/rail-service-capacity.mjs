@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {runCase, selection} from './run-case.mjs';
+fs.mkdirSync('evidence/commuter-grid', {recursive: true});
 const command = (op, x, y, x2 = x, y2 = y, kind = 0) => ({op, x, y, x2, y2, kind});
 const tiles = [[1,10,8],[10,10,8],[1,11,7],[10,11,7]].map(([x,y,kind]) => ({id:x+y*128,kind,q:0}));
 const track = command('build-track', 1,10,10,10);
