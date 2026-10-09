@@ -58,6 +58,14 @@ jobs:
         working-directory: projects/traffic-city
       - run: npm run test:commuter-ui
         working-directory: projects/traffic-city
+      - run: npm run test:employment-preservation
+        working-directory: projects/traffic-city
+      - run: npm run test:commuter-residents
+        working-directory: projects/traffic-city
+      - run: npm run test:commuter-edit-residents
+        working-directory: projects/traffic-city
+      - run: npm run test:commuter-residents-ui
+        working-directory: projects/traffic-city
       - run: npm run test:tunnels
         working-directory: projects/traffic-city
       - run: npm run test:tunnel-ui

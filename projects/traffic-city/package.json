@@ -92,7 +92,11 @@
     "test:junction-flow": "node tests/junction-flow.mjs",
     "test:commuter-layout": "node tests/commuter-layout.mjs",
     "test:commuter-rail-flow": "node tests/commuter-rail-flow.mjs",
-    "test:rail-service-capacity": "node tests/rail-service-capacity.mjs"
+    "test:rail-service-capacity": "node tests/rail-service-capacity.mjs",
+    "test:commuter-residents": "node tests/commuter-residents.mjs",
+    "test:commuter-residents-ui": "node tests/with-preview.mjs tests/commuter-residents-ui.mjs",
+    "test:employment-preservation": "node tests/employment-preservation.mjs",
+    "test:commuter-edit-residents": "COMMUTER_EDIT=1 node tests/commuter-residents.mjs"
   },
   "engines": {
     "node": ">=22"

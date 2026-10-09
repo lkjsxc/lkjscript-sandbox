@@ -2,7 +2,7 @@
 
 ## Decision
 
-A city should be constrained by its transport network, not by avoidable work in the route planner. The simulation still has a two-search budget per cycle. This change spends less of that budget on railway alternatives which cannot beat an already available option. It does not reduce the population, remove a transport mode, increase road or train capacity, or turn unfinished journeys into arrivals.
+A city should be constrained by its transport network, not by avoidable work in the route planner. The original bounded-planning change retained two searches per cycle. The current allowance is population-scaled: `min(16, max(2, ceil(population / 128)))` exact searches per cycle. Cache hits do not consume it. Candidate pruning spends less of that allowance on railway alternatives which cannot beat an already available option. It does not reduce the population, remove a transport mode, increase road or train capacity, or turn unfinished journeys into arrivals.
 
 The distinction matters in River Boroughs. A resident waiting for a route calculation is not occupying a road queue. Increasing avenue capacity cannot directly resolve that calculation backlog. The interface now reports engine planning separately while continuing to include it in the existing long-wait total and growth requirement.
 
@@ -38,7 +38,7 @@ The browser receives counts only. It neither infers the full city's state from t
 
 `npm run test:planning-bounds` runs an independent native, unpruned reference against the bounded search on identical city snapshots. The reference spells out the predecessor's queue/ride/wait arithmetic rather than calling the new lower-bound helper. It compares complete selected paths and estimates, not just aggregate traffic counts. Cases include the four city examples, useful rail in both directions, fixed walking and driving returns, congested roads, suspended and unfunded services, crowded platforms, warm caches and stale topology versions.
 
-The command-only oracle may use ten searches: at most two surface paths plus access/egress for four services. This test allowance does not change the production budget of two. Native HTTP must return 404 for the probe target. Native boundary assertions cover strict ties, unavailable surface alternatives, zero estimates, state/reason classification and the eight-cycle long-wait threshold.
+The command-only oracle may use ten searches: at most two surface paths plus access/egress for four services. This diagnostic allowance is independent of the population-scaled production allowance. Native HTTP must return 404 for the probe target. Native boundary assertions cover strict ties, unavailable surface alternatives, zero estimates, state/reason classification and the eight-cycle long-wait threshold.
 
 `npm run test:planning-ui` uses visible browser controls to load a fresh 1,024-resident city, run it, open the wait breakdown, compare its text against native statistics, use keyboard activation at a 390-pixel viewport, and save/reload the city. It uses a disposable browser identity and native store.
 
@@ -59,4 +59,4 @@ Native declarations are still regenerated reproducibly and built through public 
 
 ## Next architectural boundary
 
-Scaling should follow measured planning exposure, completed travel, cache churn and actual delivered cycles together. Raising population or fuel limits alone can move the bottleneck into request deadlines or make the city less responsive. The next structural candidates are fair admission of unresolved requests and reusable destination/access information with explicit invalidation. They should be assessed against fixed-snapshot decision witnesses and native saved-city continuations before any claim of increased capacity.
+Scaling should follow measured planning exposure, completed travel, cache churn and actual delivered cycles together. Raising population or fuel limits alone can move the bottleneck into request deadlines or make the city less responsive. Population scaling now addresses the pathological cold start in the 2,048-resident example, but the ceiling of sixteen exact searches is not a bound on the number of expanded route nodes. Further structural candidates are fair admission of unresolved requests and reusable destination/access information with explicit invalidation. They should be assessed against fixed-snapshot decision witnesses and native saved-city continuations before any claim of increased capacity.
