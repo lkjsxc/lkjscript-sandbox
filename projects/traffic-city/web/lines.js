@@ -11,7 +11,8 @@ export function lineState(line, paused = false) {
   if (line.status === 4) return {label: 'Waiting for clear track', detail: 'Another train owns a shared section. This train departs after that section clears.' + stoppedClock};
   return {label: lineMoving(line) ? 'Running' : 'At station', detail: (lineMoving(line) ? 'Travelling to the next stop.' : 'Boarding, then departing in stop order.') + (paused ? ' City time is paused.' : '')};
 }
-const palette = ['#6f7194', '#b18b53', '#528b8a', '#a7736c'];
+export const railColors = ['#6f7194', '#b18b53', '#528b8a', '#a7736c', '#4a789e', '#8b639d', '#648542', '#b46642'];
+const palette = railColors;
 const coordinates = id => `${id % 128}, ${Math.floor(id / 128)}`;
 export function createLineManager({getLines, getStations, getStatus, getPaused, getPending, send, addStop, focusStation, beginService, onOpen}) {
   const panel = document.createElement('aside'); panel.id = 'lines-panel'; panel.hidden = true;

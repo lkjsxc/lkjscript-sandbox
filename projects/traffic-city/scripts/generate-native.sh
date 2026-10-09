@@ -20,6 +20,7 @@ python3 scripts/journeys/waterfront.py
 python3 scripts/journeys/region.py
 python3 scripts/journeys/commuter.py
 python3 scripts/journeys/region_probe.py
+python3 scripts/journeys/commuter_rail_probe.py
 python3 scripts/journeys/scenarios.py
 python3 scripts/journeys/migration.py
 python3 scripts/journeys/actorpool.py

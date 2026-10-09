@@ -11,8 +11,14 @@ try{
  await page.locator('[data-scenario="6"]').click();await page.waitForFunction(()=>!document.querySelector('#city-confirm').disabled);assert((await page.locator('#confirm-title').textContent()).includes('Commuter Boroughs'));await page.locator('#city-confirm').click();
  await page.waitForFunction(()=>window.__flowgarden.stats.population===2048&&window.__flowgarden.menuPage==='home');await page.locator('#continue').click();await page.locator('#fit').click();
  const snapshot=()=>page.evaluate(()=>({stats:window.__flowgarden.stats,rails:window.__flowgarden.rails,river:window.__flowgarden.river,width:window.__flowgarden.riverWidth}));
- let before=await snapshot();assert.equal(before.rails.length,4);assert(before.rails.every(l=>l.stops.length===4));assert.equal(before.stats.wealthError,0);await page.screenshot({path:'evidence/commuter-overview.png'});
- checks.push('Six-choice menu and explicit review load the 2,048-person region, frame all 16 districts, and show four four-stop services.');
+ let before=await snapshot();assert.equal(before.rails.length,8);assert(before.rails.every(l=>l.stops.length===4));assert.equal(before.stats.wealthError,0);await page.screenshot({path:'evidence/commuter-overview.png'});
+ checks.push('Six-choice menu and explicit review load the 2,048-person region, frame all 16 districts, and show eight four-stop services across both axes.');
+ await page.getByRole('button',{name:'Build railway',exact:true}).click();await page.locator('#lines-open').click();
+ assert.equal(await page.locator('#lines-list [data-line]').count(),8);
+ assert.equal(await page.locator('#lines-list [data-line]').evaluateAll(buttons=>new Set(buttons.map(b=>b.style.getPropertyValue('--line-color'))).size),8);
+ await page.locator('[data-line="8"]').click();assert.equal(await page.locator('#line-stop-list li').count(),4);assert.match(await page.locator('#line-title').textContent(),/Line 8/);
+ await page.screenshot({path:'evidence/commuter-grid/lines.png'});await page.locator('#lines-close').click();
+ checks.push('All eight lines have distinct shared map/panel colours; the eighth north-south line exposes four ordered stops.');
  await page.locator('#play').click();await page.waitForFunction(()=>window.__flowgarden.stats.tick>=16,null,{timeout:240000});await page.locator('#play').click();await page.waitForFunction(()=>window.__flowgarden.stats.paused);before=await snapshot();assert.equal(before.stats.wealthError,0);assert(before.stats.requested>0);await page.screenshot({path:'evidence/commuter-running.png'});
  await page.locator('#menu-open').click();await page.locator('#save').click();await page.waitForFunction(()=>document.querySelector('#notice').textContent==='City saved.');const saved=await snapshot();await page.reload();await page.waitForFunction(()=>window.__flowgarden?.sessionStatus===1);assert.deepEqual(await snapshot(),saved);
  checks.push('Visible start, pause, explicit save and browser reload preserve the large native city and its actual traffic state.');
