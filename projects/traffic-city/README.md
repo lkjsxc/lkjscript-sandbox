@@ -12,7 +12,7 @@ Classic remains the foundation: freely placed streets and facilities, single-cir
 
 ## Demand-driven rendering
 
-The browser reuses identical native scenes and paints only changed input, layout or buffered movement. Paused scenes sleep; moving people and trains keep the existing interpolation cadence. Native sessions, ownership and saving continue independently. See [candidate scope, measured visual differences and release boundary](docs/DEMAND-RENDERING.md).
+The browser reuses identical native scenes and paints only changed input, layout or buffered movement. Paused scenes sleep; moving people and trains keep the existing interpolation cadence. Native sessions, ownership and saving continue independently. See [published scope, measured visual differences and release boundary](docs/DEMAND-RENDERING.md).
 
 ## Lower native simulation cost
 

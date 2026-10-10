@@ -1,8 +1,8 @@
 # Demand-driven classic rendering
 
-Status: locally verified candidate, not deployed in this work session. The
-existing classic public game, native session process and both save spaces were
-left unchanged. This is a presentation change, not a new simulation engine.
+Status: published on 2026-10-10. Only the classic native HTTP presentation
+upstream changed. The existing native session processes and both save spaces
+were preserved. This is a presentation change, not a new simulation engine.
 
 ## Behavior
 
@@ -50,11 +50,12 @@ scheduler unit cases and browser suites below also returned successful results.
 The deterministic cases cover coalescing, frame id zero, reentrant invalidation,
 visibility, disposal, native endpoint settling and exact scene comparison.
 
-A later combined selection-identity/core/repository recheck was started, but its
-completion could not be retrieved. That repeated run, including its new
-byte-for-byte presentation-selection check, is not counted as passed. Source
-and artifact identity must be confirmed again before publication; prior success
-is not a substitute for receiving the final check result.
+The earlier combined recheck had an unreceived completion and was not counted
+as passed. During the release handoff, `test:presentation-selection`, `npm test`,
+the repository check and whitespace check were rerun; successful completion was
+received for each. The selection check verified the compiler, both artifacts,
+all 137 unchanged game modules, both HTTP sources and the exact eleven embedded
+browser files. Existing builds were reused without rebuilding the game engine.
 
 A real native-server Chromium test observed zero draw calls during one-second
 settled pauses in both the starter and 2,048-person Commuter Boroughs. During
@@ -89,6 +90,29 @@ No additional actor sampling was introduced by this change.
 Early candidate browser tests failed because unchanged paused replies still
 invalidated paint. They are not counted as passing; `SnapshotGate` fixed that
 case, and the reported browser and pixel comparisons were rerun afterward.
+
+## Public release verification on 2026-10-10
+
+The HTTP artifact identified above was started under its own supervisor on a
+separate loopback listener. All eleven served assets matched source bytes before
+cutover and again over public HTTPS afterward. The proxy configuration was backed
+up, its single-file bind mount was confirmed, and its contents were updated in
+place. Configuration validation and reload succeeded. Only the classic HTTP
+upstream changed; the old listener and configuration remain available for rollback.
+
+Disposable Chromium contexts passed the classic root and alias, legacy query
+normalization, same-origin WebSocket, park construction, native save acknowledgement
+and exact saved-city reload. Walkers, cars and trains moved; 64 pedestrian glyphs
+reached actual canvas pixels. Portrait layout, zoom and pan passed. A settled
+paused public starter drew zero times over one second. The separate Metropolis
+entrypoint connected to its own WebSocket and advanced native cycles. Browser
+errors, failed HTTP responses and WebSocket errors were empty.
+
+Both existing session process IDs, supervisors and descriptor hashes remained
+unchanged across cutover and verification. Neither save root, browser recovery
+key scheme nor Metropolis storage was changed. Release smoke tests used new
+browser contexts and their own cities. Generated evidence, deployment descriptors,
+proxy backups and runtime data remain outside Git. No game source fix was needed.
 
 ## Reproduction and release boundary
 
