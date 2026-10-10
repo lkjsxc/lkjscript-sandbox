@@ -1,5 +1,8 @@
 # Aggregate traffic: population-independent work
 
+The earlier standalone work described here now has a separate playable native successor: [Metropolis](METROPOLIS.md). See that record for live editing, private persistence, browser LOD, current measurements and the explicitly unverified hosting status. The classic City type and public game were not converted.
+
+
 ## Status
 
 The `meso-benchmark` and `meso-view` native command targets are working experiments. They are **not connected to the legacy Traffic City session, its saved cities, or the public game**. The self-contained preview generated in `evidence/meso-preview.html` paints a native simulated snapshot; its animation is representative presentation, not a live simulation.

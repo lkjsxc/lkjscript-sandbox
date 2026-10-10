@@ -11,6 +11,7 @@ case "$task" in
   browser) exec npm run test:browser -- "$@" ;;
   smoke) exec npm run test:smoke -- "$@" ;;
   run) exec ./play.sh "$@" ;;
-  help|--help|-h) printf '%s\n' 'Traffic City tasks: setup build check test browser smoke run' ;;
+  metropolis) exec bash ./scripts/serve-metropolis.sh "$@" ;;
+  help|--help|-h) printf '%s\n' 'Traffic City tasks: setup build check test browser smoke run metropolis' ;;
   *) printf 'Unknown Traffic City task: %s\n' "$task" >&2; exit 2 ;;
 esac

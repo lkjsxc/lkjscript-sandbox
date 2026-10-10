@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {atPort,sessionURL,classicURL} from '../web/metropolis-address.js';
+assert.equal(sessionURL('https://city.example/metropolis'),'wss://city.example/metropolis/live');
+assert.equal(sessionURL('http://127.0.0.1:19146/metropolis?session_port=19147'),'ws://127.0.0.1:19147/metropolis/live');
+assert.equal(sessionURL('https://19146--main--workspace--user.apps.example/metropolis?session_port=19147'),'wss://19147--main--workspace--user.apps.example/metropolis/live');
+assert.equal(classicURL('https://19146--main--workspace--user.apps.example/metropolis?classic_port=19140&session_port=19147#key'),'https://19140--main--workspace--user.apps.example/');
+assert.equal(classicURL('https://city.example/metropolis'),null);
+assert.equal(atPort('http://[::1]:19146/path',19147,'/').href,'http://[::1]:19147/');
+for(const s of ['0','65536','-1','1.1','example.com','19147--other','', '1&host=example.com'])assert.throws(()=>atPort('https://city.example',s,'/'));
+console.log('PASS: 14 native-listener URL routing checks');

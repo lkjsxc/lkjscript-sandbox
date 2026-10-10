@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import {randomBytes} from 'node:crypto';
+import {startMetro,client,selection,memory,root,WS} from './metropolis-native.mjs';
+const checks=[],clients=[];let host=await startMetro({name:'metropolis-socket',tick:100});
+const key=randomBytes(32).toString('hex');
+async function open(k=key){const c=await client(host,k);clients.push(c);return c;}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+try{
+ const a=await open();assert.equal(a.resumed.status,1);assert.equal(a.resumed.stats.population,100000);assert.equal(a.resumed.roads.length,256);assert.equal(a.resumed.rails.length,32);checks.push('new private native city contains 100,000 people and 256 cohorts');
+ let f=await a.command('pause');assert(f.paused);const paused={tick:f.stats.tick,cash:f.cash,version:f.version};
+ f=await a.command('road',{x2:15,y2:15,kind:4});assert.equal(f.cash,paused.cash);assert.equal(f.version,paused.version);assert(f.notice.includes('straight'));checks.push('invalid diagonal edit is rejected atomically');
+ f=await a.command('road',{x:7,y:0,x2:7,y2:0,kind:0});assert.equal(f.roads[7],0);assert.equal(f.rows.find(r=>r[0]===0)[8],0);assert.equal(f.rows.find(r=>r[0]===2)[8],0);assert.equal(f.saved,f.stats.tick);checks.push('closing a shared corridor updates off-district capacity and commits before ack');
+ f=await a.command('road',{x:7,y:0,x2:7,y2:0,kind:2});assert.equal(f.roads[7],2);assert.equal(f.rows.find(r=>r[0]===0)[8],3);
+ f=await a.command('rail-h',{y:0,kind:1});assert.equal(f.rails[0],1);assert.equal(f.rows.find(r=>r[0]===0)[9],12);checks.push('reopening roads and adding rail change native receiving supply');
+ f=await a.command('grow',{x:7,y:0});assert.equal(f.stats.population,101000);assert.equal(f.stats.groups,256);assert.equal(f.stats.massError,0);assert.equal(f.stats.journeyError,0);checks.push('growth adds real population mass without resident allocations');
+ const beforeView={...f.stats};f=await a.command('view',{x:7,y:0,x2:1,y2:1});assert.equal(f.level,2);assert.equal(f.drawLimit,1536);assert(f.rows.some(r=>r[0]===0));assert(f.rows.length<256);assert.deepEqual(f.stats,beforeView);assert.equal(f.infraChanged,false);assert.equal(f.roads.length,0);checks.push('zoomed viewport retains crossing traffic and omits unchanged infrastructure');
+ f=await a.command('save');const saved={stats:f.stats,cash:f.cash,paused:f.paused};await a.close();
+ const b=await open();assert.deepEqual(b.resumed.stats,saved.stats);assert.equal(b.resumed.cash,saved.cash);assert.equal(b.resumed.paused,true);checks.push('same-key reconnect exactly preserves committed aggregate city');
+ const other=await open(randomBytes(32).toString('hex'));assert.equal(other.resumed.stats.population,100000);await other.command('pause');await other.close();checks.push('independent browser keys do not share cities');
+ const owner=await open();f=await b.command('grow',{x:4,y:4});assert.equal(f.status,2);assert.equal(f.stats.population,101000);await b.close();f=await owner.command('save');assert.deepEqual(f.stats,saved.stats);checks.push('stale tabs cannot overwrite or charge the current owner');
+ f=await owner.command('scenario',{kind:1000000});assert.equal(f.stats.population,1000000);assert.equal(f.stats.groups,256);assert.equal(f.saved,f.stats.tick);f=await owner.command('pause');assert(f.paused);f=await owner.command('restore');assert.equal(f.stats.population,101000);assert.deepEqual(f.stats,saved.stats);f=await owner.command('restore');assert.equal(f.stats.population,101000);checks.push('million-person scenario has a one-use exact previous-city backup');
+ const lastSeq=f.seq;owner.socket.send('{');f=await owner.wait(x=>x.seq>lastSeq&&x.notice.includes('sequence'));assert.equal(f.stats.population,101000);checks.push('malformed commands cannot mutate a city');
+ // Native live cadence includes real tick delivery, JSON and checkpoint work.
+ await owner.command('view',{x:0,y:0,x2:16,y2:16});await owner.command('pause');const startTick=owner.frames.at(-1).stats.tick;
+ await owner.wait(x=>x.stats.tick>=startTick+60,30000);f=await owner.command('pause');assert(f.paused);assert.equal(f.stats.massError,0);assert.equal(f.stats.journeyError,0);
+ const ticking=owner.frames.filter(x=>x.stats.tick>startTick&&x.stats.tick<=startTick+60&&!x.paused).filter((x,i,a)=>i===0||x.stats.tick!==a[i-1].stats.tick);
+ const deltas=ticking.slice(1).map((x,i)=>x.at-ticking[i].at).sort((a,b)=>a-b);assert(deltas.length>=50);const p=q=>deltas[Math.min(deltas.length-1,Math.floor(deltas.length*q))];
+ const live={frames:ticking.length,median_delivery_ms:p(.5),p95_delivery_ms:p(.95),maximum_delivery_ms:deltas.at(-1),...memory(host.child.pid)};assert(p(.95)<600);checks.push('100,000-person live native ticks, projection and autosaves continue without stalls');
+ const at=f.stats.tick,seq=f.seq;await wait(650);assert(!owner.frames.some(x=>x.seq>seq&&x.stats.tick!==at));checks.push('paused cities stop simulation and repeated empty frame delivery');
+ const snapshot=await owner.command('save');await owner.close();const dir=host.dir;await host.stop();host=await startMetro({name:'metropolis-socket-restart',tick:100,directory:dir});const resumed=await open();assert.deepEqual(resumed.resumed.stats,snapshot.stats);assert.equal(resumed.resumed.cash,snapshot.cash);await resumed.close();checks.push('private city survives native process restart');
+ const racers=await Promise.all([open(),open()]);const outcomes=await Promise.all(racers.map(c=>c.command('save')));assert.equal(outcomes.filter(f=>f.status===1).length,1);assert.equal(outcomes.filter(f=>f.status===2).length,1);for(const c of racers)await c.close();checks.push('simultaneous claims converge to one writable owner');
+ const rejected=await new Promise((resolve,reject)=>{const ws=new WS('ws://'+host.address+'/metropolis/live',{headers:{Origin:'https://not-allowed.example'}});ws.on('unexpected-response',(_,r)=>{resolve(r.statusCode);r.resume();ws.terminate();});ws.on('open',()=>{ws.close();reject(Error('Cross-Origin connection was accepted'));});ws.on('error',()=>{});});assert.equal(rejected,403);checks.push('unapproved cross-Origin handshake is rejected');
+ const bytes=Math.max(...clients.flatMap(c=>c.frames.map(f=>f.bytes)));assert(bytes<20000);const report={passed:true,artifact_sha256:selection.artifact_sha256,checks,live,maximum_frame_bytes:bytes};fs.writeFileSync(root+'/evidence/metropolis-socket.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
+}finally{for(const c of clients)await c.close().catch(()=>{});if(host.child.exitCode===null)await host.stop();}

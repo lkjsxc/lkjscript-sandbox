@@ -96,7 +96,12 @@
     "test:commuter-residents": "node tests/commuter-residents.mjs",
     "test:commuter-residents-ui": "node tests/with-preview.mjs tests/commuter-residents-ui.mjs",
     "test:employment-preservation": "node tests/employment-preservation.mjs",
-    "test:commuter-edit-residents": "COMMUTER_EDIT=1 node tests/commuter-residents.mjs"
+    "test:commuter-edit-residents": "COMMUTER_EDIT=1 node tests/commuter-residents.mjs",
+    "build:metropolis": "node scripts/author-metropolis.mjs",
+    "start:metropolis": "bash scripts/serve-metropolis.sh",
+    "test:metropolis": "node tests/metropolis-address.mjs && node tests/metropolis-model.mjs && node tests/metropolis-socket.mjs",
+    "test:metropolis-browser": "node tests/metropolis-browser.mjs",
+    "test:metropolis-soak": "node tests/metropolis-soak.mjs"
   },
   "engines": {
     "node": ">=22"

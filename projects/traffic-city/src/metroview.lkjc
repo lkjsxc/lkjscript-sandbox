@@ -1,0 +1,27 @@
+declarations.begin
+(units
+ (use std builtin)
+ (type-alias MesoCohort (record (id I64) (population I64) (home I64) (queuedOut I64) (outbound I64) (work I64) (queuedBack I64) (inbound I64) (road I64) (rail I64) (travel I64) (requested I64) (arrived I64) (visits I64) (roadTrips I64) (railTrips I64) (waitTicks I64) (travelTicks I64)))
+ (type-alias MesoCity (record (cohorts (list MesoCohort)) (tick I64) (population I64)))
+ (type-alias MesoTotals (record (tick I64) (groups I64) (population I64) (home I64) (queued I64) (outbound I64) (work I64) (inbound I64) (requested I64) (arrived I64) (outstanding I64) (visits I64) (roadTrips I64) (railTrips I64) (waitTicks I64) (travelTicks I64) (massError I64) (journeyError I64)))
+ (type-alias MesoInput (record (population I64) (groups I64) (ticks I64) (capacity I64) (rail I64) (closedFrom I64) (closedUntil I64)))
+ (type-alias MesoResult (record (state MesoCity) (initial MesoTotals) (final MesoTotals)))
+ (type-alias MesoView (record (x I64) (y I64) (w I64) (h I64)))
+ (type-alias MesoRow (list I64))
+ (type-alias MesoFrame (record (stats MesoTotals) (view MesoView) (level I64) (drawLimit I64) (rows (list MesoRow))))
+ (type-alias MesoViewInput (record (model MesoInput) (view MesoView)))
+ (type-alias MesoViewResult (record (frame MesoFrame) (city MesoCity)))
+ (type-alias MetroCity (record (model MesoCity) (stats MesoTotals) (roads (list I64)) (rails (list I64)) (version I64) (cash I64) (spent I64) (revenue I64) (paused Bool)))
+ (type-alias MetroCommand (record (op Text) (x I64) (y I64) (x2 I64) (y2 I64) (kind I64)))
+ (type-alias MetroOutcome (record (city MetroCity) (notice Text) (changed Bool)))
+ (type-alias MetroProbeInput (record (population I64) (ticks I64) (commands (list MetroCommand))))
+ (module create metroview
+  (function create visible (visibility public) (effect pure) (parameter create id (type I64)) (parameter create view (type MesoView)) (returns Bool)
+   (body (let (binding end (call metronetwork::destination (local id))) (binding x (call mesomath::mod (local id) (i64 16))) (binding y (call std::divide (local id) (i64 16))) (binding ex (call mesomath::mod (local end) (i64 16))) (binding ey (call std::divide (local end) (i64 16))) (in (if (call std::less (call mesomath::min (local x) (local ex)) (call std::add (field (local view) (name x)) (field (local view) (name w)))) (if (call std::less-equal (field (local view) (name x)) (call mesomath::max (local x) (local ex))) (if (call std::less (call mesomath::min (local y) (local ey)) (call std::add (field (local view) (name y)) (field (local view) (name h)))) (call std::less-equal (field (local view) (name y)) (call mesomath::max (local y) (local ey))) (bool false)) (bool false)) (bool false))))))
+  (function create rows (visibility public) (effect pure) (parameter create cohorts (type (list MesoCohort))) (parameter create view (type MesoView)) (parameter create i (type I64)) (parameter create out (type (list MesoRow))) (returns (list MesoRow))
+   (body (if (call std::less (local i) (call std::list-length (types MesoCohort) (local cohorts))) (let (binding c (call std::list-get (types MesoCohort) (local cohorts) (local i))) (in (call rows (local cohorts) (local view) (call std::add (local i) (i64 1)) (if (call visible (field (local c) (name id)) (local view)) (call std::list-append (types MesoRow) (local out) (list I64 (field (local c) (name id)) (field (local c) (name population)) (field (local c) (name home)) (field (local c) (name queuedOut)) (field (local c) (name outbound)) (field (local c) (name work)) (field (local c) (name queuedBack)) (field (local c) (name inbound)) (field (local c) (name road)) (field (local c) (name rail)) (field (local c) (name travel)))) (local out))))) (local out))))
+  (test create offscreen-origin-crosses-view (visibility private) (actual (call visible (i64 0) (record structural (field x (i64 7)) (field y (i64 0)) (field w (i64 1)) (field h (i64 1))))) (expected (bool true)))
+  (test create unrelated-corridor-culled (visibility private) (actual (call visible (i64 0) (record structural (field x (i64 7)) (field y (i64 7)) (field w (i64 1)) (field h (i64 1))))) (expected (bool false)))
+)
+)
+declarations.end

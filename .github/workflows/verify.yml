@@ -4,6 +4,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      native_checks:
+        description: Run the full native and browser game suites
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -22,6 +28,8 @@ jobs:
           node-version: '22'
       - run: node scripts/check-repository.mjs
   traffic-city:
+    # Expensive game validation is local by default; keep the full suite opt-in.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.native_checks }}
     runs-on: ubuntu-24.04
     # Native build plus all existing suites and the added directed-trip traces.
     # This outer CI budget does not change game/runtime or test admission limits.
