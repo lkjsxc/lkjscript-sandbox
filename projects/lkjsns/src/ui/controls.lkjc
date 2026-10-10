@@ -1,0 +1,64 @@
+(module create controls
+  (function create input (visibility public)
+    (parameter create name (type Text))
+    (parameter create label (type Text))
+    (parameter create value (type Text))
+    (parameter create kind (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<label>") (call std::html-escape-text (local label)) (text "<input name=\"") (call std::html-escape-text (local name)) (text "\" type=\"") (call std::html-escape-text (local kind)) (text "\" value=\"") (call std::html-escape-text (local value)) (text "\"") (if (call std::text-equal (local kind) (text "password")) (text " autocomplete=\"current-password\"") (text "")) (text "></label>")) (text ""))))
+
+  (function create area (visibility public)
+    (parameter create name (type Text))
+    (parameter create label (type Text))
+    (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<label>") (call std::html-escape-text (local label)) (text "<textarea name=\"") (call std::html-escape-text (local name)) (text "\" rows=\"5\">") (call std::html-escape-text (local value)) (text "</textarea></label>")) (text ""))))
+
+  (function create message (visibility public)
+    (parameter create message (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<div class=\"notice danger\" role=\"alert\"><strong>入力はまだ保存されていません。</strong><p>") (call std::html-escape-text (local message)) (text "</p></div>")) (text ""))))
+
+  (function create audience (visibility public)
+    (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<label class=\"audience\">公開範囲<select name=\"audience\"><option value=\"members\"") (if (call std::text-equal (local value) (text "members")) (text " selected") (text "")) (text ">メンバー限定</option><option value=\"public\"") (if (call std::text-equal (local value) (text "public")) (text " selected") (text "")) (text ">公開（誰でも閲覧）</option></select></label>")) (text ""))))
+
+  (function create set-member (visibility public)
+    (parameter create items (type (list Text)))
+    (parameter create item (type Text))
+    (parameter create enabled (type Bool))
+    (returns (list Text)) (effect pure)
+    (body (if (local enabled) (if (call util::has (local items) (local item) (i64 0)) (local items) (call std::list-append (types Text) (local items) (local item))) (call util::remove (local items) (local item)))))
+
+  (function create allowed (visibility public)
+    (parameter create items (type (list forms::field)))
+    (parameter create names (type (list Text)))
+    (parameter create index (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types forms::field) (local items))) (if (call util::has (local names) (field (call std::list-get (types forms::field) (local items) (local index)) forms::field::name) (i64 0)) (if (call controls::allowed (local items) (local names) (call std::add (local index) (i64 1))) (bool true) (bool false)) (bool false)) (bool true))))
+
+  (function create schema (visibility public)
+    (parameter create form (type Form))
+    (parameter create names (type (list Text)))
+    (returns Bool) (effect pure)
+    (body (if (field (local form) (name valid)) (if (call util::unique (field (local form) (name items)) (i64 0)) (if (call std::i64-equal (call std::list-length (types forms::field) (field (local form) (name items))) (call std::list-length (types Text) (local names))) (if (call controls::allowed (field (local form) (name items)) (local names) (i64 0)) (bool true) (bool false)) (bool false)) (bool false)) (bool false))))
+
+  (test create set-is-idempotent (visibility private)
+    (actual (call controls::set-member (list Text (text "alice")) (text "alice") (bool true))) (expected (list Text (text "alice"))))
+
+  (test create unset-is-idempotent (visibility private)
+    (actual (call controls::set-member (list Text) (text "alice") (bool false))) (expected (list Text)))
+
+  (test create unknown-form-key (visibility private)
+    (actual (call controls::schema (call util::parse (call std::bytes-from-text (text "a=1&b=2"))) (list Text (text "a")))) (expected (bool false)))
+
+  (test create missing-form-key (visibility private)
+    (actual (call controls::schema (call util::parse (call std::bytes-from-text (text "a=1"))) (list Text (text "a") (text "b")))) (expected (bool false)))
+
+  (test create valid-form-keys (visibility private)
+    (actual (call controls::schema (call util::parse (call std::bytes-from-text (text "a=1&b=2"))) (list Text (text "a") (text "b")))) (expected (bool true)))
+
+  (test create escaped-textarea (visibility private)
+    (actual (call controls::area (text "body") (text "本文") (text "</textarea><script>"))) (expected (text "<label>本文<textarea name=\"body\" rows=\"5\">&lt;/textarea&gt;&lt;script&gt;</textarea></label>")))
+)
