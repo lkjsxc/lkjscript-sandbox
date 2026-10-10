@@ -1,0 +1,110 @@
+(module create codec
+  (function create at
+    (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create needle (type Bytes))
+    (returns Bool) (effect pure)
+    (body (if (call std::less-equal (i64 0) (local at)) (if (call std::less-equal (call std::add (local at) (call std::bytes-length (local needle))) (call std::bytes-length (local data))) (if (call std::bytes-equal (call std::bytes-slice (local data) (local at) (call std::add (local at) (call std::bytes-length (local needle)))) (local needle)) (bool true) (bool false)) (bool false)) (bool false))))
+
+  (function create find
+    (visibility public) (parameter create data (type Bytes)) (parameter create needle (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64))
+    (returns I64) (effect pure)
+    (body (if (if (call std::less-equal (local at) (local end)) (if (call std::less-equal (call std::add (local at) (call std::bytes-length (local needle))) (call std::bytes-length (local data))) (bool true) (bool false)) (bool false)) (if (call codec::at (local data) (local at) (local needle)) (local at) (call codec::find (local data) (local needle) (call std::add (local at) (i64 1)) (local end))) (i64 -1))))
+
+  (function create min
+    (visibility public) (parameter create a (type I64)) (parameter create b (type I64))
+    (returns I64) (effect pure)
+    (body (if (call std::less (local a) (local b)) (local a) (local b))))
+
+  (function create safe-boundary
+    (visibility public) (parameter create data (type Bytes)) (parameter create index (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local index) (call std::bytes-length (local data))) (let (binding n (call std::bytes-get (local data) (local index))) (in (if (if (if (call std::less-equal (i64 48) (local n)) (if (call std::less-equal (local n) (i64 57)) (bool true) (bool false)) (bool false)) (bool true) (if (if (call std::less-equal (i64 65) (local n)) (if (call std::less-equal (local n) (i64 90)) (bool true) (bool false)) (bool false)) (bool true) (if (if (call std::less-equal (i64 97) (local n)) (if (call std::less-equal (local n) (i64 122)) (bool true) (bool false)) (bool false)) (bool true) (if (call std::i64-equal (local n) (i64 45)) (bool true) (if (call std::i64-equal (local n) (i64 95)) (bool true) (bool false)))))) (if (call codec::safe-boundary (local data) (call std::add (local index) (i64 1))) (bool true) (bool false)) (bool false)))) (bool true))))
+
+  (function create boundary
+    (visibility public) (parameter create content-type (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::text-starts-with (local content-type) (text "multipart/form-data; boundary=")) (let (binding raw (call util::slice (local content-type) (i64 30) (call util::size (local content-type)))) (binding n (call util::size (local raw))) (binding boundary (if (if (call std::less-equal (i64 2) (local n)) (if (call std::text-starts-with (local raw) (text "\"")) (if (call codec::at (call std::bytes-from-text (local raw)) (call std::subtract (local n) (i64 1)) (call std::bytes-from-text (text "\""))) (bool true) (bool false)) (bool false)) (bool false)) (call util::slice (local raw) (i64 1) (call std::subtract (local n) (i64 1))) (local raw))) (in (if (if (call std::less-equal (i64 1) (call util::size (local boundary))) (if (call std::less-equal (call util::size (local boundary)) (i64 70)) (if (call codec::safe-boundary (call std::bytes-from-text (local boundary)) (i64 0)) (bool true) (bool false)) (bool false)) (bool false)) (local boundary) (text "")))) (text ""))))
+
+  (function create bad-part
+    (visibility public)
+    (returns Part) (effect pure)
+    (body (record structural (field valid (bool false)) (field start (i64 0)) (field end (i64 0)) (field next (i64 0)) (field name (text "")) (field file (bool false)))))
+
+  (function create part-header
+    (visibility public) (parameter create data (type Bytes)) (parameter create start (type I64)) (parameter create end (type I64))
+    (returns Text) (effect pure)
+    (body (let (binding header (call std::bytes-slice (local data) (local start) (local end))) (binding quote (call codec::find (local header) (call std::bytes-from-text (text "\"")) (i64 55) (call std::bytes-length (local header)))) (in (if (if (call codec::at (local header) (i64 0) (call std::bytes-from-text (text "Content-Disposition: form-data; name=\"file\"; filename=\""))) (if (call std::less-equal (i64 56) (local quote)) (bool true) (bool false)) (bool false)) (let (binding name (call std::bytes-to-text-result (call std::bytes-slice (local header) (i64 55) (local quote)))) (binding tail (call std::bytes-slice (local header) (call std::add (local quote) (i64 1)) (call std::bytes-length (local header)))) (in (if (if (field (local name) (name valid)) (if (call util::clean (field (local name) (name value)) (i64 1) (i64 255)) (if (if (call std::i64-equal (call std::bytes-length (local tail)) (i64 0)) (bool true) (if (if (call codec::at (local tail) (i64 0) (call std::bytes-from-text (text "\r\nContent-Type: "))) (if (call std::less (call codec::find (local tail) (call std::bytes-from-text (text "\r\n")) (i64 2) (call std::bytes-length (local tail))) (i64 0)) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool false)) (field (local name) (name value)) (text "")))) (text ""))))))
+
+  (function create part
+    (visibility public) (parameter create data (type Bytes)) (parameter create boundary (type Text))
+    (returns Part) (effect pure)
+    (body (let (binding open (call std::bytes-from-text (call std::text-join (list Text (text "--") (local boundary) (text "\r\n")) (text "")))) (binding close (call std::bytes-from-text (call std::text-join (list Text (text "\r\n--") (local boundary) (text "--")) (text "")))) (binding len (call std::bytes-length (local data))) (binding close-end (if (call codec::at (local data) (call std::subtract (local len) (i64 2)) (call std::bytes-from-text (text "\r\n"))) (call std::subtract (local len) (i64 2)) (local len))) (binding file-end (call std::subtract (local close-end) (call std::bytes-length (local close)))) (binding header-end (call codec::find (local data) (call std::bytes-from-text (text "\r\n\r\n")) (call std::bytes-length (local open)) (call codec::min (i64 4096) (local file-end)))) (in (if (if (call std::bool-not (call std::text-equal (local boundary) (text ""))) (if (call codec::at (local data) (i64 0) (local open)) (if (call codec::at (local data) (local file-end) (local close)) (if (call std::less-equal (call std::bytes-length (local open)) (local header-end)) (if (call std::less (call std::add (local header-end) (i64 4)) (local file-end)) (if (call std::less-equal (call std::subtract (local file-end) (call std::add (local header-end) (i64 4))) (i64 33554432)) (bool true) (bool false)) (bool false)) (bool false)) (bool false)) (bool false)) (bool false)) (let (binding name (call codec::part-header (local data) (call std::bytes-length (local open)) (local header-end))) (binding file-start (call std::add (local header-end) (i64 4))) (binding payload (call std::bytes-slice (local data) (local file-start) (local file-end))) (in (if (if (call std::bool-not (call std::text-equal (local name) (text ""))) (if (call std::bool-not (call codec::contains-boundary (local payload) (call std::bytes-from-text (call std::text-join (list Text (text "\r\n--") (local boundary)) (text ""))) (i64 0))) (bool true) (bool false)) (bool false)) (record structural (field valid (bool true)) (field start (local file-start)) (field end (local file-end)) (field next (local len)) (field name (local name)) (field file (bool true))) (call codec::bad-part)))) (call codec::bad-part))))))
+
+  (function create mime
+    (visibility public) (parameter create data (type Bytes))
+    (returns Text) (effect pure)
+    (body (let (binding n (call std::bytes-length (local data))) (in (if (call std::less (local n) (i64 12)) (text "") (if (call codec::at (local data) (i64 0) (call std::bytes-from-list (list I64 (i64 137) (i64 80) (i64 78) (i64 71) (i64 13) (i64 10) (i64 26) (i64 10)))) (text "image/png") (if (if (call codec::at (local data) (i64 0) (call std::bytes-from-list (list I64 (i64 255) (i64 216) (i64 255)))) (if (call codec::at (local data) (call std::subtract (local n) (i64 2)) (call std::bytes-from-list (list I64 (i64 255) (i64 217)))) (bool true) (bool false)) (bool false)) (text "image/jpeg") (if (if (call codec::at (local data) (i64 0) (call std::bytes-from-text (text "GIF87a"))) (bool true) (if (call codec::at (local data) (i64 0) (call std::bytes-from-text (text "GIF89a"))) (bool true) (bool false))) (text "image/gif") (if (if (call codec::at (local data) (i64 0) (call std::bytes-from-text (text "RIFF"))) (if (call codec::at (local data) (i64 8) (call std::bytes-from-text (text "WEBP"))) (bool true) (bool false)) (bool false)) (text "image/webp") (if (if (call std::less-equal (i64 24) (local n)) (if (call codec::at (local data) (i64 4) (call std::bytes-from-text (text "ftyp"))) (bool true) (bool false)) (bool false)) (text "video/mp4") (if (if (call codec::at (local data) (i64 0) (call std::bytes-from-list (list I64 (i64 26) (i64 69) (i64 223) (i64 163)))) (if (call std::text-contains (call std::bytes-to-hex (call std::bytes-slice (local data) (i64 0) (call codec::min (local n) (i64 4096)))) (text "7765626d")) (bool true) (bool false)) (bool false)) (text "video/webm") (if (call codec::at (local data) (i64 0) (call std::bytes-from-text (text "OggS"))) (text "audio/ogg") (if (if (call codec::at (local data) (i64 0) (call std::bytes-from-text (text "RIFF"))) (if (call codec::at (local data) (i64 8) (call std::bytes-from-text (text "WAVE"))) (bool true) (bool false)) (bool false)) (text "audio/wav") (if (call codec::at (local data) (i64 0) (call std::bytes-from-text (text "fLaC"))) (text "audio/flac") (if (if (call codec::at (local data) (i64 0) (call std::bytes-from-text (text "ID3"))) (bool true) (if (if (call std::i64-equal (call std::bytes-get (local data) (i64 0)) (i64 255)) (if (call std::less-equal (i64 224) (call std::bytes-get (local data) (i64 1))) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (text "audio/mpeg") (text ""))))))))))))))))
+
+  (function create category
+    (visibility public) (parameter create mime (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::text-starts-with (local mime) (text "image/")) (text "image") (if (call std::text-starts-with (local mime) (text "video/")) (text "video") (text "audio")))))
+
+  (function create bad-range
+    (visibility public)
+    (returns Range) (effect pure)
+    (body (record structural (field valid (bool false)) (field partial (bool true)) (field start (i64 0)) (field length (i64 0)))))
+
+  (function create range
+    (visibility public) (parameter create value (type Text)) (parameter create size (type I64))
+    (returns Range) (effect pure)
+    (body (if (call std::text-equal (local value) (text "")) (record structural (field valid (bool true)) (field partial (bool false)) (field start (i64 0)) (field length (local size))) (if (if (call std::text-starts-with (local value) (text "bytes=")) (if (call std::less-equal (call util::size (local value)) (i64 80)) (bool true) (bool false)) (bool false)) (let (binding dash (call codec::find (call std::bytes-from-text (local value)) (call std::bytes-from-text (text "-")) (i64 6) (call util::size (local value)))) (in (if (call std::less-equal (i64 6) (local dash)) (let (binding left (call util::slice (local value) (i64 6) (local dash))) (binding right (call util::slice (local value) (call std::add (local dash) (i64 1)) (call util::size (local value)))) (binding start (call util::number (local left) (i64 2147483647))) (binding end (call util::number (local right) (i64 2147483647))) (in (if (call std::text-equal (local left) (text "")) (if (call std::less (i64 0) (local end)) (let (binding length (call codec::min (local end) (local size))) (in (record structural (field valid (bool true)) (field partial (bool true)) (field start (call std::subtract (local size) (local length))) (field length (local length))))) (call codec::bad-range)) (if (if (call std::less-equal (i64 0) (local start)) (if (call std::less (local start) (local size)) (if (if (call std::text-equal (local right) (text "")) (bool true) (if (call std::less-equal (local start) (local end)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool false)) (let (binding end (if (call std::text-equal (local right) (text "")) (call std::subtract (local size) (i64 1)) (call codec::min (local end) (call std::subtract (local size) (i64 1))))) (in (record structural (field valid (bool true)) (field partial (bool true)) (field start (local start)) (field length (call std::add (call std::subtract (local end) (local start)) (i64 1)))))) (call codec::bad-range))))) (call codec::bad-range)))) (call codec::bad-range)))))
+
+  (test create boundary-unquoted (visibility private) (actual (call codec::boundary (text "multipart/form-data; boundary=----lkj123"))) (expected (text "----lkj123")))
+
+  (test create boundary-quoted (visibility private) (actual (call codec::boundary (text "multipart/form-data; boundary=\"lkj123\""))) (expected (text "lkj123")))
+
+  (test create boundary-injection (visibility private) (actual (call codec::boundary (text "multipart/form-data; boundary=a\r\nx"))) (expected (text "")))
+
+  (test create html-denied (visibility private) (actual (call codec::mime (call std::bytes-from-text (text "<html><script>alert(1)</script></html>")))) (expected (text "")))
+
+  (test create svg-denied (visibility private) (actual (call codec::mime (call std::bytes-from-text (text "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")))) (expected (text "")))
+
+  (test create png-sniff (visibility private) (actual (call codec::mime (call std::bytes-from-list (list I64 (i64 137) (i64 80) (i64 78) (i64 71) (i64 13) (i64 10) (i64 26) (i64 10) (i64 0) (i64 0) (i64 0) (i64 0))))) (expected (text "image/png")))
+
+  (test create range-full (visibility private) (actual (call codec::range (text "") (i64 100))) (expected (record structural (field valid (bool true)) (field partial (bool false)) (field start (i64 0)) (field length (i64 100)))))
+
+  (test create range-first (visibility private) (actual (call codec::range (text "bytes=0-0") (i64 100))) (expected (record structural (field valid (bool true)) (field partial (bool true)) (field start (i64 0)) (field length (i64 1)))))
+
+  (test create range-suffix (visibility private) (actual (call codec::range (text "bytes=-10") (i64 100))) (expected (record structural (field valid (bool true)) (field partial (bool true)) (field start (i64 90)) (field length (i64 10)))))
+
+  (test create range-suffix-large (visibility private) (actual (call codec::range (text "bytes=-200") (i64 100))) (expected (record structural (field valid (bool true)) (field partial (bool true)) (field start (i64 0)) (field length (i64 100)))))
+
+  (test create range-open (visibility private) (actual (call codec::range (text "bytes=90-") (i64 100))) (expected (record structural (field valid (bool true)) (field partial (bool true)) (field start (i64 90)) (field length (i64 10)))))
+
+  (test create range-clamp (visibility private) (actual (call codec::range (text "bytes=90-200") (i64 100))) (expected (record structural (field valid (bool true)) (field partial (bool true)) (field start (i64 90)) (field length (i64 10)))))
+
+  (test create range-past (visibility private) (actual (call codec::range (text "bytes=100-") (i64 100))) (expected (record structural (field valid (bool false)) (field partial (bool true)) (field start (i64 0)) (field length (i64 0)))))
+
+  (test create range-reverse (visibility private) (actual (call codec::range (text "bytes=8-2") (i64 100))) (expected (record structural (field valid (bool false)) (field partial (bool true)) (field start (i64 0)) (field length (i64 0)))))
+
+  (test create range-multiple (visibility private) (actual (call codec::range (text "bytes=0-1,5-6") (i64 100))) (expected (record structural (field valid (bool false)) (field partial (bool true)) (field start (i64 0)) (field length (i64 0)))))
+
+  (test create range-zero-suffix (visibility private) (actual (call codec::range (text "bytes=-0") (i64 100))) (expected (record structural (field valid (bool false)) (field partial (bool true)) (field start (i64 0)) (field length (i64 0)))))
+
+  (test create range-junk (visibility private) (actual (call codec::range (text "bananas=0-1") (i64 100))) (expected (record structural (field valid (bool false)) (field partial (bool true)) (field start (i64 0)) (field length (i64 0)))))
+
+  (test create range-overflow (visibility private) (actual (call codec::range (text "bytes=99999999999-") (i64 100))) (expected (record structural (field valid (bool false)) (field partial (bool true)) (field start (i64 0)) (field length (i64 0)))))
+
+  (test create multipart-single-file (visibility private) (actual (field (call codec::part (call std::bytes-from-text (text "--abc\r\nContent-Disposition: form-data; name=\"file\"; filename=\"photo.png\"\r\nContent-Type: image/png\r\n\r\nhello\r\n--abc--\r\n")) (text "abc")) (name valid))) (expected (bool true)))
+
+  (test create multipart-filename (visibility private) (actual (field (call codec::part (call std::bytes-from-text (text "--abc\r\nContent-Disposition: form-data; name=\"file\"; filename=\"photo.png\"\r\nContent-Type: image/png\r\n\r\nhello\r\n--abc--\r\n")) (text "abc")) (name name))) (expected (text "photo.png")))
+
+  (test create multipart-truncated (visibility private) (actual (field (call codec::part (call std::bytes-from-text (text "--abc\r\nContent-Disposition: form-data; name=\"file\"; filename=\"photo.png\"\r\nContent-Type: image/png\r\n\r\nhello\r\n--ab")) (text "abc")) (name valid))) (expected (bool false)))
+
+  (test create multipart-extra-field (visibility private) (actual (field (call codec::part (call std::bytes-from-text (text "--abc\r\nContent-Disposition: form-data; name=\"file\"; filename=\"photo.png\"\r\nContent-Type: image/png\r\n\r\nhello\r\n--abc\r\nContent-Disposition: form-data; name=\"other\"\r\n\r\nvalue\r\n--abc--\r\n")) (text "abc")) (name valid))) (expected (bool false)))
+
+  (function create contains-boundary
+    (visibility public) (parameter create data (type Bytes)) (parameter create needle (type Bytes)) (parameter create offset (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local offset) (call std::bytes-length (local data))) (if (call std::text-contains (call std::bytes-to-hex (call std::bytes-slice (local data) (local offset) (call codec::min (call std::bytes-length (local data)) (call std::add (call std::add (local offset) (i64 65536)) (call std::bytes-length (local needle)))))) (call std::bytes-to-hex (local needle))) (bool true) (if (call codec::contains-boundary (local data) (local needle) (call std::add (local offset) (i64 65536))) (bool true) (bool false))) (bool false))))
+)

@@ -1,0 +1,86 @@
+(module create page
+  (function create icon
+    (visibility public) (parameter create name (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::text-equal (local name) (text "home")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9\"/></svg>") (if (call std::text-equal (local name) (text "drive")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 7h7l2-3h9v16H3zM3 9h18\"/></svg>") (if (call std::text-equal (local name) (text "draft")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 3h10l4 4v14H5zM14 3v5h5M8 12h8M8 16h5\"/></svg>") (if (call std::text-equal (local name) (text "people")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M15 3a4 4 0 0 1 0 8M22 21v-2a4 4 0 0 0-3-3.87M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0\"/></svg>") (if (call std::text-equal (local name) (text "bell")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4\"/></svg>") (if (call std::text-equal (local name) (text "bookmark")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 3h12v18l-6-4-6 4z\"/></svg>") (if (call std::text-equal (local name) (text "settings")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2\"/></svg>") (if (call std::text-equal (local name) (text "plus")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>") (if (call std::text-equal (local name) (text "upload")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 16V3M7 8l5-5 5 5M4 16v5h16v-5\"/></svg>") (if (call std::text-equal (local name) (text "image")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3h18v18H3zM3 17l6-6 4 4 3-3 5 5M15 7h.01\"/></svg>") (if (call std::text-equal (local name) (text "video")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 5h13v14H3zM16 10l5-3v10l-5-3\"/></svg>") (if (call std::text-equal (local name) (text "audio")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 18V5l12-2v13M9 18a3 3 0 1 1-3-3h3M21 16a3 3 0 1 1-3-3h3\"/></svg>") (if (call std::text-equal (local name) (text "reply")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 10 4 5l5-4M4 5h9a7 7 0 0 1 7 7v8\"/></svg>") (if (call std::text-equal (local name) (text "lock")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 10h14v11H5zM8 10V6a4 4 0 0 1 8 0v4\"/></svg>") (if (call std::text-equal (local name) (text "arrow")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg>") (if (call std::text-equal (local name) (text "file")) (text "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 3h10l4 4v14H5zM14 3v5h5\"/></svg>") (text "")))))))))))))))))))
+
+  (function create hidden
+    (visibility public) (parameter create name (type Text)) (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<input type=\"hidden\" name=\"") (call std::html-escape-text (local name)) (text "\" value=\"") (call std::html-escape-text (local value)) (text "\">")) (text ""))))
+
+  (function create begin
+    (visibility public) (parameter create ctx (type Context)) (parameter create intent (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<form method=\"post\" action=\"/action\">") (call page::hidden (text "intent") (local intent)) (call page::hidden (text "csrf") (field (local ctx) (name csrf)))) (text ""))))
+
+  (function create link
+    (visibility public) (parameter create href (type Text)) (parameter create label (type Text)) (parameter create icon (type Text)) (parameter create active (type Bool))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<a href=\"") (call std::html-escape-text (local href)) (text "\"") (if (local active) (text " aria-current=\"page\"") (text "")) (text ">") (call page::icon (local icon)) (text "<span>") (call std::html-escape-text (local label)) (text "</span></a>")) (text ""))))
+
+  (function create avatar
+    (visibility public) (parameter create user (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<span class=\"avatar\" aria-hidden=\"true\">") (call std::html-escape-text (if (call util::handle (local user)) (call util::slice (local user) (i64 0) (i64 1)) (text "·"))) (text "</span>")) (text ""))))
+
+  (function create empty
+    (visibility public) (parameter create title (type Text)) (parameter create message (type Text)) (parameter create href (type Text)) (parameter create label (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<section class=\"empty\">") (call page::icon (text "home")) (text "<h2>") (call std::html-escape-text (local title)) (text "</h2><p>") (call std::html-escape-text (local message)) (text "</p>") (if (call std::text-equal (local href) (text "")) (text "") (call std::text-join (list Text (text "<a class=\"button primary\" href=\"") (call std::html-escape-text (local href)) (text "\">") (call std::html-escape-text (local label)) (text "</a>")) (text ""))) (text "</section>")) (text ""))))
+
+  (function create nav
+    (visibility public) (parameter create title (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (call page::link (text "/") (text "ホーム") (text "home") (call std::text-equal (local title) (text "ホーム"))) (call page::link (text "/drive") (text "ドライブ") (text "drive") (call std::text-equal (local title) (text "ドライブ"))) (call page::link (text "/drafts") (text "下書き") (text "draft") (call std::text-equal (local title) (text "下書き"))) (call page::link (text "/notifications") (text "通知") (text "bell") (call std::text-equal (local title) (text "通知"))) (call page::link (text "/saved") (text "しおり") (text "bookmark") (call std::text-equal (local title) (text "しおり"))) (call page::link (text "/people") (text "メンバー") (text "people") (call std::text-equal (local title) (text "メンバー"))) (call page::link (text "/settings") (text "設定") (text "settings") (call std::text-equal (local title) (text "設定")))) (text ""))))
+
+  (function create frame
+    (visibility public) (parameter create ctx (type Context)) (parameter create title (type Text)) (parameter create body (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<!doctype html><html lang=\"ja\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\"><meta name=\"color-scheme\" content=\"light dark\"><title>") (call std::html-escape-text (local title)) (text " · lkjsns</title><link rel=\"stylesheet\" href=\"/style.css\"></head><body><a class=\"skip\" href=\"#main\">本文へ移動</a><div class=\"mobile-brand\"><a href=\"/\" class=\"brand\"><span class=\"brand-mark\">lk/</span>lkjsns</a>") (if (call util::signed (local ctx)) (call std::text-join (list Text (text "<a class=\"account-link\" href=\"/settings\">@") (call std::html-escape-text (field (local ctx) (name user))) (text "</a>")) (text "")) (text "<a class=\"account-link\" href=\"/login\">ログイン</a>")) (text "</div><div class=\"layout\"><aside class=\"sidebar\"><a href=\"/\" class=\"brand\"><span class=\"brand-mark\">lk/</span>lkjsns</a><nav class=\"nav\" aria-label=\"メイン\">") (call page::nav (local title)) (text "</nav><a class=\"button primary\" href=\"/compose\">") (call page::icon (text "plus")) (text "ノートを書く</a><div class=\"account\">") (if (call util::signed (local ctx)) (call std::text-join (list Text (text "<strong>@") (call std::html-escape-text (field (local ctx) (name user))) (text "</strong><small>自分のペースで、つながる。</small>")) (text "")) (text "<a class=\"button full\" href=\"/login\">ログイン</a><small>招待を受け取った方は <a href=\"/join\">登録</a></small>")) (text "</div></aside><main id=\"main\" class=\"content\"><header class=\"page-header\"><div><h1>") (call std::html-escape-text (local title)) (text "</h1></div>") (if (call std::text-equal (local title) (text "ホーム")) (text "<a class=\"button subtle compact\" href=\"/\">更新</a>") (text "")) (text "</header>") (local body) (text "</main><aside class=\"rail\"><section class=\"rail-section\"><h2>会話のそばに、ドライブ。</h2><p>写真や動画は、投稿しなくても保存できます。整理したファイルは、何度でもノートに添付できます。</p><div class=\"row\"><a href=\"/drive\">ドライブを開く →</a></div></section><section class=\"rail-section\"><h2>公開する範囲は、自分で。</h2><p>新しいノートは「メンバー限定」から。下書きや投稿前のファイルは、自分だけが見られます。</p></section><section class=\"rail-section\"><h2>小さなサークルのために</h2><p>時系列のタイムライン。再生は自分のタイミングで。広告やおすすめアルゴリズムはありません。</p></section><footer>lkjsns · built with lkjscript<br><a href=\"/about\">この場所について</a> · <a href=\"/admin\">管理</a></footer></aside></div><nav class=\"mobile-nav\" aria-label=\"モバイルナビゲーション\">") (call page::link (text "/") (text "ホーム") (text "home") (call std::text-equal (local title) (text "ホーム"))) (call page::link (text "/drive") (text "ドライブ") (text "drive") (call std::text-equal (local title) (text "ドライブ"))) (call page::link (text "/compose") (text "書く") (text "plus") (call std::text-equal (local title) (text "書く"))) (call page::link (text "/settings") (text "設定") (text "settings") (call std::text-equal (local title) (text "設定"))) (text "</nav></body></html>")) (text ""))))
+
+  (function create raw
+    (visibility public) (parameter create status (type I64)) (parameter create body (type Bytes)) (parameter create mime (type Text)) (parameter create extra (type (list Header)))
+    (returns Response) (effect pure)
+    (body (record structural (field status (local status)) (field body (local body)) (field headers (call page::append-headers (list Header (call editor::header (text "cache-control") (text "no-store")) (call editor::header (text "content-security-policy") (text "default-src 'none'; script-src 'none'; style-src 'self'; img-src 'self'; media-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'")) (call editor::header (text "x-content-type-options") (text "nosniff")) (call editor::header (text "referrer-policy") (text "no-referrer")) (call editor::header (text "cross-origin-resource-policy") (text "same-origin")) (call editor::header (text "x-frame-options") (text "DENY")) (call editor::header (text "permissions-policy") (text "camera=(), microphone=(), geolocation=()")) (call editor::header (text "content-type") (local mime))) (local extra) (i64 0))))))
+
+  (function create reply
+    (visibility public) (parameter create status (type I64)) (parameter create body (type Text)) (parameter create location (type Text)) (parameter create cookie (type Text))
+    (returns Response) (effect pure)
+    (body (call page::raw (local status) (call std::bytes-from-text (local body)) (text "text/html; charset=utf-8") (call page::append-headers (if (call std::text-equal (local location) (text "")) (list Header) (list Header (call editor::header (text "location") (local location)))) (if (call std::text-equal (local cookie) (text "")) (list Header) (list Header (call editor::header (text "set-cookie") (local cookie)))) (i64 0)))))
+
+  (function create redirect
+    (visibility public) (parameter create location (type Text))
+    (returns Response) (effect pure)
+    (body (call page::reply (i64 303) (text "") (local location) (text ""))))
+
+  (function create ok
+    (visibility public) (parameter create ctx (type Context)) (parameter create title (type Text)) (parameter create body (type Text))
+    (returns Response) (effect pure)
+    (body (call page::reply (i64 200) (call page::frame (local ctx) (local title) (local body)) (text "") (text ""))))
+
+  (function create error
+    (visibility public) (parameter create status (type I64)) (parameter create message (type Text))
+    (returns Response) (effect pure)
+    (body (call page::reply (local status) (call page::frame (record structural (field user (text "")) (field csrf (text "")) (field session (text "")) (field now (i64 0))) (text "操作を確認してください") (call std::text-join (list Text (text "<section class=\"panel\"><p class=\"notice danger\" role=\"alert\">") (call std::html-escape-text (local message)) (text "</p><p class=\"field-help\">保存されなかった内容は、ブラウザの「戻る」で確認できます。同じ操作を繰り返す前に、現在の状態を確認してください。</p><div class=\"row\"><a class=\"button\" href=\"/\">ホーム</a><a class=\"button\" href=\"/login\">ログイン</a></div></section>")) (text ""))) (text "") (text ""))))
+
+  (function create ago
+    (visibility public) (parameter create now (type I64)) (parameter create at (type I64))
+    (returns Text) (effect pure)
+    (body (let (binding delta (call std::subtract (local now) (local at))) (in (if (call std::less (local delta) (i64 60000)) (text "たった今") (if (call std::less (local delta) (i64 3600000)) (call std::text-join (list Text (call std::i64-to-text (call std::divide (local delta) (i64 60000))) (text "分前")) (text "")) (if (call std::less (local delta) (i64 86400000)) (call std::text-join (list Text (call std::i64-to-text (call std::divide (local delta) (i64 3600000))) (text "時間前")) (text "")) (call std::text-join (list Text (call std::i64-to-text (call std::divide (local delta) (i64 86400000))) (text "日前")) (text "")))))))))
+
+  (function create bytes
+    (visibility public) (parameter create size (type I64))
+    (returns Text) (effect pure)
+    (body (if (call std::less (local size) (i64 1048576)) (call std::text-join (list Text (call std::i64-to-text (call std::divide (local size) (i64 1024))) (text " KB")) (text "")) (call std::text-join (list Text (call std::i64-to-text (call std::divide (local size) (i64 1048576))) (text " MB")) (text "")))))
+
+  (function create pager
+    (visibility public) (parameter create next (type I64)) (parameter create base (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::less-equal (i64 0) (local next)) (call std::text-join (list Text (text "<div class=\"pager\"><a class=\"button\" rel=\"next\" href=\"") (call std::html-escape-text (local base)) (text "cursor=") (call std::i64-to-text (local next)) (text "\">もっと見る</a></div>")) (text "")) (text ""))))
+
+  (function create append-headers
+    (visibility public) (parameter create left (type (list Header))) (parameter create right (type (list Header))) (parameter create index (type I64))
+    (returns (list Header)) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types Header) (local right))) (call page::append-headers (call std::list-append (types Header) (local left) (call std::list-get (types Header) (local right) (local index))) (local right) (call std::add (local index) (i64 1))) (local left))))
+)

@@ -9,6 +9,7 @@ This is a home for multiple independent projects, not another copy of the langua
 | Project | Description | Runtime |
 | --- | --- | --- |
 | [Traffic City](projects/traffic-city/) | Browser city builder with native traffic, rail, economy, and persistence | lkjscript 0.1.77 |
+| [lkjsns](projects/lkjsns/) | Invitation-only social app rebuild; native checkpoint, not deployed | lkjscript 0.1.89 |
 
 ## Layout
 

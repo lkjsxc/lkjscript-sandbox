@@ -1,0 +1,6 @@
+(module create http
+  (function create view (visibility public)
+    (parameter create request (type Request)) (returns Response)
+    (effect (task (requirement service::app::store) (requirement service::app::entropy) (requirement service::app::clock) (requirement service::app::config) (requirement service::app::passwords) (requirement service::app::bootstrap) (requirement service::app::streams) (requirement service::app::objects)))
+    (body (record structural (field status (i64 200)) (field headers (list Header)) (field body (call std::bytes-from-text (text "native boundary"))))))
+)

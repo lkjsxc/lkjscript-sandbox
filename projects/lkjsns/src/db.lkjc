@@ -1,0 +1,156 @@
+(module create db
+  (function create key
+    (visibility public) (parameter create kind (type Text)) (parameter create id (type Text))
+    (returns (list std::DataKeyPart)) (effect pure)
+    (body (list std::DataKeyPart (variant std::DataKeyPart::Text (local kind)) (variant std::DataKeyPart::Text (local id)))))
+
+  (function create read
+    (visibility public) (parameter create kind (type Text)) (parameter create id (type Text))
+    (returns (list std::DataEntry)) (effect (task (requirement service::app::store)))
+    (body (capability-call service::app::store std::DataStore::get (static-text "lkjsns-v1") (call db::key (local kind) (local id)))))
+
+  (function create expected
+    (visibility public) (parameter create entries (type (list std::DataEntry)))
+    (returns std::DataExpectation) (effect pure)
+    (body (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (variant std::DataExpectation::Missing) (variant std::DataExpectation::Exact (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::revision)))))
+
+  (function create put
+    (visibility public) (parameter create kind (type Text)) (parameter create id (type Text)) (parameter create value (type Bytes))
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (capability-call service::app::store std::DataStore::put (static-text "lkjsns-v1") (call db::key (local kind) (local id)) (local value) (call db::expected (call db::read (local kind) (local id))))))
+
+  (function create empty-user
+    (visibility public)
+    (returns User) (effect pure)
+    (body (record structural (field handle (text "")) (field password (text "")) (field display (text "")) (field bio (text "")) (field admin (bool false)) (field suspended (bool false)) (field created (i64 0)) (field failures (i64 0)) (field locked (i64 0)) (field sessions (list Text)) (field following (list Text)) (field muted (list Text)) (field saved (list Text)) (field used (i64 0)) (field version (i64 -1)))))
+
+  (function create user
+    (visibility public) (parameter create id (type Text))
+    (returns User) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (text "user") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-user) (call std::data-decode-or (types User) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-user)))))))
+
+  (function create save-user
+    (visibility public) (parameter create value (type User))
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (call db::put (text "user") (field (local value) (name handle)) (call std::data-encode (types User) (local value)))))
+
+  (function create empty-session
+    (visibility public)
+    (returns Session) (effect pure)
+    (body (record structural (field user (text "")) (field csrf (text "")) (field expires (i64 0)))))
+
+  (function create session
+    (visibility public) (parameter create id (type Text))
+    (returns Session) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (text "session") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-session) (call std::data-decode-or (types Session) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-session)))))))
+
+  (function create empty-invite
+    (visibility public)
+    (returns Invite) (effect pure)
+    (body (record structural (field id (text "")) (field label (text "")) (field expires (i64 0)) (field remaining (i64 0)) (field revoked (bool true)))))
+
+  (function create invite
+    (visibility public) (parameter create id (type Text))
+    (returns Invite) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (text "invite") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-invite) (call std::data-decode-or (types Invite) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-invite)))))))
+
+  (function create save-invite
+    (visibility public) (parameter create value (type Invite))
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (call db::put (text "invite") (field (local value) (name id)) (call std::data-encode (types Invite) (local value)))))
+
+  (function create empty-note
+    (visibility public)
+    (returns Note) (effect pure)
+    (body (record structural (field id (text "")) (field author (text "")) (field body (text "")) (field cw (text "")) (field audience (text "private")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 0)) (field edited (i64 0)) (field version (i64 -1)) (field published (bool false)) (field deleted (bool true)))))
+
+  (function create note
+    (visibility public) (parameter create id (type Text))
+    (returns Note) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (text "note") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-note) (call std::data-decode-or (types Note) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-note)))))))
+
+  (function create save-note
+    (visibility public) (parameter create value (type Note))
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (call db::put (text "note") (field (local value) (name id)) (call std::data-encode (types Note) (local value)))))
+
+  (function create empty-media
+    (visibility public)
+    (returns Media) (effect pure)
+    (body (record structural (field id (text "")) (field owner (text "")) (field name (text "")) (field mime (text "")) (field alt (text "")) (field folder (text "")) (field size (i64 0)) (field created (i64 0)) (field sensitive (bool true)) (field state (text "missing")) (field digest (text "")) (field refs (list Text)) (field version (i64 -1)) (field offset (i64 0)) (field stored (i64 0)))))
+
+  (function create media
+    (visibility public) (parameter create id (type Text))
+    (returns Media) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (text "media") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-media) (call std::data-decode-or (types Media) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-media)))))))
+
+  (function create save-media
+    (visibility public) (parameter create value (type Media))
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (call db::put (text "media") (field (local value) (name id)) (call std::data-encode (types Media) (local value)))))
+
+  (function create empty-folder
+    (visibility public)
+    (returns Folder) (effect pure)
+    (body (record structural (field id (text "")) (field owner (text "")) (field name (text "")) (field deleted (bool true)) (field version (i64 -1)))))
+
+  (function create folder
+    (visibility public) (parameter create id (type Text))
+    (returns Folder) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (text "folder") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-folder) (call std::data-decode-or (types Folder) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-folder)))))))
+
+  (function create save-folder
+    (visibility public) (parameter create value (type Folder))
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (call db::put (text "folder") (field (local value) (name id)) (call std::data-encode (types Folder) (local value)))))
+
+  (function create empty-notice
+    (visibility public)
+    (returns Notice) (effect pure)
+    (body (record structural (field actor (text "")) (field kind (text "")) (field note (text "")) (field at (i64 0)))))
+
+  (function create notice
+    (visibility public) (parameter create id (type Text))
+    (returns Notice) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (text "notice") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-notice) (call std::data-decode-or (types Notice) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-notice)))))))
+
+  (function create count
+    (visibility public) (parameter create name (type Text))
+    (returns I64) (effect (task (requirement service::app::store)))
+    (body (let (binding rows (call db::read (text "index-count") (local name))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local rows)) (i64 0)) (i64 0) (call std::data-decode-or (types I64) (field (call std::list-get (types std::DataEntry) (local rows) (i64 0)) std::DataEntry::value) (i64 -1)))))))
+
+  (function create bucket-key
+    (visibility public) (parameter create name (type Text)) (parameter create n (type I64))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (local name) (text "/") (call std::i64-to-text (call std::divide (local n) (i64 32)))) (text ""))))
+
+  (function create bucket
+    (visibility public) (parameter create name (type Text)) (parameter create n (type I64))
+    (returns (list Text)) (effect (task (requirement service::app::store)))
+    (body (let (binding rows (call db::read (text "index-page") (call db::bucket-key (local name) (local n)))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local rows)) (i64 0)) (list Text) (call std::data-decode-or (types (list Text)) (field (call std::list-get (types std::DataEntry) (local rows) (i64 0)) std::DataEntry::value) (list Text)))))))
+
+  (function create index
+    (visibility public) (parameter create name (type Text)) (parameter create id (type Text))
+    (returns Unit) (effect (task (requirement service::app::store)))
+    (body (let (binding n (call db::count (local name))) (binding page (call db::bucket (local name) (local n))) (in (sequence (call db::put (text "index-page") (call db::bucket-key (local name) (local n)) (call std::data-encode (types (list Text)) (call std::list-append (types Text) (local page) (local id)))) (call db::put (text "index-count") (local name) (call std::data-encode (types I64) (call std::add (local n) (i64 1)))) (unit))))))
+
+  (function create walk
+    (visibility public) (parameter create name (type Text)) (parameter create index (type I64)) (parameter create remaining (type I64)) (parameter create out (type (list Text))) (parameter create page-number (type I64)) (parameter create page (type (list Text)))
+    (returns Listing) (effect (task (requirement service::app::store)))
+    (body (if (if (call std::less-equal (i64 0) (local index)) (if (call std::less (i64 0) (local remaining)) (bool true) (bool false)) (bool false)) (let (binding p (call std::divide (local index) (i64 32))) (binding items (if (call std::i64-equal (local p) (local page-number)) (local page) (call db::bucket (local name) (local index)))) (binding offset (call std::subtract (local index) (call std::multiply (local p) (i64 32)))) (in (if (call std::less (local offset) (call std::list-length (types Text) (local items))) (call db::walk (local name) (call std::subtract (local index) (i64 1)) (call std::subtract (local remaining) (i64 1)) (call std::list-append (types Text) (local out) (call std::list-get (types Text) (local items) (local offset))) (local p) (local items)) (record structural (field ids (local out)) (field next (i64 -1)))))) (record structural (field ids (local out)) (field next (local index))))))
+
+  (function create listing
+    (visibility public) (parameter create name (type Text)) (parameter create cursor (type Text)) (parameter create limit (type I64))
+    (returns Listing) (effect (task (requirement service::app::store)))
+    (body (let (binding n (call db::count (local name))) (binding cursor (call util::number (local cursor) (call std::subtract (local n) (i64 1)))) (in (call db::walk (local name) (if (call std::less (local cursor) (i64 0)) (call std::subtract (local n) (i64 1)) (local cursor)) (local limit) (list Text) (i64 -1) (list Text))))))
+
+  (function create schema
+    (visibility public)
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (let (binding rows (call db::read (text "schema") (text "version"))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local rows)) (i64 0)) (bool true) (call std::text-equal (call std::data-decode-or (types Text) (field (call std::list-get (types std::DataEntry) (local rows) (i64 0)) std::DataEntry::value) (text "invalid")) (text "lkjsns-v1")))))))
+
+  (function create install-schema
+    (visibility public)
+    (returns Unit) (effect (task (requirement service::app::store)))
+    (body (sequence (call db::put (text "schema") (text "version") (call std::data-encode (types Text) (text "lkjsns-v1"))) (unit))))
+)

@@ -1,0 +1,135 @@
+(module create util
+  (function create has
+    (visibility public) (parameter create items (type (list Text))) (parameter create item (type Text)) (parameter create index (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types Text) (local items))) (if (call std::text-equal (call std::list-get (types Text) (local items) (local index)) (local item)) (bool true) (if (call util::has (local items) (local item) (call std::add (local index) (i64 1))) (bool true) (bool false))) (bool false))))
+
+  (function create without
+    (visibility public) (parameter create items (type (list Text))) (parameter create item (type Text)) (parameter create index (type I64)) (parameter create out (type (list Text)))
+    (returns (list Text)) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types Text) (local items))) (let (binding x (call std::list-get (types Text) (local items) (local index))) (in (call util::without (local items) (local item) (call std::add (local index) (i64 1)) (if (call std::text-equal (local x) (local item)) (local out) (call std::list-append (types Text) (local out) (local x)))))) (local out))))
+
+  (function create remove
+    (visibility public) (parameter create items (type (list Text))) (parameter create item (type Text))
+    (returns (list Text)) (effect pure)
+    (body (call util::without (local items) (local item) (i64 0) (list Text))))
+
+  (function create toggle
+    (visibility public) (parameter create items (type (list Text))) (parameter create item (type Text))
+    (returns (list Text)) (effect pure)
+    (body (if (call util::has (local items) (local item) (i64 0)) (call util::remove (local items) (local item)) (call std::list-append (types Text) (local items) (local item)))))
+
+  (function create slice
+    (visibility public) (parameter create value (type Text)) (parameter create start (type I64)) (parameter create end (type I64))
+    (returns Text) (effect pure)
+    (body (call std::bytes-to-text (call std::bytes-slice (call std::bytes-from-text (local value)) (local start) (local end)))))
+
+  (function create size
+    (visibility public) (parameter create value (type Text))
+    (returns I64) (effect pure)
+    (body (call std::bytes-length (call std::bytes-from-text (local value)))))
+
+  (function create ascii
+    (visibility public) (parameter create bytes (type Bytes)) (parameter create index (type I64)) (parameter create hex (type Bool))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local index) (call std::bytes-length (local bytes))) (let (binding x (call std::bytes-get (local bytes) (local index))) (in (if (if (if (call std::less-equal (i64 97) (local x)) (if (call std::less-equal (local x) (if (local hex) (i64 102) (i64 122))) (bool true) (bool false)) (bool false)) (bool true) (if (if (call std::less-equal (i64 48) (local x)) (if (call std::less-equal (local x) (i64 57)) (bool true) (bool false)) (bool false)) (bool true) (if (if (call std::bool-not (local hex)) (if (if (call std::i64-equal (local x) (i64 45)) (bool true) (if (call std::i64-equal (local x) (i64 95)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool true) (bool false)))) (if (call util::ascii (local bytes) (call std::add (local index) (i64 1)) (local hex)) (bool true) (bool false)) (bool false)))) (bool true))))
+
+  (function create token
+    (visibility public) (parameter create value (type Text))
+    (returns Bool) (effect pure)
+    (body (if (call std::i64-equal (call util::size (local value)) (i64 64)) (if (call util::ascii (call std::bytes-from-text (local value)) (i64 0) (bool true)) (bool true) (bool false)) (bool false))))
+
+  (function create handle
+    (visibility public) (parameter create value (type Text))
+    (returns Bool) (effect pure)
+    (body (if (call std::less-equal (i64 3) (call util::size (local value))) (if (call std::less-equal (call util::size (local value)) (i64 24)) (if (call util::ascii (call std::bytes-from-text (local value)) (i64 0) (bool false)) (bool true) (bool false)) (bool false)) (bool false))))
+
+  (function create clean
+    (visibility public) (parameter create value (type Text)) (parameter create minimum (type I64)) (parameter create maximum (type I64))
+    (returns Bool) (effect pure)
+    (body (if (field (call editor::clean-text (local value)) (name valid)) (if (call std::less-equal (local minimum) (call util::size (local value))) (if (call std::less-equal (call util::size (local value)) (local maximum)) (bool true) (bool false)) (bool false)) (bool false))))
+
+  (function create normal
+    (visibility public) (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (field (call editor::clean-text (local value)) (name value))))
+
+  (function create number
+    (visibility public) (parameter create value (type Text)) (parameter create maximum (type I64))
+    (returns I64) (effect pure)
+    (body (if (if (call std::less-equal (call util::size (local value)) (i64 10)) (if (call editor::valid-base (call std::bytes-from-text (local value))) (bool true) (bool false)) (bool false)) (let (binding n (call std::i64-parse (local value))) (in (if (if (call std::less-equal (i64 0) (local n)) (if (call std::less-equal (local n) (local maximum)) (bool true) (bool false)) (bool false)) (local n) (i64 -1)))) (i64 -1))))
+
+  (function create parse
+    (visibility public) (parameter create data (type Bytes))
+    (returns Form) (effect pure)
+    (body (match (call forms::decode (local data) (i64 65536) (i64 32)) (arm forms::result::valid (payload items (list forms::field)) (record structural (field valid (bool true)) (field items (local items)))) (arm forms::result::invalid (payload error Text) (record structural (field valid (bool false)) (field items (list forms::field)))))))
+
+  (function create values
+    (visibility public) (parameter create items (type (list forms::field))) (parameter create name (type Text)) (parameter create index (type I64)) (parameter create out (type (list Text)))
+    (returns (list Text)) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types forms::field) (local items))) (let (binding x (call std::list-get (types forms::field) (local items) (local index))) (in (call util::values (local items) (local name) (call std::add (local index) (i64 1)) (if (call std::text-equal (field (local x) forms::field::name) (local name)) (call std::list-append (types Text) (local out) (field (local x) forms::field::value)) (local out))))) (local out))))
+
+  (function create value
+    (visibility public) (parameter create form (type Form)) (parameter create name (type Text))
+    (returns Text) (effect pure)
+    (body (let (binding items (call util::values (field (local form) (name items)) (local name) (i64 0) (list Text))) (in (if (call std::i64-equal (call std::list-length (types Text) (local items)) (i64 1)) (call std::list-get (types Text) (local items) (i64 0)) (text ""))))))
+
+  (function create unique
+    (visibility public) (parameter create items (type (list forms::field))) (parameter create index (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types forms::field) (local items))) (if (call std::i64-equal (call std::list-length (types Text) (call util::values (local items) (field (call std::list-get (types forms::field) (local items) (local index)) forms::field::name) (i64 0) (list Text))) (i64 1)) (if (call util::unique (local items) (call std::add (local index) (i64 1))) (bool true) (bool false)) (bool false)) (bool true))))
+
+  (function create query
+    (visibility public) (parameter create request (type Request)) (parameter create name (type Text))
+    (returns Text) (effect pure)
+    (body (let (binding items (call std::map-get-or (types Text (list Text)) (field (local request) (name query_parameters)) (local name) (list Text))) (in (if (call std::i64-equal (call std::list-length (types Text) (local items)) (i64 1)) (call std::list-get (types Text) (local items) (i64 0)) (text ""))))))
+
+  (function create header
+    (visibility public) (parameter create request (type Request)) (parameter create name (type Text))
+    (returns Text) (effect pure)
+    (body (let (binding h (call editor::header-value (local name) (field (local request) (name headers)))) (binding d (call std::bytes-to-text-result (field (local h) (name value)))) (in (if (if (field (local h) (name valid)) (if (field (local d) (name valid)) (bool true) (bool false)) (bool false)) (field (local d) (name value)) (text ""))))))
+
+  (function create random
+    (visibility public)
+    (returns Text) (effect (task (requirement service::app::entropy)))
+    (body (call std::bytes-to-hex (capability-call service::app::entropy std::SecureRandom::bytes (i64 32)))))
+
+  (function create digest
+    (visibility public) (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (call std::bytes-to-hex (call std::bytes-blake3 (call std::bytes-from-text (local value))))))
+
+  (function create signed
+    (visibility public) (parameter create ctx (type Context))
+    (returns Bool) (effect pure)
+    (body (call util::handle (field (local ctx) (name user)))))
+
+  (function create csrf
+    (visibility public) (parameter create ctx (type Context)) (parameter create form (type Form))
+    (returns Bool) (effect pure)
+    (body (if (call util::signed (local ctx)) (if (call std::text-equal (field (local ctx) (name csrf)) (call util::value (local form) (text "csrf"))) (bool true) (bool false)) (bool false))))
+
+  (function create cookie-parts
+    (visibility public) (parameter create value (type Bytes)) (parameter create start (type I64)) (parameter create index (type I64)) (parameter create prefix (type Text)) (parameter create found (type Text)) (parameter create count (type I64))
+    (returns Text) (effect pure)
+    (body (if (if (call std::i64-equal (local index) (call std::bytes-length (local value))) (bool true) (if (call std::i64-equal (call std::bytes-get (local value) (local index)) (i64 59)) (bool true) (bool false))) (let (binding s (call std::bytes-to-text (call std::bytes-slice (local value) (local start) (local index)))) (binding part (call util::trim (local s) (i64 0))) (binding match (call std::text-starts-with (local part) (local prefix))) (binding newcount (call std::add (local count) (if (local match) (i64 1) (i64 0)))) (binding newfound (if (local match) (call util::slice (local part) (call util::size (local prefix)) (call util::size (local part))) (local found))) (in (if (call std::i64-equal (local index) (call std::bytes-length (local value))) (if (call std::i64-equal (local newcount) (i64 1)) (local newfound) (text "")) (call util::cookie-parts (local value) (call std::add (local index) (i64 1)) (call std::add (local index) (i64 1)) (local prefix) (local newfound) (local newcount))))) (call util::cookie-parts (local value) (local start) (call std::add (local index) (i64 1)) (local prefix) (local found) (local count)))))
+
+  (function create trim
+    (visibility public) (parameter create value (type Text)) (parameter create index (type I64))
+    (returns Text) (effect pure)
+    (body (if (call std::less (local index) (call util::size (local value))) (if (if (call std::i64-equal (call std::bytes-get (call std::bytes-from-text (local value)) (local index)) (i64 32)) (bool true) (if (call std::i64-equal (call std::bytes-get (call std::bytes-from-text (local value)) (local index)) (i64 9)) (bool true) (bool false))) (call util::trim (local value) (call std::add (local index) (i64 1))) (call util::slice (local value) (local index) (call util::size (local value)))) (text ""))))
+
+  (test create valid-user (visibility private) (actual (call util::handle (text "alice"))) (expected (bool true)))
+
+  (test create bad-user (visibility private) (actual (call util::handle (text "../a"))) (expected (bool false)))
+
+  (test create upper-user (visibility private) (actual (call util::handle (text "Alice"))) (expected (bool false)))
+
+  (test create short-user (visibility private) (actual (call util::handle (text "ab"))) (expected (bool false)))
+
+  (test create max-number (visibility private) (actual (call util::number (text "12") (i64 10))) (expected (i64 -1)))
+
+  (test create invalid-number (visibility private) (actual (call util::number (text "wat") (i64 10))) (expected (i64 -1)))
+
+  (test create duplicate-fields (visibility private) (actual (call util::unique (field (call util::parse (call std::bytes-from-text (text "a=1&a=2"))) (name items)) (i64 0))) (expected (bool false)))
+)
