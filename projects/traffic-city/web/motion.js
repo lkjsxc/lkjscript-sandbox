@@ -134,3 +134,65 @@ export function streetCaption(frame){
  const walking=frame.streetWalkers||0,driving=frame.streetDrivers||0,shown=frame.actors?.length||0,total=walking+driving;
  return {counts:`In view · ${walking.toLocaleString('en-US')} on foot · ${driving.toLocaleString('en-US')} in cars`,sample:shown<total?`${shown} of ${total.toLocaleString('en-US')} shown · zoom for detail`:`${shown} street travellers shown`};
 }
+
+// Presentation work is bounded by screen coverage, never by total population.
+// Hysteresis avoids flipping quality levels in response to one expensive frame.
+export class RenderBudget {
+ constructor(){this.quality=2;this.cost=0;this.count=0;this.slow=0;this.fast=0;this.changes=0}
+ observe(milliseconds){
+  if(!Number.isFinite(milliseconds)||milliseconds<0)return;
+  this.cost=this.count?this.cost*.9+milliseconds*.1:milliseconds;this.count++;
+  this.slow=this.cost>12?this.slow+1:0;this.fast=this.cost<6?this.fast+1:0;
+  if(this.slow>=30&&this.quality>0){this.quality--;this.slow=0;this.fast=0;this.changes++}
+  else if(this.fast>=180&&this.quality<2){this.quality++;this.slow=0;this.fast=0;this.changes++}
+ }
+ level(scale,moving=false){return scale<7||this.quality===0?0:scale<22||moving||this.quality===1?1:2}
+ limit(level){return [256,640,1536][level]}
+ get diagnostics(){return{quality:this.quality,meanDrawMs:this.cost,adjustments:this.changes}}
+}
+
+// One coherent projection per native frame/camera rectangle. It holds references
+// to the latest cells, not a second mutable city. Query cost is visible chunks.
+export class TileIndex {
+ constructor(size=8){if(!Number.isInteger(size)||size<1||128%size)throw new RangeError('Chunk size must divide 128');this.size=size;this.layers=[new Map(),new Map()];this.revision=0;this.visits=0;this.queryCount=0;this.cached=null}
+ rebuild(cells){
+  this.layers=[new Map(),new Map()];this.stations=[];this.hot=[[],[]];
+  for(const c of cells.values()){
+   const layer=layerOf(c.id);if(layer<0||layer>1)continue;
+   const key=Math.floor((c.id%128)/this.size)+Math.floor(gridY(c.id)/this.size)*(128/this.size);
+   const bucket=this.layers[layer].get(key)||[];bucket.push(c);this.layers[layer].set(key,bucket);
+   if(!layer&&c.kind===8)this.stations.push(c.id);
+   if(c.q>(c.kind===1?5:c.kind===2?20:8))this.hot[layer].push(c);
+  }
+  for(const hot of this.hot)hot.sort((a,b)=>b.q-a.q||a.id-b.id);
+  this.revision++;this.cached=null;
+ }
+ query(layer,x0,y0,x1,y1){
+  x0=Math.max(0,Math.floor(x0));y0=Math.max(0,Math.floor(y0));x1=Math.min(127,Math.ceil(x1));y1=Math.min(127,Math.ceil(y1));
+  const key=[this.revision,layer,x0,y0,x1,y1].join(':');if(this.cached?.key===key)return this.cached.cells;
+  const cells=[];this.queryCount++;const buckets=this.layers[layer];
+  if(buckets&&x0<=x1&&y0<=y1)for(let cy=Math.floor(y0/this.size);cy<=Math.floor(y1/this.size);cy++)for(let cx=Math.floor(x0/this.size);cx<=Math.floor(x1/this.size);cx++)for(const c of buckets.get(cx+cy*(128/this.size))||[]){this.visits++;const x=c.id%128,y=gridY(c.id);if(x>=x0&&x<=x1&&y>=y0&&y<=y1)cells.push(c)}
+  this.cached={key,cells};return cells;
+ }
+}
+
+// Stable screen-space sampling: a fixed identity hash is independent of the
+// arrival order, camera movement and frame cadence. Never materialize population.
+export function stableVisualRank(id){let n=id|0;n=Math.imul(n^(n>>>16),0x45d9f3b);n=Math.imul(n^(n>>>16),0x45d9f3b);return(n^(n>>>16))>>>0}
+export function sampleVisualActors(actors,limit){
+ if(!Number.isSafeInteger(limit)||limit<0)throw new RangeError('Nonnegative visual budget required');
+ if(!limit)return [];if(actors.length<=limit)return actors;
+ const heap=[],worse=(a,b)=>a.rank>b.rank||a.rank===b.rank&&a.actor.id>b.actor.id;
+ for(const actor of actors){const rank=stableVisualRank(actor.id);
+  if(heap.length<limit){let i=heap.length;const entry={actor,rank};heap.push(entry);while(i){const parent=(i-1)>>1;if(!worse(entry,heap[parent]))break;heap[i]=heap[parent];i=parent}heap[i]=entry}
+  else if(rank<heap[0].rank||rank===heap[0].rank&&actor.id<heap[0].actor.id){const entry={actor,rank};let i=0;while(i*2+1<heap.length){let child=i*2+1;if(child+1<heap.length&&worse(heap[child+1],heap[child]))child++;if(!worse(heap[child],entry))break;heap[i]=heap[child];i=child}heap[i]=entry}
+ }
+ return heap.sort((a,b)=>a.rank-b.rank||a.actor.id-b.actor.id).map(item=>item.actor);
+}
+
+// Cached rail presentation shared by the existing native HTTP bundle.
+export function railPath(l){if(l.path?.length)return l.path;const out=[],dx=Math.sign(l.b%128-l.a%128),dy=Math.sign(gridY(l.b)-gridY(l.a));let p=l.a;for(let i=0;i<129;i++){out.push(p);if(p===l.b)break;p+=dx+dy*128}return out}
+const railGeometryCache=new Map(),railObjectGeometry=new WeakMap();
+export function railGeometry(l){if(railObjectGeometry.has(l))return railObjectGeometry.get(l);const path=railPath(l),key=path.join(',');if(railGeometryCache.has(key)){const value=railGeometryCache.get(key);railObjectGeometry.set(l,value);return value}const points=path.map(id=>({x:id%128+.5,y:gridY(id)+.5})),out=[];const push=(p,index)=>out.push({...p,index});if(points.length)push(points[0],0);for(let i=1;i<points.length-1;i++){const a=points[i-1],p=points[i],b=points[i+1],ux=p.x-a.x,uy=p.y-a.y,vx=b.x-p.x,vy=b.y-p.y;if(ux===vx&&uy===vy){push(p,i);continue}const radius=.34,start={x:p.x-ux*radius,y:p.y-uy*radius},end={x:p.x+vx*radius,y:p.y+vy*radius};push(start,i-radius);for(let k=1;k<=12;k++){const t=k/12,u=1-t;push({x:u*u*start.x+2*u*t*p.x+t*t*end.x,y:u*u*start.y+2*u*t*p.y+t*t*end.y},i-radius+2*radius*t)}}if(points.length>1)push(points.at(-1),points.length-1);if(railGeometryCache.size>32)railGeometryCache.clear();railGeometryCache.set(key,out);railObjectGeometry.set(l,out);return out}
+export function railProgress(l){const path=railPath(l),a=Math.max(0,path.indexOf(l.from)),b=Math.max(0,path.indexOf(l.to));return a+(b-a)*(l.duration?clamp(l.elapsed/l.duration,0,1):1)}
+export function railPose(l,index){const points=railGeometry(l);if(points.length<2)return{x:l.a%128+.5,y:gridY(l.a)+.5,angle:0};let i=1;while(i<points.length-1&&points[i].index<index)i++;const a=points[i-1],b=points[i],t=clamp((index-a.index)/(b.index-a.index||1),0,1);return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,angle:Math.atan2(b.y-a.y,b.x-a.x)+(l.direction<0?Math.PI:0)}}

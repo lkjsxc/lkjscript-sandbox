@@ -1,0 +1,24 @@
+declarations.begin
+(units
+ (use std builtin)
+ (type-alias MesoCohort (record (id I64) (population I64) (home I64) (queuedOut I64) (outbound I64) (work I64) (queuedBack I64) (inbound I64) (road I64) (rail I64) (travel I64) (requested I64) (arrived I64) (visits I64) (roadTrips I64) (railTrips I64) (waitTicks I64) (travelTicks I64)))
+ (type-alias MesoCity (record (cohorts (list MesoCohort)) (tick I64) (population I64)))
+ (type-alias MesoTotals (record (tick I64) (groups I64) (population I64) (home I64) (queued I64) (outbound I64) (work I64) (inbound I64) (requested I64) (arrived I64) (outstanding I64) (visits I64) (roadTrips I64) (railTrips I64) (waitTicks I64) (travelTicks I64) (massError I64) (journeyError I64)))
+ (type-alias MesoInput (record (population I64) (groups I64) (ticks I64) (capacity I64) (rail I64) (closedFrom I64) (closedUntil I64)))
+ (type-alias MesoResult (record (state MesoCity) (initial MesoTotals) (final MesoTotals)))
+ (module create mesomath
+  (function create min (visibility public) (effect pure) (parameter create a (type I64)) (parameter create b (type I64)) (returns I64)
+   (body (if (call std::less (local a) (local b)) (local a) (local b))))
+  (function create max (visibility public) (effect pure) (parameter create a (type I64)) (parameter create b (type I64)) (returns I64)
+   (body (if (call std::less (local a) (local b)) (local b) (local a))))
+  (function create mod (visibility public) (effect pure) (parameter create a (type I64)) (parameter create b (type I64)) (returns I64)
+   (body (call std::subtract (local a) (call std::multiply (call std::divide (local a) (local b)) (local b)))))
+  (function create release (visibility public) (effect pure) (parameter create people (type I64)) (parameter create duration (type I64)) (returns I64)
+   (body (call mesomath::min (local people) (call mesomath::max (i64 1) (call std::divide (local people) (call mesomath::max (i64 1) (local duration)))))))
+  (test create release-0-10 (visibility private) (actual (call release (i64 0) (i64 10))) (expected (i64 0)))
+  (test create release-1-10 (visibility private) (actual (call release (i64 1) (i64 10))) (expected (i64 1)))
+  (test create release-100-10 (visibility private) (actual (call release (i64 100) (i64 10))) (expected (i64 10)))
+  (test create release-10-0 (visibility private) (actual (call release (i64 10) (i64 0))) (expected (i64 10)))
+)
+)
+declarations.end

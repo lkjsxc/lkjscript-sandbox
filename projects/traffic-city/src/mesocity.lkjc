@@ -1,0 +1,22 @@
+declarations.begin
+(units
+ (use std builtin)
+ (type-alias MesoCohort (record (id I64) (population I64) (home I64) (queuedOut I64) (outbound I64) (work I64) (queuedBack I64) (inbound I64) (road I64) (rail I64) (travel I64) (requested I64) (arrived I64) (visits I64) (roadTrips I64) (railTrips I64) (waitTicks I64) (travelTicks I64)))
+ (type-alias MesoCity (record (cohorts (list MesoCohort)) (tick I64) (population I64)))
+ (type-alias MesoTotals (record (tick I64) (groups I64) (population I64) (home I64) (queued I64) (outbound I64) (work I64) (inbound I64) (requested I64) (arrived I64) (outstanding I64) (visits I64) (roadTrips I64) (railTrips I64) (waitTicks I64) (travelTicks I64) (massError I64) (journeyError I64)))
+ (type-alias MesoInput (record (population I64) (groups I64) (ticks I64) (capacity I64) (rail I64) (closedFrom I64) (closedUntil I64)))
+ (type-alias MesoResult (record (state MesoCity) (initial MesoTotals) (final MesoTotals)))
+ (module create mesocity
+  (function create seed-loop (visibility public) (effect pure) (parameter create population (type I64)) (parameter create groups (type I64)) (parameter create road (type I64)) (parameter create rail (type I64)) (parameter create id (type I64)) (parameter create cohorts (type (list MesoCohort))) (returns (list MesoCohort))
+   (body (if (call std::less (local id) (local groups)) (call seed-loop (local population) (local groups) (local road) (local rail) (call std::add (local id) (i64 1)) (call std::list-append (types MesoCohort) (local cohorts) (call mesocohort::seed (local id) (local population) (local groups) (local road) (local rail)))) (local cohorts))))
+  (function create seed (visibility public) (effect pure) (parameter create input (type MesoInput)) (returns MesoCity)
+   (body (let (binding population (call mesomath::min (i64 1000000) (call mesomath::max (i64 0) (field (local input) (name population))))) (binding groups (call mesomath::min (i64 512) (call mesomath::max (i64 1) (field (local input) (name groups))))) (binding road (call mesomath::min (i64 1000) (call mesomath::max (i64 0) (field (local input) (name capacity))))) (binding rail (call mesomath::min (i64 1000) (call mesomath::max (i64 0) (field (local input) (name rail))))) (in (record structural (field cohorts (call seed-loop (local population) (local groups) (local road) (local rail) (i64 0) (list MesoCohort))) (field tick (i64 0)) (field population (local population)))))))
+  (function create step-loop (visibility public) (effect pure) (parameter create cohorts (type (list MesoCohort))) (parameter create tick (type I64)) (parameter create closed (type Bool)) (parameter create id (type I64)) (parameter create out (type (list MesoCohort))) (returns (list MesoCohort))
+   (body (if (call std::less (local id) (call std::list-length (types MesoCohort) (local cohorts))) (call step-loop (local cohorts) (local tick) (local closed) (call std::add (local id) (i64 1)) (call std::list-append (types MesoCohort) (local out) (call mesocohort::step (call std::list-get (types MesoCohort) (local cohorts) (local id)) (local tick) (local closed)))) (local out))))
+  (function create tick (visibility public) (effect pure) (parameter create city (type MesoCity)) (parameter create closed (type Bool)) (returns MesoCity)
+   (body (record structural (field cohorts (call step-loop (field (local city) (name cohorts)) (field (local city) (name tick)) (local closed) (i64 0) (list MesoCohort))) (field tick (call std::add (field (local city) (name tick)) (i64 1))) (field population (field (local city) (name population))))))
+  (function create advance (visibility public) (effect pure) (parameter create city (type MesoCity)) (parameter create remaining (type I64)) (parameter create closedFrom (type I64)) (parameter create closedUntil (type I64)) (returns MesoCity)
+   (body (if (call std::less (i64 0) (local remaining)) (call advance (call tick (local city) (if (call std::less-equal (local closedFrom) (field (local city) (name tick))) (call std::less (field (local city) (name tick)) (local closedUntil)) (bool false))) (call std::subtract (local remaining) (i64 1)) (local closedFrom) (local closedUntil)) (local city))))
+)
+)
+declarations.end
