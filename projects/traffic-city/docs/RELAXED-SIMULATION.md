@@ -146,6 +146,32 @@ session artifact. Retain the previous descriptor and artifact for rollback and
 verify the public game in a disposable browser context. Never initialize over
 an existing store or start a competing writer.
 
+## Public verification
+
+The native session artifact above was deployed while retaining the independent
+classic HTTP artifact. The existing store was verified and backed up while its
+writer was stopped; that backup was restored and verified separately. Previous
+artifacts, descriptors, supervisor configuration and native backups were retained
+for rollback. Neither classic keys nor the separate Metropolis store were reset.
+
+All eleven public browser assets matched current source bytes. Classic root,
+`/classic`, legacy-query normalization and the explicit `/metropolis` entry
+responded correctly. The final disposable public browser passed construction,
+acknowledged saving and exact reload, moving walkers/cars/trains, 64 visible
+pedestrian pixel samples, and portrait zoom/pan. Browser, HTTP and WebSocket
+errors were empty in that final run.
+
+Earlier public attempts encountered the existing automatic save-history
+compaction: one movement wait timed out across a restart and another completed
+the functional checks but reported a reconnect WebSocket 502. These were not
+counted as passing tests. The public supervisor's existing configurable history
+watermark was raised from 64 to 256 MiB, with the prior script preserved. Its
+existing larger-store rule (twice the last compacted size) still applies. This
+reduces interruption frequency at the cost of more on-disk history; it does not
+eliminate maintenance reconnects. Saving frequency, admission limits, store
+contents and the game artifact were unchanged by this operational adjustment.
+The successful public rerun occurred after that change.
+
 ## Limits
 
 Shared-host times are observations, not guaranteed device latency or browser
