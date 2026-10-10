@@ -16,11 +16,12 @@ try{
   await page.locator('#fit').click();await page.waitForFunction(()=>window.__flowgarden.detail);
   const state=()=>page.evaluate(()=>window.__flowgarden.stats);
   await page.waitForTimeout(700);
+  await page.waitForFunction(()=>window.__flowgarden.stats.paused&&!window.__flowgarden.renderMetrics.pendingFrame);
   const first=await page.evaluate(()=>({...window.__flowgarden.renderMetrics,layoutReads:window.__layoutReads}));
   await page.waitForTimeout(600);
   const next=await page.evaluate(()=>({...window.__flowgarden.renderMetrics,layoutReads:window.__layoutReads}));
   assert(next.layoutReads-first.layoutReads<=next.draws-first.draws+20,'Each paint should read layout only once; allow native view replies outside paint');
-  assert(next.draws>first.draws+10);
+  assert.equal(next.draws-first.draws,0,'A settled paused view must sleep until an invalidation');
   assert(next.queries-first.queries<=next.indexRebuilds-first.indexRebuilds+1,'Stable views must reuse the tile query between native frames');
   async function pixel(){await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));return page.evaluate(()=>{const g=window.__flowgarden,c=document.querySelector('#map'),p=g.worldToScreen(g.stats.originX+7.5,g.stats.originY+11.5),r=c.getBoundingClientRect(),scale=c.width/r.width;return [...c.getContext('2d').getImageData(Math.floor(p.x*scale),Math.floor(p.y*scale),1,1).data]});}
   const empty=await pixel(),before=await state();await selectTool(page,6);let p=await districtPoint(page,7,11);await page.mouse.click(p.x,p.y);await waitTile(page,7,11,6);await selectTool(page,-2);

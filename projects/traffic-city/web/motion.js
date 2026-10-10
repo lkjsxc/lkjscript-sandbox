@@ -208,3 +208,35 @@ export function railPresentation(stationIds,rails){
  }
  return{assigned,stations:stationIds.map(id=>({id,...(firstLine.get(id)||{line:null,label:'S'}),waiting:waiting.get(id)||0}))};
 }
+
+// Coalesce presentation invalidations into one request. The active predicate
+// runs AFTER paint, so buffered movement and camera settling get a final frame.
+// Native simulation, connection timers and saves are never paused by this class.
+export class DemandPainter {
+ constructor(draw,active,{request=callback=>globalThis.requestAnimationFrame(callback),cancel=id=>globalThis.cancelAnimationFrame(id)}={}){
+  this.draw=draw;this.active=active;this.request=request;this.cancel=cancel;
+  this.frame=null;this.visible=true;this.disposed=false;this.requests=0;
+  this.callback=now=>{this.frame=null;if(!this.visible||this.disposed)return;this.draw(now);if(this.active(now))this.invalidate()};
+ }
+ invalidate(){if(this.visible&&!this.disposed&&this.frame===null){this.requests++;this.frame=this.request(this.callback)}}
+ setVisible(visible){
+  visible=!!visible;if(visible===this.visible)return;this.visible=visible;
+  if(!visible){if(this.frame!==null)this.cancel(this.frame);this.frame=null}
+  else this.invalidate();
+ }
+ dispose(){this.disposed=true;if(this.frame!==null)this.cancel(this.frame);this.frame=null}
+ get pending(){return this.frame!==null}
+}
+
+// Delivery sequence, save badges and notices still update the UI on every
+// message. All other native fields participate in exact scene comparison,
+// including future fields such as City Lab overlays. No hash collisions, no
+// ignored actor/rail edits, and only one bounded serialized snapshot is retained.
+export class SnapshotGate {
+ constructor(){this.clear()}
+ clear(){this.key=null}
+ accept(frame){
+  const {seq,ack,saved,notice,...scene}=frame,key=JSON.stringify(scene);
+  if(key===this.key)return false;this.key=key;return true;
+ }
+}

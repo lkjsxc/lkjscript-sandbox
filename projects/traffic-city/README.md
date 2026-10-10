@@ -10,6 +10,10 @@ Ground and underground roads, explicit tunnel portals and one-way driving are in
 
 Classic remains the foundation: freely placed streets and facilities, single-circle pedestrians, small turning cars, rail services and the soft river landscape. Rendering reuses visible tile queries, snapshot-derived congestion and station summaries, and static paint at both overview and detail scales. The actor sample, movement geometry, simulation and saves are unchanged. See [restoration and validation](docs/ATMOSPHERE.md).
 
+## Demand-driven rendering
+
+The browser reuses identical native scenes and paints only changed input, layout or buffered movement. Paused scenes sleep; moving people and trains keep the existing interpolation cadence. Native sessions, ownership and saving continue independently. See [candidate scope, measured visual differences and release boundary](docs/DEMAND-RENDERING.md).
+
 ## Lower native simulation cost
 
 Driving now chooses a legal minimum-hop route and estimates its actual congested

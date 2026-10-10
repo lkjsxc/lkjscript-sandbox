@@ -14,14 +14,17 @@ try {
  const saved=await page.evaluate(()=>window.__flowgarden.stats),baseline=new Map();
  async function capture(name){
   await page.waitForTimeout(1000);
+  const drawsBefore=await page.evaluate(()=>window.__flowgarden.renderMetrics.draws);
+  await page.waitForTimeout(1000);
+  const idleDraws=(await page.evaluate(()=>window.__flowgarden.renderMetrics.draws))-drawsBefore;
   const value=await page.evaluate(()=>{const c=document.querySelector('#map'),bytes=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let text='';for(let i=0;i<bytes.length;i+=8192)text+=String.fromCharCode(...bytes.subarray(i,i+8192));return {pixels:btoa(text),camera:window.__flowgarden.camera,stats:window.__flowgarden.stats}});
   await page.screenshot({path:`evidence/atmosphere-${changed?'after':'before'}-${name}.png`});
   assert.deepEqual(value.stats,saved);
   const pixels=Buffer.from(value.pixels,'base64');
-  if(!changed)baseline.set(name,{pixels,camera:value.camera});else{
+  if(!changed)baseline.set(name,{pixels,camera:value.camera,idleDraws});else{
    const old=baseline.get(name);assert.deepEqual(value.camera,old.camera);assert.equal(pixels.length,old.pixels.length);let changedPixels=0,maxDifference=0;
    for(let i=0;i<pixels.length;i+=4){let d=0;for(let k=0;k<4;k++)d=Math.max(d,Math.abs(pixels[i+k]-old.pixels[i+k]));if(d>0)changedPixels++;maxDifference=Math.max(maxDifference,d)}
-   const fraction=changedPixels/(pixels.length/4);reports.push({name,changedPixels,fraction,maxDifference});assert(fraction<.002,'Static raster compositing must preserve the scene');
+   const fraction=changedPixels/(pixels.length/4);reports.push({name,changedPixels,fraction,maxDifference,beforeIdleDraws:old.idleDraws,afterIdleDraws:idleDraws,idleMilliseconds:1000});assert.equal(idleDraws,0,'Unchanged paused scene should not redraw');assert(fraction<.002,'Static raster compositing must preserve the scene');
   }
  }
  for(const after of [false,true]){

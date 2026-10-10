@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/author.mjs",
     "start": "./play.sh",
-    "test": "node tests/render-projection.mjs && node tests/command-queue.mjs && node tests/line-status.mjs && node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/motion-timing.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
+    "test": "node tests/demand-painter.mjs && node tests/render-projection.mjs && node tests/command-queue.mjs && node tests/line-status.mjs && node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/motion-timing.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
     "test:browser": "node tests/with-preview.mjs tests/browser.mjs",
     "test:scale": "node tests/scaling.mjs",
     "test:backpressure": "node tests/backpressure.mjs",
@@ -102,7 +102,9 @@
     "test:metropolis": "node tests/metropolis-address.mjs && node tests/metropolis-model.mjs && node tests/metropolis-socket.mjs",
     "test:metropolis-browser": "node tests/metropolis-browser.mjs",
     "test:metropolis-soak": "node tests/metropolis-soak.mjs",
-    "test:metropolis-host": "node tests/metropolis-host.mjs"
+    "test:metropolis-host": "node tests/metropolis-host.mjs",
+    "test:demand-render-ui": "node tests/with-preview.mjs tests/demand-render-ui.mjs",
+    "test:presentation-selection": "node tests/presentation-selection.mjs"
   },
   "engines": {
     "node": ">=22"

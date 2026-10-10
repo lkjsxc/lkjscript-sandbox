@@ -20,8 +20,9 @@ uses direct overview paint to avoid rebuilding a full bitmap on every drag step.
 Queues, pedestrians, trains, selection and pending edits remain dynamic overlays.
 
 No new actor thinning, changed glyphs, colors, roads, rail curves, facility
-entrances, native rules or save schema are introduced. This release retains the
-continuous animation loop; stopping idle paint safely is future work. Simulation
+entrances, native rules or save schema are introduced. This restoration release retained the
+continuous animation loop. The subsequent [demand-driven rendering candidate](DEMAND-RENDERING.md)
+removes idle paint; its separate deployment status is recorded there. Simulation
 still follows its native running state, including while menus are open.
 
 ## Reproduction
