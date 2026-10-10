@@ -18,13 +18,23 @@ if(httpListen===wsListen)throw Error('HTTP and session listeners need distinct a
 const normalizeOrigin=s=>{const u=new URL(s);if(!['http:','https:'].includes(u.protocol)||u.username||u.password||u.origin!==s)throw Error('Use an exact HTTP(S) Origin, without a path.');return s;};
 const publicOrigin=normalizeOrigin(process.env.METRO_ORIGIN||'http://127.0.0.1:'+httpListen.split(':').at(-1));
 const localOrigin=normalizeOrigin(process.env.METRO_LOCAL_ORIGIN||'http://localhost:'+httpListen.split(':').at(-1));
-if(!fs.existsSync(dir+'/data/HEAD')){if(fs.existsSync(dir+'/data'))throw Error('Existing store lacks HEAD; recovery is required, not initialization.');console.log(run(['data','initialize','--root',dir+'/data']));}
+if(fs.existsSync(dir+'/data.retired')){
+ if(!fs.existsSync(dir+'/data'))fs.renameSync(dir+'/data.retired',dir+'/data');
+ else {run(['data','verify','--root',dir+'/data']);fs.rmSync(dir+'/data.retired',{recursive:true});}
+}
+if(!fs.existsSync(dir+'/data/HEAD')){
+ if(fs.existsSync(dir+'/data')||fs.existsSync(dir+'/data.initialized'))throw Error('Existing store is missing or lacks HEAD; recovery is required, not initialization.');
+ console.log(run(['data','initialize','--root',dir+'/data']));
+}
+fs.writeFileSync(dir+'/data.initialized','Native Metropolis store initialized.\n',{mode:0o600});
 const artifact=dir+'/app-'+selection.artifact_sha256+'.lkja';if(!fs.existsSync(artifact)){try{fs.linkSync(selection.artifact,artifact);}catch{fs.copyFileSync(selection.artifact,artifact,fs.constants.COPYFILE_EXCL);}}
 const config=JSON.parse(fs.readFileSync(root+'/deployment.json'));
 Object.assign(config,{artifact:path.basename(artifact),target:'metropolis-live',listen:wsListen});
 config.runtime.maximum_queued_tasks=8;
-Object.assign(config.session,{tick_interval_milliseconds:250,maximum_message_bytes:4096,maximum_state_bytes:16777216,maximum_state_nodes:300000,maximum_transition_bytes:32768,maximum_process_buffer_bytes:100663296});
-config.streams.maximum_total_bytes=4096;
+// maximum_message_bytes also bounds outbound frames (about 11 KiB at one million).
+// Native input parsing independently retains its 4 KiB read-all bound.
+Object.assign(config.session,{tick_interval_milliseconds:250,maximum_message_bytes:32768,maximum_state_bytes:16777216,maximum_state_nodes:300000,maximum_transition_bytes:32768,maximum_process_buffer_bytes:100663296});
+config.streams.maximum_total_bytes=32768;
 const data=config.grants.find(g=>g.requirement==='data');data.adapter.root='data';data.adapter.namespace='traffic-city-metropolis';data.sharing_domain='traffic-city-metropolis-data';
 Object.assign(data.adapter.limits,{maximum_value_bytes:1048576,maximum_transaction_bytes:2097152,maximum_scan_bytes:1048576});
 config.configuration={direct_origin:{kind:'text',value:publicOrigin},local_origin:{kind:'text',value:localOrigin},saved_city_limit:{kind:'text',value:'1024'}};

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Own native listeners and native save-history compaction. No game server in JS.
 set -euo pipefail
+umask 077
 cd -- "$(dirname -- "$0")/.."
 root=$PWD
 export METRO_DIR=${METRO_DIR:-"$root/runtime/metropolis-host"}
@@ -23,9 +24,20 @@ rotate(){ local file=$1; if [[ -f "$file" ]] && (( $(stat -c %s "$file") > 41943
 compact(){
  mkdir -p checkpoints
  local next="checkpoints/checkpoint-$(date -u +%Y%m%dT%H%M%S)-$$.native"
- "$bin" data backup --deployment "$METRO_DIR/session.json" --destination "$METRO_DIR/$next" >>maintenance.log 2>&1
+ "$bin" data verify --root "$METRO_DIR/data" >>maintenance.log 2>&1
+ "$bin" data backup --root "$METRO_DIR/data" --output "$METRO_DIR/$next" >>maintenance.log 2>&1
  chmod 600 "$next"
- "$bin" data restore --deployment "$METRO_DIR/session.json" --source "$METRO_DIR/$next" >>maintenance.log 2>&1
+ local staged
+ staged=$(mktemp -d "$METRO_DIR/restore-XXXXXXXX")
+ "$bin" data restore --backup "$METRO_DIR/$next" --root "$staged/data" >>maintenance.log 2>&1
+ "$bin" data verify --root "$staged/data" >>maintenance.log 2>&1
+ # Recoverable two-step exchange. prepare-metropolis restores data.retired if
+ # shutdown occurred between renames; it never initializes over that store.
+ [[ ! -e data.retired ]] || { echo 'Unresolved retired store; refusing compaction.' >&2; return 1; }
+ mv -- data data.retired
+ mv -- "$staged/data" data
+ rmdir -- "$staged"
+ rm -rf -- data.retired
  du -sk data | cut -f1 > compacted-kib
  mapfile -t copies < <(find checkpoints -maxdepth 1 -type f -name 'checkpoint-*.native' -printf '%f\n' | sort -r)
  for ((i=2;i<${#copies[@]};i++)); do rm -- "checkpoints/${copies[i]}"; done

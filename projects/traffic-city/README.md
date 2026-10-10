@@ -10,7 +10,7 @@ Ground and underground roads, explicit tunnel portals and one-way driving are in
 
 [Metropolis](docs/METROPOLIS.md) is a separate, playable native mode built around 256 population cohorts, bounded viewport projection and adaptive canvas LOD. It starts with 100,000 people and provides district road capacity, whole-corridor rail, population growth, funds and private saves. Native game/model/socket/browser tests pass locally, including four simultaneous million-person cities. It intentionally does not reproduce all classic mechanics or convert classic saves.
 
-Build it with `npm run build:metropolis`; its independent validation is `npm run test:metropolis`, `npm run test:metropolis-browser` and `npm run test:metropolis-soak`. The dedicated hosting scripts are prepared but their production/compaction test was blocked by the tool safety gate. **The public classic game has not been switched, and Metropolis is not claimed as deployed.** See the linked implementation record for exact results, approximations and operational status. The commands below still build and run classic Traffic City.
+Build it with `npm run build:metropolis`; its independent validation is `npm run test:metropolis`, `npm run test:metropolis-browser` and `npm run test:metropolis-soak`. The hosting and recovery lifecycle passes `npm run test:metropolis-host`. **The published entrypoint now opens Metropolis; classic remains at `/classic` with its saves retained.** Public-browser editing, saving and reload have been verified. See the linked implementation record for exact results, approximations and operational status. The commands below still build and run classic Traffic City.
 
 ## Build and run
 
