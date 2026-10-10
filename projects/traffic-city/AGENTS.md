@@ -10,6 +10,28 @@ Preserve requested = arrived + explicitly cancelled + outstanding journeys. Road
 
 Run the native build/check and npm test; run relevant browser, migration, rail, and scaling workloads when their behavior changes. Tests must use isolated runtime/ data. Never use an existing public preview or real browser profile by default. Downloads belong to tools/, built graphs to .build/, stores and artifacts to runtime/, reports to evidence/; all are private/generated and ignored.
 
-## Experimental scale policy
+## Atmosphere and performance policy
 
-Traffic City prioritizes low processing cost, responsive editing and attractive motion over microscopic simulation fidelity. The user explicitly permits aggressive approximation and aggregation, with a target population of 100,000. Scale work with bounded cohorts, network summaries and visible detail, not one resident object per person. Distinguish actual aggregate population from representative visual markers. Use local targeted validation; do not add expensive CI gates. The aggregate experiment is documented in `docs/mesoscopic-performance.md` and is not yet a replacement for the legacy session/save engine.
+Classic Traffic City is the product foundation and default public entrypoint.
+Preserve the small homes, workplaces, shops and parks, freely placed roads,
+footpaths, bridges, tunnels and one-way streets, tracks, stations and services,
+small cars turning along real roads, single-circle pedestrians, natural facility
+entrances, soft colors and the river. Watching this particular city is part of
+play. Player placement must continue to determine where people and trains move.
+
+Optimize reuse, off-screen work and snapshot-derived summaries before changing
+the picture or mechanics. Aggregation and approximation are allowed when they
+preserve these relationships. Do not remove street life through excessive actor
+sampling. A population of 100,000 is a long-term goal, not a release gate or an
+excuse to replace the game with fixed districts or inflate a displayed number.
+
+Metropolis is an explicit separate experiment at its own URL and in its own save
+space. Never make it the default instead of classic or describe its different
+rules as an equivalent speedup. Preserve both stores and browser keys. Keep
+validation local and targeted and CI lightweight.
+
+For presentation-only releases, verify every unchanged native source against the
+selected session artifact, check that selected graph, build the HTTP-only artifact
+with `npm run build:web`, and test both selections together using
+`HTTP_CITY_SELECTION`. Do not rebuild or restart a public session just to replace
+browser assets. Record exactly which source and artifact each result covers.

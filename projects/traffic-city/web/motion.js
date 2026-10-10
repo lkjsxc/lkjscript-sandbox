@@ -164,7 +164,7 @@ export class TileIndex {
    if(!layer&&c.kind===8)this.stations.push(c.id);
    if(c.q>(c.kind===1?5:c.kind===2?20:8))this.hot[layer].push(c);
   }
-  for(const hot of this.hot)hot.sort((a,b)=>b.q-a.q||a.id-b.id);
+  for(const hot of this.hot)hot.sort((a,b)=>b.q-a.q);
   this.revision++;this.cached=null;
  }
  query(layer,x0,y0,x1,y1){
@@ -172,7 +172,7 @@ export class TileIndex {
   const key=[this.revision,layer,x0,y0,x1,y1].join(':');if(this.cached?.key===key)return this.cached.cells;
   const cells=[];this.queryCount++;const buckets=this.layers[layer];
   if(buckets&&x0<=x1&&y0<=y1)for(let cy=Math.floor(y0/this.size);cy<=Math.floor(y1/this.size);cy++)for(let cx=Math.floor(x0/this.size);cx<=Math.floor(x1/this.size);cx++)for(const c of buckets.get(cx+cy*(128/this.size))||[]){this.visits++;const x=c.id%128,y=gridY(c.id);if(x>=x0&&x<=x1&&y>=y0&&y<=y1)cells.push(c)}
-  this.cached={key,cells};return cells;
+  cells.sort((a,b)=>a.id-b.id);this.cached={key,cells};return cells;
  }
 }
 
@@ -196,3 +196,15 @@ const railGeometryCache=new Map(),railObjectGeometry=new WeakMap();
 export function railGeometry(l){if(railObjectGeometry.has(l))return railObjectGeometry.get(l);const path=railPath(l),key=path.join(',');if(railGeometryCache.has(key)){const value=railGeometryCache.get(key);railObjectGeometry.set(l,value);return value}const points=path.map(id=>({x:id%128+.5,y:gridY(id)+.5})),out=[];const push=(p,index)=>out.push({...p,index});if(points.length)push(points[0],0);for(let i=1;i<points.length-1;i++){const a=points[i-1],p=points[i],b=points[i+1],ux=p.x-a.x,uy=p.y-a.y,vx=b.x-p.x,vy=b.y-p.y;if(ux===vx&&uy===vy){push(p,i);continue}const radius=.34,start={x:p.x-ux*radius,y:p.y-uy*radius},end={x:p.x+vx*radius,y:p.y+vy*radius};push(start,i-radius);for(let k=1;k<=12;k++){const t=k/12,u=1-t;push({x:u*u*start.x+2*u*t*p.x+t*t*end.x,y:u*u*start.y+2*u*t*p.y+t*t*end.y},i-radius+2*radius*t)}}if(points.length>1)push(points.at(-1),points.length-1);if(railGeometryCache.size>32)railGeometryCache.clear();railGeometryCache.set(key,out);railObjectGeometry.set(l,out);return out}
 export function railProgress(l){const path=railPath(l),a=Math.max(0,path.indexOf(l.from)),b=Math.max(0,path.indexOf(l.to));return a+(b-a)*(l.duration?clamp(l.elapsed/l.duration,0,1):1)}
 export function railPose(l,index){const points=railGeometry(l);if(points.length<2)return{x:l.a%128+.5,y:gridY(l.a)+.5,angle:0};let i=1;while(i<points.length-1&&points[i].index<index)i++;const a=points[i-1],b=points[i],t=clamp((index-a.index)/(b.index-a.index||1),0,1);return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,angle:Math.atan2(b.y-a.y,b.x-a.x)+(l.direction<0?Math.PI:0)}}
+
+// Snapshot-derived station paint; changing passengers and line state rebuild it
+// on every native frame. Train interpolation remains separate and live.
+export function railPresentation(stationIds,rails){
+ const assigned=new Set(),firstLine=new Map(),waiting=new Map();
+ for(const line of rails){
+  for(const id of railPath(line))assigned.add(id);
+  for(const [index,id] of (line.stops||[line.a,line.b]).entries())if(!firstLine.has(id))firstLine.set(id,{line,label:String(index+1)});
+  for(const p of line.platforms||[])waiting.set(p.station,(waiting.get(p.station)||0)+p.forward+p.reverse);
+ }
+ return{assigned,stations:stationIds.map(id=>({id,...(firstLine.get(id)||{line:null,label:'S'}),waiting:waiting.get(id)||0}))};
+}

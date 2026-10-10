@@ -6,11 +6,15 @@ This is one independent project in [lkjscript-sandbox](../../README.md). It star
 
 Ground and underground roads, explicit tunnel portals and one-way driving are integrated. Before taking a car onto a directed network, residents also need a connected car route home. See [the model, verification and measured costs](docs/DIRECTED-TUNNELS-STATUS.md) and [source-bound results](docs/DIRECTED-TUNNELS-RESULTS.json). Building or updating this checkout does not deploy it over an existing hosted city.
 
-## Metropolis: 100,000-person aggregate mode
+## Classic atmosphere and rendering
+
+Classic remains the foundation: freely placed streets and facilities, single-circle pedestrians, small turning cars, rail services and the soft river landscape. Rendering reuses visible tile queries, snapshot-derived congestion and station summaries, and static paint at both overview and detail scales. The actor sample, movement geometry, simulation and saves are unchanged. See [restoration and validation](docs/ATMOSPHERE.md).
+
+## Metropolis: separate aggregate experiment
 
 [Metropolis](docs/METROPOLIS.md) is a separate, playable native mode built around 256 population cohorts, bounded viewport projection and adaptive canvas LOD. It starts with 100,000 people and provides district road capacity, whole-corridor rail, population growth, funds and private saves. Native game/model/socket/browser tests pass locally, including four simultaneous million-person cities. It intentionally does not reproduce all classic mechanics or convert classic saves.
 
-Build it with `npm run build:metropolis`; its independent validation is `npm run test:metropolis`, `npm run test:metropolis-browser` and `npm run test:metropolis-soak`. The hosting and recovery lifecycle passes `npm run test:metropolis-host`. **The published entrypoint now opens Metropolis; classic remains at `/classic` with its saves retained.** Public-browser editing, saving and reload have been verified. See the linked implementation record for exact results, approximations and operational status. The commands below still build and run classic Traffic City.
+Build it with `npm run build:metropolis`; its independent validation is `npm run test:metropolis`, `npm run test:metropolis-browser` and `npm run test:metropolis-soak`. The hosting and recovery lifecycle passes `npm run test:metropolis-host`. **The published entrypoint opens classic Traffic City directly; `/classic` remains an alias. Metropolis is an opt-in experiment at `/metropolis`, with a separate retained save space.** Its numbers are not evidence that classic supports 100,000 residents. See the linked implementation record for exact results, approximations and operational status. The commands below still build and run classic Traffic City.
 
 ## Build and run
 
