@@ -5,6 +5,7 @@ from native import *
 def add_derived_facts(fn, test):
     travelling = eq(V('r.state'), I(2))
     driving = AND(OR(V('travelling'), AND(eq(V('r.state'), I(1)), C('road', get(V('world.tiles'), V('r.cell'))))), eq(V('r.mode'), I(2)))
+    occupies = OR(eq(V('r.state'), I(3)), eq(V('r.state'), I(4)), AND(eq(V('r.state'), I(2)), C('building', get(V('world.tiles'), V('r.cell')))))
     inside = IF(OR(eq(V('r.state'), I(3)), eq(V('r.state'), I(4)), AND(eq(V('r.state'), I(2)), C('building', get(V('world.tiles'), V('r.cell'))))), C('bump', V('f.inside'), V('r.cell'), I(1)), V('f.inside'))
     summary_fields = dict(
         q=IF(V('driving'), C('bump', V('f.q'), V('r.cell'), I(1)), V('f.q')),
@@ -35,7 +36,7 @@ def add_derived_facts(fn, test):
                ('oldhead', get(V('f.heads'), V('key'))),
                ('junction', IF(lt(I(0), get(V('world.junctions'), V('r.cell'))), C('junction-key', V('world'), V('r.cell')), IF(AND(lt(V('r.elapsed'), V('r.duration')), lt(I(0), get(V('world.junctions'), V('r.from')))), C('junction-key', V('world'), V('r.from')), I(-1)))),
            ], PATCH('Facts', V('f'), **admission_fields)),
-           PATCH('Facts', V('f'), inside=inside))))
+           IF(occupies, PATCH('Facts', V('f'), inside=C('bump', V('f.inside'), V('r.cell'), I(1))), V('f')))))
     # map-get-or is eager: construct its unchanged sentinel once per traversal,
     # not once per resident. Keep original identity order and missing-ID meaning.
     for name in ['summary', 'admission']:

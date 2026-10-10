@@ -57,22 +57,24 @@ fn('plan-choice',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'
  route=IF(V('byRail'),V('search.choice.accessRoute'),IF(eq(V('mode'),I(1)),V('walk.id'),V('car.id'))),mode=V('mode'),
  eta=IF(V('byRail'),V('search.choice.eta'),IF(eq(V('mode'),I(1)),V('etaWalk'),V('etaCar'))),elapsed=I(0),
  duration=IF(AND(eq(V('mode'),I(2)),V('origin')),C('game::car-access-time'),I(0)),**{'from':V('r.cell'),'to':V('r.cell')},wait=I(0),reason=IF(eq(V('mode'),I(2)),I(6),I(0)),lane=I(0),ready=V('tick'))))))))))
-# A zero-budget planning turn cannot allocate or alter a route. At a facility,
-# a missing required surface route forces the original planner to wait before
-# committing any rail choice. Preserve its destination and ETA observations,
-# and avoid enumerating every train for the hundreds of other waiting residents.
-# Fully cached choices, mid-route travel and returning drivers use the original
-# planner unchanged. The complete-state replay checks this fast path, not totals.
-fn('plan-choice-fast',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'),('m','Move')],'Move',IF(AND(le(V('m.budget'),I(0)),C('building',get(V('world.tiles'),V('r.cell'))),NOT(AND(eq(V('r.purpose'),I(4)),eq(V('r.mode'),I(2))))),LET([
- ('dest',C('destination',V('world'),V('r'))),('needCar',NOT(eq(V('r.purpose'),I(4))))],IF(lt(V('dest'),I(0)),C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m')),LET([
- ('p0',R(routes=V('m.routes'),lookup=V('m.lookup'),nextRoute=V('m.nextRoute'),budget=V('m.budget'),id=I(0))),
- ('walk',C('ensure-route',V('world'),V('sim.q'),V('r.cell'),V('dest'),I(1),V('p0'))),
- ('car',IF(V('needCar'),C('ensure-route',V('world'),V('sim.q'),V('r.cell'),V('dest'),I(2),V('walk')),PATCH('Plan',V('walk'),id=I(0))))],
- IF(C('planninggate::admitted',B(True),B(False),V('car.budget'),B(True),V('walk.id'),V('needCar'),V('car.id')),C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m')),
- LET([('etaWalk',IF(lt(I(0),V('walk.id')),C('estimate',V('world'),V('sim.q'),C('route',V('car.routes'),V('walk.id'))),I(-1))),('memo',C('car-estimate',V('world'),V('sim.q'),V('car.routes'),V('car.id'),V('m.estimates'))),('etaCar',V('memo.eta'))],C('wait-agent',PATCH('Move',V('m'),estimates=V('memo.values')),PATCH('Resident',V('r'),dest=V('dest'),etaWalk=V('etaWalk'),etaCar=V('etaCar')),I(8))))))),C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m'))))
+# Waiting residents keep their last diagnostic ETAs until planning can proceed.
+# Check cached route identity without constructing Plan or ETA records. A cached
+# household still departs immediately, even after the cycle's search budget ends.
+fn('cached-surface',[('world','World'),('m','Move'),('origin','I64'),('dest','I64'),('mode','I64')],'Bool',LET([
+ ('id',get(V('m.lookup'),C('route-signature',V('origin'),V('dest'),V('mode'))))],
+ IF(le(V('id'),I(0)),B(False),LET([('r',C('route',V('m.routes'),V('id')))],
+ AND(eq(V('r.version'),V('world.version')),eq(V('r.origin'),V('origin')),eq(V('r.dest'),V('dest')),eq(V('r.mode'),V('mode')))))))
+fn('plan-choice-fast',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'),('m','Move')],'Move',
+ IF(AND(le(V('m.budget'),I(0)),C('building',get(V('world.tiles'),V('r.cell'))),NOT(AND(eq(V('r.purpose'),I(4)),eq(V('r.mode'),I(2))))),
+ LET([('dest',C('destination',V('world'),V('r')))],
+ IF(AND(le(I(0),V('dest')),NOT(AND(C('cached-surface',V('world'),V('m'),V('r.cell'),V('dest'),I(1)),
+ OR(eq(V('r.purpose'),I(4)),C('cached-surface',V('world'),V('m'),V('r.cell'),V('dest'),I(2)))))),
+ C('wait-agent',V('m'),PATCH('Resident',V('r'),dest=V('dest')),I(8)),
+ C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m')))),
+ C('plan-choice',V('world'),V('sim'),V('tick'),V('r'),V('m'))))
 fn('plan-agent',[('world','World'),('sim','Sim'),('tick','I64'),('r','Resident'),('m','Move')],'Move',LET([
- ('p',C('rail::plan',V('m.transit'),V('r.id'))),('l',C('rail::line',V('m.transit'),V('p.line')))],
+ ('p',C('rail::plan',V('m.transit'),V('r.id')))],
  IF(lt(I(0),V('p.line')),
- IF(AND(eq(V('p.stage'),I(1)),OR(eq(V('l.id'),I(0)),NOT(V('l.enabled')))),C('plan-choice-fast',V('world'),V('sim'),V('tick'),PATCH('Resident',V('r'),mode=I(1)),PATCH('Move',V('m'),transit=C('rail::forget',V('m.transit'),V('r.id')))),C('rail-leg',V('world'),V('sim'),V('tick'),V('r'),V('m'))),
+ IF(IF(eq(V('p.stage'),I(1)),LET([('l',C('rail::line',V('m.transit'),V('p.line')))],OR(eq(V('l.id'),I(0)),NOT(V('l.enabled')))),B(False)),C('plan-choice-fast',V('world'),V('sim'),V('tick'),PATCH('Resident',V('r'),mode=I(1)),PATCH('Move',V('m'),transit=C('rail::forget',V('m.transit'),V('r.id')))),C('rail-leg',V('world'),V('sim'),V('tick'),V('r'),V('m'))),
  C('plan-choice-fast',V('world'),V('sim'),V('tick'),V('r'),V('m')))))
 fn('wait-train',[('r','Resident'),('m','Move')],'Move',IF(C('railtrain::fallback',V('m.transit'),V('r')),C('apply-agent',PATCH('Move',V('m'),transit=C('rail::forget',V('m.transit'),V('r.id'))),PATCH('Resident',V('r'),state=I(1),mode=I(1),route=I(0),step=I(0),elapsed=I(0),duration=I(0),wait=I(0),reason=I(8))),C('wait-agent',V('m'),V('r'),I(10))))

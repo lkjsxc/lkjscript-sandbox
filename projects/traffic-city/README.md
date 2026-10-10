@@ -10,6 +10,15 @@ Ground and underground roads, explicit tunnel portals and one-way driving are in
 
 Classic remains the foundation: freely placed streets and facilities, single-circle pedestrians, small turning cars, rail services and the soft river landscape. Rendering reuses visible tile queries, snapshot-derived congestion and station summaries, and static paint at both overview and detail scales. The actor sample, movement geometry, simulation and saves are unchanged. See [restoration and validation](docs/ATMOSPHERE.md).
 
+## Lower native simulation cost
+
+Driving now chooses a legal minimum-hop route and estimates its actual congested
+travel time. Waiting residents reuse their last diagnostic ETAs until planning can
+proceed; cached journeys still depart without waiting for a new search budget.
+Rail candidate screening and occupancy collection avoid unnecessary work without
+removing residents or changing street rendering. See [measurements, approximations
+and validation](docs/RELAXED-SIMULATION.md).
+
 ## Metropolis: separate aggregate experiment
 
 [Metropolis](docs/METROPOLIS.md) is a separate, playable native mode built around 256 population cohorts, bounded viewport projection and adaptive canvas LOD. It starts with 100,000 people and provides district road capacity, whole-corridor rail, population growth, funds and private saves. Native game/model/socket/browser tests pass locally, including four simultaneous million-person cities. It intentionally does not reproduce all classic mechanics or convert classic saves.

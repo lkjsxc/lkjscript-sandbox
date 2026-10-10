@@ -89,7 +89,7 @@ sets={
  'railpath':set('append-path segment path stops index distance service-direction next-stop ride queue-key travel-direction platform set-platform waiting-loop waiting track-put keys track-ids path-slice leg shares blocked'.split()),
  'railinfra':set('track-plan track-build station-build track-route create-service service-pair insert-stop add-stop'.split()),
  'railbuild':{'build','service'},
- 'railplan':{'candidate','candidate-pair','candidate-bounded','search','search-bounded','boarding-cost','lower-bound','can-improve','pair','pair-positions','pair-scan','ride-between'},
+ 'railplan':{'candidate','candidate-pair','candidate-bounded','search','search-bounded','boarding-cost','lower-bound','can-improve','pair','near-stop','pair-positions','pair-scan','ride-between'},
  'railqueue':{'enqueue','board','riders'},
  'railboarding':{'suspend-riders','depart'},
  'railtrain':{'step-line','tick','fallback'},
