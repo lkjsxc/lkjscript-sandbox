@@ -22,7 +22,7 @@
   (function create audience (visibility public)
     (parameter create value (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (text "<label class=\"audience\">公開範囲<select name=\"audience\"><option value=\"members\"") (if (call std::text-equal (local value) (text "members")) (text " selected") (text "")) (text ">メンバー限定</option><option value=\"public\"") (if (call std::text-equal (local value) (text "public")) (text " selected") (text "")) (text ">公開（誰でも閲覧）</option></select></label>")) (text ""))))
+    (body (call std::text-join (list Text (text "<label class=\"audience\">公開範囲<select name=\"audience\" aria-describedby=\"audience-help\"><option value=\"members\"") (if (call std::text-equal (local value) (text "members")) (text " selected") (text "")) (text ">メンバー限定</option><option value=\"public\"") (if (call std::text-equal (local value) (text "public")) (text " selected") (text "")) (text ">公開（誰でも閲覧）</option></select></label><p class=\"field-help scope-help\" id=\"audience-help\">メンバー限定は、この場所に登録した全員が対象です。フォロワー限定ではありません。公開ではログインしていない人も本文・添付を閲覧できます。</p>")) (text ""))))
 
   (function create set-member (visibility public)
     (parameter create items (type (list Text)))

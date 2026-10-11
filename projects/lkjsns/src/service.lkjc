@@ -18,6 +18,7 @@
     (requirement create objects (interface std::ObjectStorage)
       (operations std::ObjectStorage::put-new std::ObjectStorage::get std::ObjectStorage::range std::ObjectStorage::reconcile-put std::ObjectStorage::delete)
       (limits (maximum_calls 32 calls)))
+    (port create health (type (task-function (Request) Response (row))) (function health::respond))
     (port create view (type (task-function (Request) Response
       (row (requirement store) (requirement entropy) (requirement clock) (requirement config) (requirement passwords) (requirement bootstrap) (requirement streams) (requirement objects)))) (function http::view))
   ))

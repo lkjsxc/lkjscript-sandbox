@@ -1,0 +1,12 @@
+(module create health
+  (function create respond (visibility public)
+    (parameter create request (type Request))
+    (returns Response) (effect (task))
+    (body (record structural
+      (field status (i64 200))
+      (field headers (list Header
+        (call editor::header (text "content-type") (text "text/plain; charset=utf-8"))
+        (call editor::header (text "cache-control") (text "no-store"))
+        (call editor::header (text "x-content-type-options") (text "nosniff"))))
+      (field body (call std::bytes-from-text (text "lkjsns\n"))))))
+)

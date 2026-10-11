@@ -1,24 +1,32 @@
-# lkjsns — rebuild checkpoint
+# lkjsns — native local candidate
 
-Read README.md, docs/DESIGN.md and docs/CHECKPOINT.md before editing. This is an
-unfinished replacement, not the legacy private lkjsns application. The only HTTP
-route is currently a non-product boundary probe. Do not describe it as a deployed SNS.
+Read README.md, docs/DESIGN.md and docs/CHECKPOINT.md before editing. This replacement
+has a complete connected HTTP graph, but authenticated browser acceptance and public
+cutover remain unfinished. Do not describe native unit checks as a deployed SNS.
 
-Use the pinned, checksum-verified public lkjscript 0.1.89. Never invoke Codex tasks,
-Codex CLI or paid external APIs. Application behavior must remain native lkjscript;
-no Python/JavaScript server or tracked host-language source generator. Bash is
-build/operations tooling, not an application server. Native proposal fragments are
-reviewed bootstrap inputs; after authoring, the accepted graph is executable authority.
-Use public change draft/plan/apply, never edit canonical graph storage directly.
+Use pinned, checksum-verified public lkjscript 0.1.89. Never invoke Codex tasks,
+Codex CLI or paid external APIs. Application behavior stays native lkjscript; no
+Python/JavaScript server or tracked host-language source generator. Bash and jq are
+operations tooling. Use public change draft/plan/apply; never edit canonical graph
+storage directly. Preserve exact capability identities during staged graph assembly.
 
-Preserve the legacy repository, processes, user stores, secrets and public entrypoints.
-Never copy legacy private history or operational data into this public monorepo.
-Do not integrate or deploy this checkpoint before its missing routes and browser
-flows are implemented and verified. Media publication requires current ownership,
-completed data transactions and access checks at the direct delivery endpoint.
-Objects and metadata are separate authorities; their effects are not one transaction.
+Preserve legacy code, processes, data, secrets and public routes. Local prepare/run
+is not permission to expose a fixture or retire the old service. Do not merge or
+publicly deploy the replacement until the documented browser/media gates pass.
+Never publish old private history, operational records or development credentials.
 
-Generated graph stores, bundles, tools, logs, local credentials and development
-helpers belong in ignored directories. Commit only reviewed native sources,
-operational scripts, authored CSS and documentation. Maintain Japanese UI and
-English engineering documentation. No unrelated Traffic City edits or new expensive CI.
+Source selection must bind the complete source file set and bundle checksum, not
+only a list of files that happened to exist at an earlier build. Keep application
+artifacts and acceptance claims tied to the actual tested source. Newly authored
+functions are not automatically executed tests. Keep Japanese UI and English docs.
+
+Store metadata and object bytes are separate authorities. Publication requires a
+completed data transaction and current delivery ACL. Never put object effects inside
+a retryable metadata transaction, infer ownership from an opaque URL, silently change
+note audience, or discard typed input after a rejected write. A Drive folder is not
+an access-control boundary. The attachment shortcut requires an owned, ready file and
+an owned unpublished draft; its destination is an enum, never a supplied redirect URL.
+
+Keep generated graphs, bundles, data, secrets, logs, screenshots and optional developer
+tools ignored. No unrelated Traffic City changes, expensive CI, force pushes or
+rewriting someone else's work. Commit as lkjsxc and review publication content first.

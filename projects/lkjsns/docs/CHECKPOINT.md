@@ -1,129 +1,119 @@
-# Native rebuild checkpoint — 2026-10-11
+# Native local candidate — 2026-10-11
 
-## Delivery status
+## Delivery boundary
 
-This is an unfinished branch checkpoint. No replacement SNS has been deployed and no
-legacy repository, process, data store or public entrypoint was changed. The current
-native HTTP target has only GET `/`, returning `native boundary`. Do not use that probe
-as evidence that registration, social actions or media upload works through the browser.
+This branch now contains the connected native HTTP application, not a placeholder
+boundary response. It is a local candidate, not a completed public replacement.
+The legacy repository, users, data, media, process and public entrypoint were not
+imported, retired or changed. Authenticated browser and media acceptance remain open.
 
-The selected public release was re-read from GitHub Releases during this session:
-**v0.1.89**, published 2026-10-09 at 11:45:05 UTC. This is the latest **published
-release observed**, not a claim that it equals the latest development main.
-
+The pinned public executable is **lkjscript 0.1.89**. The published release was
+re-read during this work; this does not assert equality with development main.
 Archive SHA-256:
 `3b4ced16faa94142c3bcf70098be4168a462dc661d0d3095089dcfd9b0860418`
 
 Executable SHA-256:
 `e24c054f9b3e44a71a8875aba5385aad82dc391a1eae88a6c115fca75bc5c9a9`
 
-## Accepted native source
+## Changes since the connected-source checkpoint
 
-The development graph before clean reconstruction is:
+The graph now assembles successfully. Capability bootstrap owns a permanent health
+port while retaining the exact capability identities needed by application functions.
+The real HTTP target is added only after all router dependencies have been accepted.
+There is no temporary product responder and no canonical-store patching.
 
-```text
-repository repo_2e083a5f032af51c5428629cbd646ad8
-package    pkg_12f36b6a920873e8fcf561cff8d23702
-revision   rev_72b9f97f5e4fede1260d35897cce743b3536f9bbfe8911b764f8827a89b840f2
-state      semantic_state_dee0e467063425abd73ad07428b0220d85f6320babfd5a3af4e48d8ee79520fb
-```
+The media UI test source was reduced from 457,492 to 10,813 bytes by replacing
+repeatedly expanded fixture records with three private native functions. All twelve
+existing delivery-ACL cases remain. This is a build-source simplification, not a
+claim of an equivalent improvement in social-feed or media throughput.
 
-A fresh `check` of that exact graph passed **251 tests, 0 failures**, with production
-and reference results equal. There are **34 project-authored pure tests**: util 7,
-access 3, codec 22, compose 2; the other 217 come from the selected standard/template.
-Authentication and media lifecycle task effects were compiled but not tested through
-HTTP, real accounts, a real object adapter or a browser in this checkpoint.
+File details now expose the next action in the writing workflow. A successful upload
+shows that the file is saved, not posted. Metadata saves preserve the draft context.
+An owned ready file can be attached and return directly to the composer, or return
+without another mutation when already attached. Full selections explain the limit.
+The attachment destination is an enum, not an arbitrary redirect. The established
+transaction still updates both note attachments and reverse file references.
 
-Authored native modules include account/session/invite functions, conditional typed
-metadata storage, Eyes/bookmark/follow/mute/notification functions, text-note draft and
-version-conflict paths, and responsive page primitives. `drive` adds quota reservation,
-private object upload, metadata finalization, file edits, folder creation/rename,
-reference helpers and deletion states. `delivery` adds ACL-checked payload range reads.
+The composer labels its primary action Post and explains Members versus Public.
+Guests receive navigation they can actually use; the signed-in four-destination
+mobile layout is retained. The attachment picker remains part of Write. Success,
+error, focus and scope descriptions use explicit HTML semantics. Mobile controls use
+16px input text. These source changes do not establish accessibility conformance.
 
-## What remains unconnected
+Media request selection now ignores Range on HEAD and unknown range units. A supplied
+If-Range conservatively selects the full representation because no comparable media
+validator is implemented. Six pure tests cover these choices. Actual HEAD framing,
+range byte delivery and privacy revocation still require a populated HTTP fixture.
 
-- Implement the actual GET/POST router with strict Host, Origin, CSRF and form admission.
-  Bind completed transactions around mutations, and keep object effects outside them.
-- Implement and verify login/join, timelines, profile/settings/admin, notifications,
-  note details/replies and the working Drive screens. The layout/CSS is not browser-tested.
-- Connect persisted-draft attachment picking and atomic reverse references. Current
-  note save/delete explicitly reject notes containing media. The Drive reference
-  helpers exist but are not connected to those paths.
-- Preserve the draft context across upload completion. Current completion redirects
-  to file details without retaining a draft ID; the upload UI sketch must not hide this.
-- Verify real JPEG/PNG/GIF/WebP, MP4/WebM and audio, malformed input, range byte equality,
-  quota/conflict/interruption cleanup, privacy revocation, restart and backup/restore.
-- Decide and test the deployment descriptor, then expose a separate review entrypoint.
-  No new deployment descriptor or public URL is accepted at this checkpoint.
+The checked-in local preparation/run workflow initializes only an isolated development
+store and serves only loopback. It refuses accidental reinitialization and duplicate
+launchers. Selection verifies the complete source file set, bundle checksum and exact
+native graph revision. It is a local consistency check, not malicious-host attestation.
 
-The pure MIME code is signature recognition, not a complete decoder or codec guarantee.
-No EXIF removal, transcoding, thumbnailing, physical metadata-history erasure or
-federation is implemented. See the concrete risks in [DESIGN.md](DESIGN.md).
+## Evidence and its limits
 
-## Tool interruption
+Earlier connected candidates passed 308 native tests, then 328 after the workflow and
+navigation improvements. Those earlier counts are historical, not substitutes for
+checking the final delivery-method changes. Final selected-graph evidence is recorded
+below only after the corresponding commands complete.
 
-A combined call to correct and emit the in-progress Drive-view draft and plan its
-native modules was explicitly blocked with: “the safety of the request could not be
-verified.” That specific operation was not replayed through a different tool or path.
-Subsequent independent reads and verification of the previously accepted graph worked;
-it would be inaccurate to call the entire environment inaccessible.
+The separate selection-wrapper harness passed ten checks using synthetic files and a
+mock status command: exact selection, added/deleted/changed native source, modified
+bundle, linked source, noncanonical selection path, changed graph revision, missing
+check receipt, and restoration. This does not simulate authentication or object I/O.
+An actual stale-selection prepare attempt was rejected before creating a data store.
 
-The blocked operation did not change the accepted graph. The Drive UI sketch is not
-among the checked-in native fragments and must not be counted as implementation.
-Do not attempt to disguise or route around the blocked call. Continue only through
-permitted operations and report the exact boundary when a tool refuses an operation.
+Anonymous HTTP requests on the earlier connected native server verified public page
+responses, private-page redirects, strict Host/query admission and response policies.
+Guest login/home screenshots were captured from that earlier candidate. Only the
+initial login screenshot was visually reviewed; these are not populated or final-UI
+browser acceptance. Final local HTTP observations, when completed, appear below.
 
-## Reproduction and preservation
+Custom browser automation was rejected by the execution environment before account
+registration. No test account was created, and no authenticated browser run passed.
+A later read-only investigation was also denied; it was not treated as a passed test
+or retried through another execution path. Source editing and native builds continued
+where available. These blocks are workflow limitations, not evidence of app correctness.
 
-The checked-in Bash workflow reconstructs the accepted fragment set through the public
-CLI and keeps per-step requests, plans, acceptance results, graph, check output and
-bundle under an ignored `.build/bootstrap-*` directory. Re-running build creates new
-identities in a separate graph; a passing fresh result is evidence for that fresh graph,
-not identity equality with the development graph above.
+## Release gates still open
 
-Never publish private development helpers, runtime stores, credentials, installed
-binaries or full operational logs. The branch checkpoint is suitable for continuation,
-not main integration or production cutover. Use the current root AGENTS.md and this
-project's AGENTS.md, avoid paid tools/Codex execution, and preserve all unrelated work.
+Registration/invite exhaustion, login/logout, draft save and navigation, uploads,
+metadata editing, both attachment destinations, publication, replies, bookmarks,
+notification behavior and conflict recovery need real authenticated acceptance.
+Synthetic users and actual valid/malformed media must exercise the native data and
+object adapters, not only pure predicates or HTML strings.
 
-## Clean reconstruction completed
+Verify guest/wrong-user GET, HEAD and Range; exact payload bytes; range edge cases;
+reference-safe deletion; revocation after removing the final readable note; quota;
+interrupted-transfer cleanup; restart with populated data; and consistent backup and
+restore. Static or empty-store checks do not close any of those lifecycle gates.
 
-The new checked-in Bash workflow was run against the reviewed native fragments in a
-fresh graph, without the private authoring helper. It passed 251/251 differential
-tests and produced a detached checkpoint bundle. No listener or operational store
-was started.
+The media sniffer is not a full decoder. ISO-BMFF recognition, codec compatibility,
+bounded decoded dimensions, metadata handling and browser playback remain work.
+No transcoding, generated thumbnails, EXIF removal, email recovery, federation or
+physical deletion of retained metadata history is implemented by this checkpoint.
 
-Fresh repository: `repo_722f4ee55218494f1c05d291f10697e8`
-Fresh package: `pkg_ea4494c1b01b43cd0fd575c48e9071d0`
-Fresh revision: `rev_2ef54e3764a2504f4a661523c7106c7dafef0eb48eaa8225481f2ce8fd10e262`
-Bundle bytes: 4,297,338
-Bundle SHA-256: `7b45440dccf55bb193eb2d7823478e08f3b282d1cbc88f15b8f0accbaf0f1f4e`
+Review populated desktop/mobile light/dark screens, keyboard operation, zoom and
+screen readers. Only then expose a separate candidate and deliberately switch the
+old public entry. No public cutover or completed product acceptance is claimed here.
+See [OPERATIONS.md](OPERATIONS.md) and [USABLE-CORE.md](USABLE-CORE.md).
 
-The graph is fresh rather than byte-identical to the development graph. Both runs
-reported 106,699 production instructions and 60,956 reference expressions for the
-same 251 tests. This is pure test equivalence, not a server load or media benchmark.
+## Verified local run — continuation
 
-### Final publication-source reconstruction
+The exact selected graph `rev_532943fe7fdaec0eb8807d9e271fc7481d74d1bee186d115b5d2383bca175024`
+passed **334/334 native checks**, with production and reference execution equal.
+The selected bundle SHA-256 is
+`81d0d86eeb1eb0e154bac59e8c5a81ce7a97c87f99949afb61e78facb8eb581d`.
+A separate `./sandbox lkjsns check` against that selected graph also passed.
 
-After removing trailing formatting whitespace, the final native source files were
-reconstructed again from scratch and checked before publication. This is the selected
-checkpoint associated with the final staged sources; documentation-only changes do
-not change the selected source manifest.
+`./sandbox lkjsns prepare` created an isolated empty native data store and private
+bootstrap secret (file mode 0600), without initializing any account. The selected
+bundle was started using `./sandbox lkjsns run` on **127.0.0.1:19272**. The native
+service returned the expected ready event. Local HTTP smoke verification observed
+200 responses from `/healthz`, `/`, `/login`, `/join`, and `/style.css`; 303 redirects
+from `/compose`, `/drive`, `/drafts`, and `/settings` as an anonymous visitor;
+400 on an unknown query and wrong Host; and 403 on a POST from the wrong Origin.
+The process is a local-only development candidate, not a public deployment.
 
-`repo_63051abbbbd48f2173b829892f691bce`
-
-`pkg_84cde2f20cbc337ea0582c4cefad319b`
-
-`rev_d9cd7c4a8bac57dc68958581879ce1e19611c194d24c47a72f5a716b984ebb01`
-
-Tests: 251 passed, 0 failed, differential equal. Production instructions: 106,695;
-reference expressions: 60,953. These counters are reported observations, not a
-performance comparison between randomly re-identified fresh graphs.
-
-Bundle size: 4,301,426 bytes. Bundle SHA-256:
-`1c18b9cd254291156781112b4630d61babe9049f14919609501ecec109ebcac3`
-
-Repository validation passed for 485 staged source paths, including syntax,
-documentation links and dispatcher failure cases. A separate staged-path and
-credential-pattern scan passed for the 26 changed files. No runtime stores, private
-helpers, installed executable, binary bundle or credentials were included in Git.
+Authenticated end-to-end workflows, media delivery, populated accessibility and
+backup/restore remain unverified; they must not be inferred from these checks.

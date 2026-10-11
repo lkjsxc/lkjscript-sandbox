@@ -9,14 +9,10 @@ case "$task" in
   build) exec "$ROOT/ops/build.sh" ;;
   check|test)
     verify_runtime
-    [[ -f "$ROOT/.build/selection" && ! -L "$ROOT/.build/selection" ]] || { echo 'Run ./sandbox lkjsns build first.' >&2; exit 2; }
-    IFS= read -r selected < "$ROOT/.build/selection"
-    [[ "$selected" == "$ROOT"/.build/bootstrap-* && -d "$selected/project" && ! -L "$selected/project" ]] || { echo 'Invalid local graph selection.' >&2; exit 2; }
-    (cd "$ROOT" && sha256sum --check --status "$selected/sources.sha256") || { echo 'Sources changed after selection; rebuild or verify the actual accepted graph explicitly.' >&2; exit 2; }
+    source "$ROOT/ops/selection.sh"
+    verify_selection
     exec "$LKJ" --project "$selected/project" check ;;
-  run)
-    echo 'lkjsns is an unfinished checkpoint; public routing and browser flows are not ready. No listener was started.' >&2
-    exit 2 ;;
-  help|--help|-h) printf '%s\n' 'lkjsns checkpoint tasks: setup build check test' 'run deliberately refuses until end-to-end application verification.' ;;
+  prepare|run) exec "$ROOT/ops/development.sh" "$task" ;;
+  help|--help|-h) printf '%s\n' 'lkjsns tasks: setup build check test prepare run' 'prepare/run are local-only candidates, not a public deployment.' ;;
   *) printf 'Unknown lkjsns task: %s\n' "$task" >&2; exit 2 ;;
 esac

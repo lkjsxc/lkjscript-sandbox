@@ -9,10 +9,12 @@ link_http_target() {
   module=${modules[0]}
   "$LKJ" --project "$project" change draft --owner "$module" --output "$work/service.draft.lkjc" > "$work/service.draft.log"
   [[ "$(grep -c '^[[:space:]]*(component edit ' "$work/service.draft.lkjc")" == 1 ]]
-  if grep -q '^[[:space:]]*(port edit ' "$work/service.draft.lkjc"; then
-    echo 'Unexpected existing service port; refusing duplicate link.' >&2
+  # The only existing port is the permanent, non-routing health port. Preserve
+  # its exact identity; attach the real router as a second port in this draft.
+  [[ "$(grep -c '^[[:space:]]*(port edit ' "$work/service.draft.lkjc")" == 1 ]] || {
+    echo 'Expected exactly the existing health port.' >&2
     return 1
-  fi
+  }
   awk '
     /^    \(port create view/{copy=1}
     /^  \)\)/{copy=0}

@@ -65,8 +65,8 @@ Drafts, Notifications, Bookmarks, Members and Settings are secondary destination
 Desktop navigation may show all of them; mobile navigation should contain four stable
 primary entries, with the secondary destinations accessible from Settings or a menu.
 Avoid a landing-page hero or repeated promotional explanation inside the working app.
-The existing CSS is only a proposed visual system; no screenshot-backed UI review has
-been completed at this checkpoint.
+Static guest-page screenshots have been captured; authenticated, populated-layout
+acceptance is still required. See CHECKPOINT.md for exactly what ran.
 
 ## Composition must survive navigation
 
@@ -141,8 +141,7 @@ needed, malformed-container cases and real browser decoding tests. Reject HTML/S
 serve only admitted types with nosniff and a restrictive content policy. Do not claim
 malware scanning, EXIF removal, transcoding or thumbnail production exists.
 
-Authored metadata mutation functions are not reachable until the HTTP router exists.
-The router must reject incorrect Host/Origin, missing/duplicate/unknown form fields,
+The connected HTTP router has been implemented. Acceptance must verify that it rejects incorrect Host/Origin, missing/duplicate/unknown form fields,
 missing CSRF, anonymous access and unauthorized owners **before** effects. Destructive
 checkboxes must be enforced server-side, not merely marked `required` in HTML. Data
 transaction aborts must never yield a success redirect. Upload authorization must be

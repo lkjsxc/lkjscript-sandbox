@@ -1,0 +1,140 @@
+{
+  "artifact": "candidate.lkja",
+  "target": "lkjsns",
+  "listen": "127.0.0.1:19272",
+  "runtime": {
+    "maximum_concurrent_tasks": 8,
+    "maximum_queued_tasks": 32,
+    "request_deadline_milliseconds": 120000,
+    "shutdown_grace_milliseconds": 30000,
+    "cancellation_grace_milliseconds": 5000
+  },
+  "execution": {
+    "instruction_fuel": null,
+    "maximum_call_depth": 4096,
+    "maximum_value_stack": 1000000,
+    "maximum_allocated_bytes": null,
+    "maximum_collection_items": null,
+    "maximum_capability_calls": null
+  },
+  "http": {
+    "maximum_request_body_bytes": 33562624,
+    "maximum_response_body_bytes": 33562624,
+    "maximum_header_bytes": 32768,
+    "maximum_headers": 128
+  },
+  "session": null,
+  "worker": null,
+  "streams": {
+    "maximum_chunk_bytes": 65536,
+    "maximum_buffered_chunks": 8,
+    "maximum_total_bytes": 67108864,
+    "maximum_live_streams": 64
+  },
+  "configuration": {
+    "origin": {
+      "kind": "text",
+      "value": "http://127.0.0.1:19272"
+    }
+  },
+  "secrets": [
+    {
+      "name": "bootstrap-invite",
+      "variable": "LKJSNS_BOOTSTRAP_SECRET"
+    }
+  ],
+  "grants": [
+    {
+      "requirement": "store",
+      "sharing_domain": "lkjsns-store",
+      "authority_revision": "bd2aa81f648f12bbd9b8236bf4db33d2fb79639df06972ffcdacdc711cc3803e",
+      "adapter": {
+        "kind": "data",
+        "root": "data",
+        "namespace": "lkjsns",
+        "limits": {
+          "maximum_space_name_bytes": 128,
+          "maximum_key_parts": 16,
+          "maximum_key_bytes": 4096,
+          "maximum_value_bytes": 1048576,
+          "maximum_transaction_mutations": 128,
+          "maximum_transaction_bytes": 4194304,
+          "maximum_scan_items": 1024,
+          "maximum_scan_bytes": 4194304,
+          "maximum_scan_work": 100000,
+          "maximum_live_transactions": 32
+        }
+      }
+    },
+    {
+      "requirement": "entropy",
+      "sharing_domain": "lkjsns-entropy",
+      "authority_revision": "3f2f1423071bcf8a6cababb434f890f2d1a6d07db340944495d199b5ca6208a6",
+      "adapter": {
+        "kind": "secure_random"
+      }
+    },
+    {
+      "requirement": "clock",
+      "sharing_domain": "lkjsns-clock",
+      "authority_revision": "a4e2878cf8cbacb7be22de4f8ae904e6f5019720a2211fa4ab51331578fba48d",
+      "adapter": {
+        "kind": "wall_clock"
+      }
+    },
+    {
+      "requirement": "config",
+      "sharing_domain": "lkjsns-config",
+      "authority_revision": "2ba63f030ff7137191b89d1abf7af1e32cade9e1267250c5daba0ba86bbe21a6",
+      "adapter": {
+        "kind": "configuration"
+      }
+    },
+    {
+      "requirement": "passwords",
+      "sharing_domain": "lkjsns-passwords",
+      "authority_revision": "da915486c26a726b99ce3da1c0d0c0f0703264c60a0f894797ad54b14c82bc30",
+      "adapter": {
+        "kind": "password_hash",
+        "policy": {
+          "memory_kibibytes": 65536,
+          "iterations": 3,
+          "lanes": 1,
+          "output_bytes": 32
+        }
+      }
+    },
+    {
+      "requirement": "bootstrap",
+      "sharing_domain": "lkjsns-bootstrap",
+      "authority_revision": "979811b5667049a86aca24937973ccf8027142fa1b57fbb6593d9a92eca5bc01",
+      "adapter": {
+        "kind": "secret_verifier",
+        "secret": "bootstrap-invite",
+        "maximum_candidate_bytes": 64
+      }
+    },
+    {
+      "requirement": "streams",
+      "sharing_domain": "lkjsns-streams",
+      "authority_revision": "ec6291b8dfd0437332c793d4bebdba6cdb5416c0a4d884dfc5903ea626b62aaa",
+      "adapter": {
+        "kind": "byte_stream"
+      }
+    },
+    {
+      "requirement": "objects",
+      "sharing_domain": "lkjsns-objects",
+      "authority_revision": "1f77c3904ed437d363a5159e0a7f0a17f03040ef97eeca27ab8959fe8002e336",
+      "adapter": {
+        "kind": "object_local",
+        "root": "objects",
+        "prefix": "lkjsns",
+        "limits": {
+          "maximum_object_bytes": 33562624,
+          "maximum_whole_read_bytes": 33562624
+        }
+      }
+    }
+  ]
+}

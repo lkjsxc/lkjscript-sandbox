@@ -1,3 +1,6 @@
+> Historical authoring notes below. The current connected runtime and verification
+> state are recorded in [CHECKPOINT.md](CHECKPOINT.md). Do not interpret earlier unconnected-source status as current.
+
 # Workflow UX refinements
 
 These are implementation decisions and acceptance criteria, **not a visual review

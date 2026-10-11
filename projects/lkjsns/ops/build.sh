@@ -4,15 +4,12 @@
 set -euo pipefail
 source "$(dirname -- "$0")/runtime.sh"
 verify_runtime
+source "$ROOT/ops/selection.sh"
 umask 077
 mkdir -p "$ROOT/.build"
 work=$(mktemp -d "$ROOT/.build/bootstrap-XXXXXXXX")
 project="$work/project"
-(
-  cd "$ROOT"
-  find src -type f -name '*.lkjc' -print0 | sort -z | xargs -0 sha256sum
-  sha256sum web/style.css ops/*.sh project.sh
-) > "$work/sources.sha256"
+source_manifest > "$work/sources.sha256"
 "$LKJ" new "$project" --template web-editor --name lkjsns > "$work/new.log"
 apply_request() {
   local name=$1 input=$2 token
@@ -39,15 +36,18 @@ apply_fragment() {
   } > "$work/$name.request.lkjc"
   apply_request "$name" "$work/$name.request.lkjc"
 }
-# Requirements can be created before the executable port. This avoids a temporary
-# executable stub and breaks the capability/HTTP/UI bootstrap dependency cycle.
+# A component must own a port in the pinned runtime. Keep the permanent health
+# port during capability bootstrap, but create no target until the real HTTP
+# router and all of its dependencies have been accepted. Nothing is executable
+# or selectable as the SNS during these intermediate changes.
 [[ "$(grep -c '^    (port create view' "$ROOT/src/service.lkjc")" == 1 ]]
+[[ "$(grep -c '^    (port create health' "$ROOT/src/service.lkjc")" == 1 ]]
 [[ "$(grep -c '^(target create lkjsns' "$ROOT/src/service.lkjc")" == 1 ]]
 {
   awk '/^    \(port create view/{exit} {print}' "$ROOT/src/service.lkjc"
   printf '  ))\n'
 } > "$work/capabilities.lkjc"
-apply_fragment capabilities "$work/capabilities.lkjc"
+apply_fragment capabilities "$work/capabilities.lkjc" "$ROOT/src/health.lkjc"
 for name in util db page assets auth access codec social compose notes drive delivery; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
@@ -56,7 +56,7 @@ for name in controls navigation admission mediaui; do
 done
 # These two modules are one semantic dependency component, not separate mock APIs.
 apply_fragment journal-workflows "$ROOT/src/ui/journal.lkjc" "$ROOT/src/ui/journalview.lkjc"
-for name in attachments relations adminview accounts driveview mediaflow recovery; do
+for name in attachments relations adminview accounts fileactions driveview mediaflow recovery; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
 apply_fragment http "$ROOT/src/http.lkjc"
@@ -67,7 +67,7 @@ link_http_target
 "$LKJ" --project "$project" check | tee "$work/check.log"
 "$LKJ" --project "$project" build --output "$work/lkjsns.lkja" | tee "$work/build.log"
 sha256sum "$work/lkjsns.lkja" > "$work/artifact.sha256"
-(cd "$ROOT" && sha256sum --check --status "$work/sources.sha256") || {
+[[ "$(source_manifest)" == "$(cat "$work/sources.sha256")" ]] || {
   echo 'Source snapshot changed during the build; no selection was published.' >&2
   exit 1
 }

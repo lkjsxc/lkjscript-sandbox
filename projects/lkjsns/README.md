@@ -1,27 +1,31 @@
 # lkjsns
 
-A native lkjscript social application being rebuilt inside lkjscript-sandbox.
+A native lkjscript social application inside lkjscript-sandbox: chronological notes,
+replies, persistent drafts, and a reusable private Drive, with a Japanese interface.
 
-**Status: implementation checkpoint, not a usable or deployed SNS.** Authentication,
-text-social domain functions, a private-media lifecycle and byte-range delivery
-functions have been authored and accepted by public lkjscript **0.1.89**. The current
-HTTP target deliberately exposes only a `native boundary` probe. The replacement
-must not be deployed as a finished application.
+**Status: runnable local candidate, not a verified public replacement.** The complete
+HTTP application now builds on checksum-pinned **lkjscript 0.1.89**. Native tests and
+anonymous HTTP checks have run; authenticated browser flows have not. The legacy
+service, store, repository and public entrypoint remain unchanged. The exact evidence
+and remaining release gates are in [CHECKPOINT.md](docs/CHECKPOINT.md).
 
-The legacy private repository, running service, accounts and media-free store have
-not been changed or imported. See [checkpoint and remaining work](docs/CHECKPOINT.md).
+## Read, write, keep your place
 
-## Product direction
+Home is chronological and refreshes only when requested. Writing, saving a draft,
+selecting attachments and publishing are separate actions. Opening the picker saves
+the draft first. File details retain that draft context and offer an explicit return
+to the composer; uploading alone never publishes a note. Validation/conflict pages
+retain submitted text instead of pretending a rejected write succeeded.
 
-A chronological, invitation-only community with Japanese UI, reusable private Drive,
-photos, videos, audio, explicit publishing scopes and a small set of predictable
-controls. Preserve input before opening an attachment picker, show where files are
-used, and never interpret uploading as publishing. See [design decisions](docs/DESIGN.md).
+Drive has file cards, folders, kind/name filters, quota, descriptions, sensitive-media
+controls and reverse usage lists. An unposted ready file is owner-private, including
+its byte URL. Deletion is rejected while any note or draft references the file.
+See [product decisions](docs/DESIGN.md) and [usability decisions](docs/USABLE-CORE.md).
 
-## Reproduce the accepted native checkpoint
+## Build and check
 
-Linux x86-64, Bash, curl, tar, sha256sum and the ordinary core utilities are required.
-No Node.js or Python is required by the checked-in build workflow.
+Linux x86-64, Bash, curl, tar, sha256sum and ordinary core utilities are required.
+The application and checked-in build need neither Node.js nor Python.
 
 ```sh
 ./sandbox lkjsns setup
@@ -29,43 +33,52 @@ No Node.js or Python is required by the checked-in build workflow.
 ./sandbox lkjsns check
 ```
 
-Setup verifies both the archive and executable SHA-256. Build creates a new isolated
-native graph from the embedded `web-editor` foundation, applies the reviewed fragments
-through the public CLI, runs graph tests and writes a detached bundle. Build selects
-an output only after success. It does not initialize application data, acquire any
-legacy credentials, start a listener, or choose a public deployment.
+Build creates an isolated native graph using public proposal plan/apply operations,
+connects the real HTTP router, runs native tests, and builds a detached bundle. A
+selection is published only after success. Both source content and the entire source
+file set must still match before `check`, `prepare` or `run`. The bundle checksum is
+also checked. Build does not initialize a store, start a listener or deploy anything.
 
-`run` intentionally refuses: end-to-end routing and the new user-facing flows are not
-ready. `test` is an alias for native `check`, not a browser or datastore integration
-suite. The previous accepted graph passed **251 tests**, including **34 project-authored
-pure tests** and 217 inherited standard/template tests. This does not test account,
-media lifecycle or browser effects end-to-end.
+`test` is an alias for native `check`; it is not a browser acceptance suite.
 
-## Source boundaries
+## Start an isolated local candidate
 
-`src/` contains native declaration fragments; `web/style.css` is the authored design
-reference embedded in `src/assets.lkjc`. `ops/` owns the Bash build/verification entry
-points. Accepted graphs, installed runtimes and detached bundles remain untracked.
-The build retains each request, plan and acceptance result beside its selected graph.
+Local operations additionally require `jq` and `flock`. This recipe intentionally has
+no public-host option and does not change DNS, tunnels, proxy routes or the old app.
 
-The implementation separates social metadata in native DataStore from private bytes
-in ObjectStorage. Uploads reserve quota before object I/O, then become readable only
-after metadata publication. Rejected uploads are removed before quota is released.
-Interrupted uploads retain an explicit incomplete state rather than pretending to
-roll back an external object effect. These are implemented domain paths, not yet
-verified application-level guarantees.
+```sh
+./sandbox lkjsns prepare   # once; refuses to overwrite an existing store
+./sandbox lkjsns run       # foreground; localhost only, port 19272
+```
 
-## Known limitations
+Open `http://127.0.0.1:19272` from the same machine. In a remote workspace, this address
+is on the workspace, not the reader's computer. Do not make an unverified fixture
+public merely to access it. Private data is under `runtime/development/`, ignored by
+Git. The one-time bootstrap invitation is in `bootstrap.secret` inside that directory;
+it is never printed, committed or inserted into a URL by the launcher. The recipe
+creates no user account. Keep test data synthetic until acceptance is complete.
 
-The native compiler and pure checks pass, but **login, feeds, forms, Drive and direct
-media routes are not wired into the HTTP target**. Text-note saving currently rejects
-notes with media until atomic attachment/reference handling is connected. The staged
-Drive UI work is not part of this accepted checkpoint. There is no migration, public
-cutover, browser verification, federation, DM, passkey, email recovery, transcoding,
-thumbnail generation or metadata removal.
+Rebuilding then running stages a new content-addressed bundle without reinitializing
+that development store. Stop the foreground process before running a new candidate.
+The local process lock rejects a second launcher. See [operations](docs/OPERATIONS.md)
+for the distinction between local rehearsal, backup and production release.
 
-Planned initial limits are 32 MiB per file and 2 GiB charged storage per account, with
-four attachments per note. Only the per-file/quota domain checks are currently
-implemented; the attachment limit is a design decision awaiting its write path.
-Native data history is retained, so logical deletion is not a promise of physical
-history or backup erasure. Do not put real private data into a development fixture.
+## Boundaries and limits
+
+All application behavior, HTML generation, authentication, metadata transactions,
+media access checks and HTTP routing are native lkjscript. CSS is authored in
+`web/style.css` and embedded in `src/assets.lkjc`. Bash/jq are operations tooling,
+not an application backend. Accepted graphs, bundles, local credentials, data, logs,
+screenshots and optional development helpers stay out of Git.
+
+Initial limits are 32 MiB of media payload, 2 GiB of charged storage per account and
+four attachments per note. Incomplete reservations count against quota. Object I/O
+and metadata are separate authorities, with explicit intermediate states rather
+than a claimed cross-store rollback. These limits are not measured capacity.
+
+There is no federation, direct messaging, passkey/email recovery, transcoding,
+thumbnail service, EXIF removal or guarantee of codec compatibility. Signature checks
+are not full decoding. HTTP media GET/HEAD/Range, authenticated revocation, interrupted
+upload cleanup, restart with populated data and backup/restore still require end-to-end
+acceptance. Logical deletion does not physically erase retained metadata history or
+backups. Do not treat this local candidate as production-ready.

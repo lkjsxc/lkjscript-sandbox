@@ -1,26 +1,18 @@
-# Unconnected workflow proposal fragments
+# Connected native interface
 
-These native lkjscript fragments are **source-only continuation work**, not an
-accepted application graph. The current `ops/build.sh` deliberately does not load
-this directory. The HTTP target still serves only the original boundary probe.
+These UI modules are included in the native HTTP application built by
+`../../sandbox lkjsns build` from the repository root. They are no longer
+unconnected proposals. The exact runnable status and release gates are recorded
+in [the current checkpoint](../../docs/CHECKPOINT.md).
 
-Read [the continuation record](../../docs/WORKFLOWS.md) and
-[the UX refinements](../../docs/WORKFLOW-UX.md) before changing or connecting them.
-The original project AGENTS.md and release gates continue to apply.
+`controls` and `admission` handle strict, escaped form controls and field-set
+admission. `journal` and `journalview` implement versioned text notes, editing,
+recovery, feeds, details, replies and bookmarks. `attachments` and `fileactions`
+connect owned drafts to ready private Drive files; both sides of the reference are
+updated in the same native data transaction. `mediaui` renders owned originals,
+attachment views and explicit sensitive-media disclosure. These modules must not
+be called outside the router's session, form, ownership and transaction gates.
 
-`controls` contains escaped form controls, explicit membership state, and exact
-field-set admission helpers. `journal` proposes text-note mutations. `journalview`
-contains the corresponding composer, recovery, chronological feed, permalink,
-reply-list and bookmark view functions. There are 25 functions and 11 unexecuted
-pure test declarations across the three modules.
-
-Do not call `journal` mutations directly from an HTTP route. They require a freshly
-validated session, exact form admission, ownership checks and a router-owned,
-completed native data transaction. The proposed responses are tentative until
-that transaction commits. No such router is delivered here. A planning receipt is
-not graph acceptance, a passing test, a working account or a deployed service.
-
-Do not reuse ignored development generators: some are incomplete and others
-would overwrite later source corrections. The reviewed fragments themselves,
-not those helpers, are the continuation inputs. Native planning and tests of the
-final source remain outstanding.
+Successful native unit tests are not a substitute for authenticated browser,
+media-byte, recovery and populated-layout acceptance. Preserve test evidence
+and keep generated stores and credentials out of the repository.
