@@ -109,7 +109,7 @@
         (if (field (local user) (name suspended)) (call page::error (i64 404) (text "Member not found."))
           (let (binding listing (call db::listing (call std::text-join (list Text (text "author/") (field (local user) (name handle))) (text ""))
                     (call util::query (local request) (text "cursor")) (i64 30)))
-            (in (call page::ok (local ctx) (field (local user) (name display))
+            (in (call page::ok-at (local ctx) (field (local user) (name display)) (text "Profile")
               (call std::text-join (list Text (text "<section class=\"panel profile\">")
                 (call page::avatar (field (local user) (name handle)))
                 (text "<h2>") (call std::html-escape-text (field (local user) (name display)))

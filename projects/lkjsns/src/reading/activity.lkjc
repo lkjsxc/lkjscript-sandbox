@@ -1,0 +1,113 @@
+(module create activity
+  (function create valid-filter (visibility public)
+    (parameter create filter (type Text))
+    (returns Bool) (effect pure)
+    (body (call util::has (list Text (text "") (text "replies") (text "likes") (text "follows")) (local filter) (i64 0))))
+
+  (function create matches (visibility public)
+    (parameter create filter (type Text))
+    (parameter create kind (type Text))
+    (returns Bool) (effect pure)
+    (body (if (call std::text-equal (local filter) (text "")) (call util::has (list Text (text "reply") (text "eyes") (text "follow")) (local kind) (i64 0)) (if (call std::text-equal (local filter) (text "replies")) (call std::text-equal (local kind) (text "reply")) (if (call std::text-equal (local filter) (text "likes")) (call std::text-equal (local kind) (text "eyes")) (if (call std::text-equal (local filter) (text "follows")) (call std::text-equal (local kind) (text "follow")) (bool false)))))))
+
+  (function create label (visibility public)
+    (parameter create kind (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::text-equal (local kind) (text "follow")) (text "followed you") (if (call std::text-equal (local kind) (text "reply")) (text "replied to your post") (text "liked your post")))))
+
+  (function create base (visibility public)
+    (parameter create filter (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::text-equal (local filter) (text "")) (text "/notifications?") (call std::text-join (list Text (text "/notifications?kind=") (local filter) (text "&")) (text "")))))
+
+  (function create tabs (visibility public)
+    (parameter create filter (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<div class=\"feed\"><nav class=\"tabs activity-tabs\" aria-label=\"Activity filter\">") (call page::link (text "/notifications") (text "All") (text "") (call std::text-equal (local filter) (text ""))) (call page::link (text "/notifications?kind=replies") (text "Replies") (text "") (call std::text-equal (local filter) (text "replies"))) (call page::link (text "/notifications?kind=likes") (text "Likes") (text "") (call std::text-equal (local filter) (text "likes"))) (call page::link (text "/notifications?kind=follows") (text "Follows") (text "") (call std::text-equal (local filter) (text "follows"))) (text "</nav></div>")) (text ""))))
+
+  (function create row (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create notice (type Notice))
+    (parameter create actor (type User))
+    (parameter create note (type Note))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<a class=\"activity-row\" href=\"") (if (call std::text-equal (field (local notice) (name kind)) (text "follow")) (call std::text-join (list Text (text "/profile?user=") (field (local notice) (name actor))) (text "")) (call std::text-join (list Text (text "/note?id=") (field (local notice) (name note)) (text "")) (text ""))) (text "\">") (call page::avatar (field (local notice) (name actor))) (text "<span class=\"activity-content\"><span class=\"activity-title\"><strong>") (call std::html-escape-text (field (local actor) (name display))) (text "</strong> ") (call activity::label (field (local notice) (name kind))) (text "</span><span class=\"meta\">@") (call std::html-escape-text (field (local notice) (name actor))) (text " · ") (call page::ago (field (local ctx) (name now)) (field (local notice) (name at))) (text "</span>") (if (call std::text-equal (field (local notice) (name kind)) (text "follow")) (text "") (call std::text-join (list Text (text "<span class=\"activity-preview\">") (call std::html-escape-text (call conversation::summary (local note))) (text "</span>")) (text ""))) (text "</span>") (call page::icon (if (call std::text-equal (field (local notice) (name kind)) (text "follow")) (text "people") (if (call std::text-equal (field (local notice) (name kind)) (text "reply")) (text "reply") (text "arrow")))) (text "</a>")) (text ""))))
+
+  (function create rows (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create viewer (type User))
+    (parameter create ids (type (list Text)))
+    (parameter create index (type I64))
+    (parameter create filter (type Text))
+    (parameter create out (type Text))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (if (call std::less (local index) (call std::list-length (types Text) (local ids))) (let (binding notice (call db::notice (call std::list-get (types Text) (local ids) (local index)))) (binding actor (call db::user (field (local notice) (name actor)))) (binding note (call db::note (field (local notice) (name note)))) (in (call activity::rows (local ctx) (local viewer) (local ids) (call std::add (local index) (i64 1)) (local filter) (if (if (call util::handle (field (local actor) (name handle))) (if (call std::bool-not (field (local actor) (name suspended))) (if (call std::bool-not (call util::has (field (local viewer) (name muted)) (field (local notice) (name actor)) (i64 0))) (if (call activity::matches (local filter) (field (local notice) (name kind))) (if (if (call std::text-equal (field (local notice) (name kind)) (text "follow")) (bool true) (if (call access::visible (local ctx) (local note)) (if (field (local note) (name published)) (bool true) (bool false)) (bool false))) (bool true) (bool false)) (bool false)) (bool false)) (bool false)) (bool false)) (call std::text-join (list Text (local out) (call activity::row (local ctx) (local notice) (local actor) (local note))) (text "")) (local out))))) (local out))))
+
+  (function create scan-next (visibility public)
+    (parameter create rows (type Text))
+    (parameter create next (type I64))
+    (parameter create remaining (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::text-equal (local rows) (text "")) (if (call std::less-equal (i64 0) (local next)) (if (call std::less (i64 1) (local remaining)) (if (call std::less-equal (local remaining) (i64 4)) (bool true) (bool false)) (bool false)) (bool false)) (bool false))))
+
+  (function create collection (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create viewer (type User))
+    (parameter create filter (type Text))
+    (parameter create cursor (type Text))
+    (parameter create remaining (type I64))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (let (binding listing (call db::listing (call std::text-join (list Text (text "notice/") (field (local ctx) (name user))) (text "")) (local cursor) (i64 30))) (binding rows (call activity::rows (local ctx) (local viewer) (field (local listing) (name ids)) (i64 0) (local filter) (text ""))) (in (if (call activity::scan-next (local rows) (field (local listing) (name next)) (local remaining)) (call activity::collection (local ctx) (local viewer) (local filter) (call std::i64-to-text (field (local listing) (name next))) (call std::subtract (local remaining) (i64 1))) (call std::text-join (list Text (text "<section class=\"feed activity-list\" aria-label=\"Activity\">") (if (call std::text-equal (local rows) (text "")) (if (call std::less-equal (i64 0) (field (local listing) (name next))) (text "<div class=\"empty\"><h2>No matching activity on this page</h2><p>Older activity may match this filter. Continue to the next page.</p></div>") (call page::empty (text "No activity to show") (text "Replies, likes, and follows appear here. Hidden or unavailable posts are not shown.") (text "/") (text "Back to Home"))) (local rows)) (text "</section>") (call page::pager (field (local listing) (name next)) (call activity::base (local filter)))) (text "")))))))
+
+  (function create view (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create request (type Request))
+    (returns Response) (effect (task (requirement service::app::store)))
+    (body (let (binding filter (call util::query (local request) (text "kind"))) (in (if (call activity::valid-filter (local filter)) (let (binding viewer (call db::user (field (local ctx) (name user)))) (in (call page::ok (local ctx) (text "Notifications") (call std::text-join (list Text (call activity::tabs (local filter)) (text "<p class=\"context-hint\">Replies, likes, and follows. Newest first, without interruptions.</p>") (call activity::collection (local ctx) (local viewer) (local filter) (call util::query (local request) (text "cursor")) (i64 4))) (text ""))))) (call page::error (i64 400) (text "Choose All, Replies, Likes, or Follows.")))))))
+
+  (test create filter-8 (visibility private)
+    (actual (call activity::matches (text "") (text "reply"))) (expected (bool true)))
+
+  (test create filter-9 (visibility private)
+    (actual (call activity::matches (text "") (text "unknown"))) (expected (bool false)))
+
+  (test create filter-10 (visibility private)
+    (actual (call activity::matches (text "replies") (text "reply"))) (expected (bool true)))
+
+  (test create filter-11 (visibility private)
+    (actual (call activity::matches (text "replies") (text "eyes"))) (expected (bool false)))
+
+  (test create filter-12 (visibility private)
+    (actual (call activity::matches (text "likes") (text "eyes"))) (expected (bool true)))
+
+  (test create filter-13 (visibility private)
+    (actual (call activity::matches (text "likes") (text "follow"))) (expected (bool false)))
+
+  (test create filter-14 (visibility private)
+    (actual (call activity::matches (text "follows") (text "follow"))) (expected (bool true)))
+
+  (test create filter-15 (visibility private)
+    (actual (call activity::matches (text "follows") (text "reply"))) (expected (bool false)))
+
+  (test create filter-16 (visibility private)
+    (actual (call activity::matches (text "//bad") (text "follow"))) (expected (bool false)))
+
+  (test create filter-refuses-query-injection (visibility private)
+    (actual (call activity::valid-filter (text "likes&admin=1"))) (expected (bool false)))
+
+  (test create filter-retains-pagination (visibility private)
+    (actual (call activity::base (text "replies"))) (expected (text "/notifications?kind=replies&")))
+
+  (test create all-retains-pagination (visibility private)
+    (actual (call activity::base (text ""))) (expected (text "/notifications?")))
+  (test create scan-empty-window (visibility private)
+    (actual (call activity::scan-next (text "") (i64 10) (i64 4))) (expected (bool true)))
+  (test create stop-at-rendered-rows (visibility private)
+    (actual (call activity::scan-next (text "visible") (i64 10) (i64 4))) (expected (bool false)))
+  (test create stop-at-budget (visibility private)
+    (actual (call activity::scan-next (text "") (i64 10) (i64 1))) (expected (bool false)))
+  (test create stop-at-end (visibility private)
+    (actual (call activity::scan-next (text "") (i64 -1) (i64 4))) (expected (bool false)))
+  (test create refuse-unbounded-budget (visibility private)
+    (actual (call activity::scan-next (text "") (i64 10) (i64 999))) (expected (bool false)))
+)

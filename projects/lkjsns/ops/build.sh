@@ -54,6 +54,9 @@ done
 for name in controls navigation admission mediaui; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
+for name in conversation activity; do
+  apply_fragment "$name" "$ROOT/src/reading/$name.lkjc"
+done
 # These two modules are one semantic dependency component, not separate mock APIs.
 apply_fragment journal-workflows "$ROOT/src/ui/journal.lkjc" "$ROOT/src/ui/journalview.lkjc"
 for name in attachments relations adminview accounts fileactions driveview mediaflow recovery; do

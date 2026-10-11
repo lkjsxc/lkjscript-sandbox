@@ -50,7 +50,12 @@ done
 curl --fail --silent "$LKJSNS_TEST_URL/healthz" >/dev/null
 printf 'Fixture: %s\nEvidence: %s\nBundle SHA256: %s\n' "$LKJSNS_TEST_FIXTURE" "$LKJSNS_TEST_OUTPUT" "$selected_sha"
 sha256sum "$ROOT"/tests/browser/*.cjs > "$LKJSNS_TEST_OUTPUT/test-sources.sha256"
-for test in media-fixtures account-smoke flows reading-context layout-security; do
+for test in media-fixtures account-smoke flows reading-context conversation-activity layout-security; do
   node "$ROOT/tests/browser/$test.cjs" 2>&1 | tee "$LKJSNS_TEST_OUTPUT/$test.log"
 done
+if [[ -n "${LKJSNS_AXE:-}" ]]; then
+  node "$ROOT/tests/browser/accessibility.cjs" 2>&1 | tee "$LKJSNS_TEST_OUTPUT/accessibility.log"
+else
+  printf 'Optional axe audit not run. Set LKJSNS_AXE to an installed axe.min.js.\n'
+fi
 printf 'All selected browser suites completed. Public services were not changed.\n'
