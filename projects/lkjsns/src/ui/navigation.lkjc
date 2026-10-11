@@ -1,0 +1,34 @@
+(module create navigation
+  (function create unreserved (visibility public)
+    (parameter create byte (type I64))
+    (returns Bool) (effect pure)
+    (body (if (if (call std::less-equal (i64 48) (local byte)) (if (call std::less-equal (local byte) (i64 57)) (bool true) (bool false)) (bool false)) (bool true) (if (if (call std::less-equal (i64 65) (local byte)) (if (call std::less-equal (local byte) (i64 90)) (bool true) (bool false)) (bool false)) (bool true) (if (if (call std::less-equal (i64 97) (local byte)) (if (call std::less-equal (local byte) (i64 122)) (bool true) (bool false)) (bool false)) (bool true) (if (call std::i64-equal (local byte) (i64 45)) (bool true) (if (call std::i64-equal (local byte) (i64 46)) (bool true) (if (call std::i64-equal (local byte) (i64 95)) (bool true) (if (call std::i64-equal (local byte) (i64 126)) (bool true) (bool false))))))))))
+
+  (function create encode-bytes (visibility public)
+    (parameter create bytes (type Bytes))
+    (parameter create index (type I64))
+    (parameter create out (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::less (local index) (call std::bytes-length (local bytes))) (let (binding byte (call std::bytes-get (local bytes) (local index))) (binding single (call std::bytes-from-list (list I64 (local byte)))) (in (call navigation::encode-bytes (local bytes) (call std::add (local index) (i64 1)) (call std::text-join (list Text (local out) (if (call navigation::unreserved (local byte)) (call std::bytes-to-text (local single)) (call std::text-join (list Text (text "%") (call std::bytes-to-hex (local single))) (text "")))) (text ""))))) (local out))))
+
+  (function create encode (visibility public)
+    (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (call navigation::encode-bytes (call std::bytes-from-text (local value)) (i64 0) (text ""))))
+
+  (function create option (visibility public)
+    (parameter create value (type Text))
+    (parameter create label (type Text))
+    (parameter create selected (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "<option value=\"") (call std::html-escape-text (local value)) (text "\"") (if (call std::text-equal (local value) (local selected)) (text " selected") (text "")) (text ">") (call std::html-escape-text (local label)) (text "</option>")) (text ""))))
+
+  (test create query-escaping (visibility private)
+    (actual (call navigation::encode (text "a&b=c +/"))) (expected (text "a%26b%3dc%20%2b%2f")))
+
+  (test create utf8-query (visibility private)
+    (actual (call navigation::encode (text "写真"))) (expected (text "%e5%86%99%e7%9c%9f")))
+
+  (test create unreserved-query (visibility private)
+    (actual (call navigation::encode (text "hello-_.~123"))) (expected (text "hello-_.~123")))
+)

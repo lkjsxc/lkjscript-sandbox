@@ -1,0 +1,73 @@
+(module create admission
+  (function create fields (visibility public)
+    (parameter create intent (type Text))
+    (returns (list Text)) (effect pure)
+    (body (if (call std::text-equal (local intent) (text "login")) (list Text (text "intent") (text "csrf") (text "handle") (text "password")) (if (call std::text-equal (local intent) (text "join")) (list Text (text "intent") (text "csrf") (text "handle") (text "password") (text "confirm") (text "invite")) (if (call std::text-equal (local intent) (text "logout")) (list Text (text "intent") (text "csrf")) (if (call std::text-equal (local intent) (text "profile")) (list Text (text "intent") (text "csrf") (text "version") (text "display") (text "bio")) (if (call std::text-equal (local intent) (text "password")) (list Text (text "intent") (text "csrf") (text "old") (text "password") (text "confirm")) (if (call std::text-equal (local intent) (text "invite")) (list Text (text "intent") (text "csrf") (text "label") (text "uses") (text "days")) (if (call std::text-equal (local intent) (text "revoke-invite")) (list Text (text "intent") (text "csrf") (text "id")) (if (call std::text-equal (local intent) (text "note")) (list Text (text "intent") (text "csrf") (text "id") (text "version") (text "reply") (text "body") (text "cw") (text "audience") (text "mode")) (if (call std::text-equal (local intent) (text "delete-note")) (list Text (text "intent") (text "csrf") (text "id") (text "version") (text "confirm")) (if (call std::text-equal (local intent) (text "eyes")) (list Text (text "intent") (text "csrf") (text "id") (text "enabled")) (if (call std::text-equal (local intent) (text "bookmark")) (list Text (text "intent") (text "csrf") (text "id") (text "enabled")) (if (call std::text-equal (local intent) (text "follow")) (list Text (text "intent") (text "csrf") (text "handle") (text "enabled")) (if (call std::text-equal (local intent) (text "mute")) (list Text (text "intent") (text "csrf") (text "handle") (text "enabled")) (if (call std::text-equal (local intent) (text "file")) (list Text (text "intent") (text "csrf") (text "id") (text "version") (text "name") (text "alt") (text "folder") (text "sensitive") (text "draft")) (if (call std::text-equal (local intent) (text "delete-file")) (list Text (text "intent") (text "csrf") (text "id") (text "version") (text "confirm") (text "draft")) (if (call std::text-equal (local intent) (text "folder")) (list Text (text "intent") (text "csrf") (text "id") (text "version") (text "name")) (if (call std::text-equal (local intent) (text "attach")) (list Text (text "intent") (text "csrf") (text "draft") (text "id") (text "version") (text "enabled")) (list Text))))))))))))))))))))
+
+  (function create valid (visibility public)
+    (parameter create form (type Form))
+    (returns Bool) (effect pure)
+    (body (if (call util::has (list Text (text "login") (text "join") (text "logout") (text "profile") (text "password") (text "invite") (text "revoke-invite") (text "note") (text "delete-note") (text "eyes") (text "bookmark") (text "follow") (text "mute") (text "file") (text "delete-file") (text "folder") (text "attach")) (call util::value (local form) (text "intent")) (i64 0)) (if (call controls::schema (local form) (call admission::fields (call util::value (local form) (text "intent")))) (bool true) (bool false)) (bool false))))
+
+  (function create guest (visibility public)
+    (parameter create intent (type Text))
+    (returns Bool) (effect pure)
+    (body (if (call std::text-equal (local intent) (text "login")) (bool true) (if (call std::text-equal (local intent) (text "join")) (bool true) (bool false)))))
+
+  (function create optional-fields (visibility public)
+    (parameter create form (type Form))
+    (parameter create names (type (list Text)))
+    (returns Bool) (effect pure)
+    (body (if (field (local form) (name valid)) (if (call util::unique (field (local form) (name items)) (i64 0)) (if (call controls::allowed (field (local form) (name items)) (local names) (i64 0)) (bool true) (bool false)) (bool false)) (bool false))))
+
+  (function create query (visibility public)
+    (parameter create request (type Request))
+    (parameter create names (type (list Text)))
+    (returns Bool) (effect pure)
+    (body (call admission::optional-fields (call util::parse (call std::bytes-from-text (field (local request) (name query)))) (local names))))
+
+  (test create login-complete (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=login&csrf=&handle=alice&password=long-password"))))) (expected (bool true)))
+
+  (test create login-missing-password (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=login&csrf=&handle=alice"))))) (expected (bool false)))
+
+  (test create unknown-intent (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=unknown&csrf="))))) (expected (bool false)))
+
+  (test create duplicate-intent (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=login&intent=join&csrf=&handle=alice&password=long-password"))))) (expected (bool false)))
+
+  (test create duplicate-csrf (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=logout&csrf=a&csrf=a"))))) (expected (bool false)))
+
+  (test create unexpected-owner (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=logout&csrf=a&owner=alice"))))) (expected (bool false)))
+
+  (test create logout-complete (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=logout&csrf=a"))))) (expected (bool true)))
+
+  (test create note-complete (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=note&csrf=a&id=b&version=0&reply=&body=hello&cw=&audience=members&mode=publish"))))) (expected (bool true)))
+
+  (test create delete-without-confirm (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=delete-file&csrf=a&id=b&version=0"))))) (expected (bool false)))
+
+  (test create attach-complete (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=attach&csrf=a&draft=b&id=c&version=1&enabled=1"))))) (expected (bool true)))
+
+  (test create duplicate-query (visibility private)
+    (actual (call admission::optional-fields (call util::parse (call std::bytes-from-text (text "id=a&id=b"))) (list Text (text "id")))) (expected (bool false)))
+
+  (test create empty-query (visibility private)
+    (actual (call admission::optional-fields (call util::parse (call std::bytes-from-text (text ""))) (list Text (text "id")))) (expected (bool true)))
+
+  (test create file-context-complete (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=file&csrf=a&id=b&version=1&name=photo&alt=&folder=&sensitive=no&draft="))))) (expected (bool true)))
+
+  (test create file-duplicate-context-denied (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=file&csrf=a&id=b&version=1&name=photo&alt=&folder=&sensitive=no&draft=c&draft=d"))))) (expected (bool false)))
+
+  (test create file-delete-context-complete (visibility private)
+    (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=delete-file&csrf=a&id=b&version=1&confirm=delete&draft="))))) (expected (bool true)))
+)

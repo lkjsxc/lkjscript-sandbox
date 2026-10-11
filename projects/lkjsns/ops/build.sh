@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Rebuild only the accepted checkpoint. This script does not author missing UI work.
+# Bootstrap native proposal fragments in dependency-sized, publicly reviewed changes.
+# This creates a local executable candidate only; it never starts an app or store.
 set -euo pipefail
 source "$(dirname -- "$0")/runtime.sh"
 verify_runtime
@@ -7,36 +8,69 @@ umask 077
 mkdir -p "$ROOT/.build"
 work=$(mktemp -d "$ROOT/.build/bootstrap-XXXXXXXX")
 project="$work/project"
+(
+  cd "$ROOT"
+  find src -type f -name '*.lkjc' -print0 | sort -z | xargs -0 sha256sum
+  sha256sum web/style.css ops/*.sh project.sh
+) > "$work/sources.sha256"
 "$LKJ" new "$project" --template web-editor --name lkjsns > "$work/new.log"
+apply_request() {
+  local name=$1 input=$2 token
+  if ! "$LKJ" --project "$project" change plan --input-file "$input" > "$work/$name.plan.log" 2>&1; then
+    cat "$work/$name.plan.log" >&2; return 1
+  fi
+  token=$(sed -n 's/^plan token=\([^ ]*\).*/\1/p' "$work/$name.plan.log")
+  [[ "$token" =~ ^plan_[0-9a-f]+$ ]] || { echo "No reviewed token for $name" >&2; return 1; }
+  if ! "$LKJ" --project "$project" change apply --input-file "$input" --plan "$token" > "$work/$name.apply.log" 2>&1; then
+    cat "$work/$name.apply.log" >&2; return 1
+  fi
+  printf 'Accepted %s\n' "$name"
+}
 apply_fragment() {
-  local name=$1 revision token
+  local name=$1 revision
   shift
   revision=$("$LKJ" --project "$project" status | sed -n 's/^revision id=\([^ ]*\).*/\1/p')
   [[ "$revision" =~ ^rev_[0-9a-f]{64}$ ]]
   {
     printf 'request base=%s\ndeclarations.begin\n(units\n' "$revision"
     cat "$ROOT/src/00-types.lkjc"
-    for source in "$@"; do cat "$ROOT/src/$source.lkjc"; done
+    for fragment in "$@"; do cat "$fragment"; done
     printf ')\ndeclarations.end\n'
   } > "$work/$name.request.lkjc"
-  if ! "$LKJ" --project "$project" change plan --input-file "$work/$name.request.lkjc" > "$work/$name.plan.log" 2>&1; then
-    cat "$work/$name.plan.log" >&2; exit 1
-  fi
-  token=$(sed -n 's/^plan token=\([^ ]*\).*/\1/p' "$work/$name.plan.log")
-  [[ "$token" =~ ^plan_[0-9a-f]+$ ]]
-  if ! "$LKJ" --project "$project" change apply --input-file "$work/$name.request.lkjc" --plan "$token" > "$work/$name.apply.log" 2>&1; then
-    cat "$work/$name.apply.log" >&2; exit 1
-  fi
-  printf 'Accepted %s\n' "$name"
+  apply_request "$name" "$work/$name.request.lkjc"
 }
-apply_fragment boundary service http
+# Requirements can be created before the executable port. This avoids a temporary
+# executable stub and breaks the capability/HTTP/UI bootstrap dependency cycle.
+[[ "$(grep -c '^    (port create view' "$ROOT/src/service.lkjc")" == 1 ]]
+[[ "$(grep -c '^(target create lkjsns' "$ROOT/src/service.lkjc")" == 1 ]]
+{
+  awk '/^    \(port create view/{exit} {print}' "$ROOT/src/service.lkjc"
+  printf '  ))\n'
+} > "$work/capabilities.lkjc"
+apply_fragment capabilities "$work/capabilities.lkjc"
 for name in util db page assets auth access codec social compose notes drive delivery; do
-  apply_fragment "$name" "$name"
+  apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
+for name in controls navigation admission mediaui; do
+  apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
+done
+# These two modules are one semantic dependency component, not separate mock APIs.
+apply_fragment journal-workflows "$ROOT/src/ui/journal.lkjc" "$ROOT/src/ui/journalview.lkjc"
+for name in attachments relations adminview accounts driveview mediaflow recovery; do
+  apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
+done
+apply_fragment http "$ROOT/src/http.lkjc"
+# The link step edits a complete public draft, keeping existing exact requirement
+# identities, and adds the authored port/routes. It never edits canonical storage.
+source "$ROOT/ops/link.sh"
+link_http_target
 "$LKJ" --project "$project" check | tee "$work/check.log"
-"$LKJ" --project "$project" build --output "$work/lkjsns-checkpoint.lkja" | tee "$work/build.log"
-sha256sum "$work/lkjsns-checkpoint.lkja" > "$work/artifact.sha256"
-(cd "$ROOT" && sha256sum src/*.lkjc web/style.css ops/*.sh project.sh) > "$work/sources.sha256"
+"$LKJ" --project "$project" build --output "$work/lkjsns.lkja" | tee "$work/build.log"
+sha256sum "$work/lkjsns.lkja" > "$work/artifact.sha256"
+(cd "$ROOT" && sha256sum --check --status "$work/sources.sha256") || {
+  echo 'Source snapshot changed during the build; no selection was published.' >&2
+  exit 1
+}
 printf '%s\n' "$work" > "$ROOT/.build/selection.next"
 mv -- "$ROOT/.build/selection.next" "$ROOT/.build/selection"
-printf 'Selected native checkpoint: %s\nNo application listener or data store was started.\n' "$work"
+printf 'Selected native candidate: %s\nNo browser-flow verification or service cutover is implied.\n' "$work"
