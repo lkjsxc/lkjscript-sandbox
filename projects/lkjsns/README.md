@@ -4,6 +4,10 @@ An invitation-only community application built with native lkjscript inside
 lkjscript-sandbox. The interface is English-first, with a chronological feed,
 explicit audiences, private drafts and a reusable media Drive.
 
+The native application was publicly updated on October 11, 2026. The legacy
+service is stopped. See [the release record](docs/RELEASE.md) for the exact source,
+accepted bundle, verification scope, and temporary-hostname limitation.
+
 ## What is implemented
 
 Accounts and invitations, profiles, following and muting, posts and replies,
@@ -39,6 +43,10 @@ An optional browser suite uses an already-installed Node/Playwright toolchain:
 LKJSNS_PLAYWRIGHT=/absolute/path/to/playwright ./sandbox lkjsns browser
 ```
 
+Set `LKJSNS_AXE` to an installed `axe.min.js` to include the optional automated
+accessibility audit. Without it, the browser runner explicitly reports that the
+axe audit was not run.
+
 The browser suite creates isolated synthetic data, checks real HTTP/browser
 journeys, writes private evidence under `.build`, and stops its own process. It
 refuses non-loopback test URLs. Node is a development-test dependency only; the
@@ -61,5 +69,6 @@ with this runtime: authorized requests return 405/Allow: GET, not incorrect zero
 length metadata. Unauthorized requests remain 404.
 
 See [the current checkpoint](docs/CHECKPOINT.md),
+[the verified release](docs/RELEASE.md),
 [English-first interaction decisions](docs/ENGLISH-READING.md), and
 [the native architecture](docs/DESIGN.md).

@@ -1,54 +1,55 @@
 # lkjsns checkpoint — 2026-10-11
 
-This checkpoint supersedes the earlier unexecuted workflow sketches and the
-local-only usable-core checkpoint. Legacy data migration is not part of the new
-application. The owner explicitly authorized replacing the old service.
+## Current released source
 
-## Accepted release candidate
+Application source `1a859236e9036f9e9900fd9d1161c59e9c97984f` was promoted to
+the public native service on October 11, 2026 at 20:18:34 JST. The legacy service
+is stopped and disabled. The temporary HTTPS tunnel was retained.
 
-The candidate uses the checksum-pinned public lkjscript 0.1.89 executable, SHA256
+The selected application file SHA-256 is
+`55745f7ead25bfff5bc33295876af0a8ef89ac262c8627fe346b2a023d634d03`.
+The runtime is the checksum-pinned public lkjscript 0.1.89 executable, SHA-256
 `e24c054f9b3e44a71a8875aba5385aad82dc391a1eae88a6c115fca75bc5c9a9`.
-The detached application file SHA256 is
-`a2f6846f9b78163e9da9c5b7ebbf027d0e1f312ce3989513c6ae82e041067c54`.
-The graph revision is
-`rev_d4b39265aab9ec63d63508fbc1ef57e5deca20089684a23d728ccb914623a95e`.
-The internal artifact identity is
-`artifact_bundle_46ef8fa47e84000620c20cf65165c0249632492a33a6b0306db85edc27d96bbc`.
-The bundle contains 7,143,196 bytes. Internal artifact identity and file SHA256 are
-different identifiers and are not interchangeable.
 
-Native verification passed 358 tests, zero failed, with equal production/reference
-outcomes. A fresh loopback store then passed 50 grouped browser checks: 12 account,
-17 content/media, 8 reading-context and 13 responsive/security checks. Layout
-coverage includes six authenticated pages at 320, 390, 768 and 1440 CSS pixels in
-light and dark mode. This is not full accessibility certification or a load test.
+Acceptance completed on that exact application bundle: 392 native tests,
+65 grouped browser checks, 48 automated accessibility combinations with zero
+violations, and 28 persistence checks across restart, offline restoration,
+cross-build upgrade, and binary rollback. The repository publication check passed.
+See [the release record](RELEASE.md) for the precise scope and qualifications.
 
-After stopping that server, the complete synthetic data/object store was copied to
-an independent directory. A cold restart and the independent restored copy each
-passed seven persistence checks, including fresh sign-in, retained administration,
-a Members post, PNG/video/audio byte equality and continued guest access denial.
+## Connected implementation
 
-The local evidence is under `.build/browser-7WKHxN1M`; build receipts are under
-`.build/acceptance/build-release.log`. Test source hashes were recorded before the
-fresh suite. Generated logs, screenshots, stores, binaries and credentials are not
-versioned. No synthetic fixture is eligible for public deployment.
+Accounts, invitations, profiles, chronological posts, replies, following, muting,
+Likes, bookmarks, drafts, and reusable media Drive are native lkjscript. Product
+rendering and forms have no browser application JavaScript dependency.
 
-## Deliberate corrections and remaining limits
+`src/reading/conversation.lkjc` provides admitted original-post context and
+reading-first reply destinations. `src/reading/activity.lkjc` provides filtered,
+visibility-checked activity with bounded empty-window scanning. Profile headings
+are distinct from navigation location. Product-owned UI text remains English.
 
-All product-owned UI copy is English. Reading actions retain their collection,
-cursor and article anchor. The browser-origin defect caused by no-referrer was
-fixed with same-origin; strict Host, Origin and CSRF enforcement was not relaxed.
+Browser tests in `tests/browser` are optional development tools, not application
+runtime dependencies. `./sandbox lkjsns browser` runs the core suites using an
+installed Playwright package. Set `LKJSNS_AXE` to an installed `axe.min.js` to add
+the automated accessibility audit. `tests/browser/upgrade.sh` checks a selected
+candidate against a copied, stopped synthetic fixture and then the preceding
+binary against the same data. It does not operate on public storage.
 
-Media HEAD exposed a native-runtime representation-length limitation. It now
-returns an explicit 405 after authorization rather than a misleading 200 with a
-zero Content-Length. GET and single-range delivery were verified with exact bytes.
-This is a documented unsupported capability, not claimed HEAD conformance.
+Source selection binds the complete native input set, CSS, operations scripts,
+and configuration. Changed executable inputs require a new build. A test report
+from another candidate is not sufficient for promotion.
 
-Upload originals retain metadata; there is no transcoding, thumbnail service,
-federation or email recovery. See [interaction and media decisions](ENGLISH-READING.md).
+## Scope and unfinished work
 
-## Publication
+Legacy account/data migration is intentionally absent. Public state is separate
+from all synthetic fixtures. The latest promotion preserved the new application's
+state and retained a stopped-service snapshot.
 
-Public service replacement is a separate operation from this accepted candidate.
-Record its verified outcome in RELEASE.md; do not infer exposure from a build,
-loopback server, source commit or branch push.
+A permanent hostname, account recovery, automatic draft saving, federation, media
+transcoding, and location-metadata removal are not complete. Media HEAD remains
+explicitly unsupported after authorization; GET and single ranges are verified.
+There is no guarantee of physical erasure from all retained copies.
+
+The [release record](RELEASE.md) supersedes the earlier candidate-only checkpoint.
+Keep runtime data, private evidence, owner invitations, and machine-specific
+operator details out of the public repository.
