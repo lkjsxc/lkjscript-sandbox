@@ -1,32 +1,33 @@
-# lkjsns — native local candidate
+# lkjsns agent guidance
 
-Read README.md, docs/DESIGN.md and docs/CHECKPOINT.md before editing. This replacement
-has a complete connected HTTP graph, but authenticated browser acceptance and public
-cutover remain unfinished. Do not describe native unit checks as a deployed SNS.
+Use the checksum-pinned public lkjscript 0.1.89 runtime. Change application behavior
+through public draft/plan/apply operations; do not edit canonical graph state or
+substitute a Node/Python application server. Product rendering, forms, admission,
+authentication, social behavior and media access remain native lkjscript.
 
-Use pinned, checksum-verified public lkjscript 0.1.89. Never invoke Codex tasks,
-Codex CLI or paid external APIs. Application behavior stays native lkjscript; no
-Python/JavaScript server or tracked host-language source generator. Bash and jq are
-operations tooling. Use public change draft/plan/apply; never edit canonical graph
-storage directly. Preserve exact capability identities during staged graph assembly.
+Keep every product-owned label, message, title and accessibility name in English.
+User-authored content may use any language. Preserve exact CSS/native-asset byte
+equality. The selected bundle must match the complete source-input file set; any
+changed native fragment, stylesheet, operations script or configuration needs a
+fresh build. A successful build is not proof of browser behavior or publication.
 
-Preserve legacy code, processes, data, secrets and public routes. Local prepare/run
-is not permission to expose a fixture or retire the old service. Do not merge or
-publicly deploy the replacement until the documented browser/media gates pass.
-Never publish old private history, operational records or development credentials.
+The owner explicitly authorized replacing the legacy public service on 2026-10-11.
+Legacy migration and compatibility are not required. Preserve unrelated services,
+unrelated worktrees and secrets. Never expose a synthetic browser fixture. Use a
+fresh detached service directory for public state and record an actual cutover
+separately from candidate acceptance. No force pushes or paid external agents.
 
-Source selection must bind the complete source file set and bundle checksum, not
-only a list of files that happened to exist at an earlier build. Keep application
-artifacts and acceptance claims tied to the actual tested source. Newly authored
-functions are not automatically executed tests. Keep Japanese UI and English docs.
+Data metadata and object bytes use separate authorities. Access must be derived
+from current readable post references, not a stale upload flag. Keep object effects
+outside retried data transactions and preserve submitted input on optimistic
+conflicts. Do not weaken exact Host, Origin or CSRF checks to make a test pass.
 
-Store metadata and object bytes are separate authorities. Publication requires a
-completed data transaction and current delivery ACL. Never put object effects inside
-a retryable metadata transaction, infer ownership from an opaque URL, silently change
-note audience, or discard typed input after a rejected write. A Drive folder is not
-an access-control boundary. The attachment shortcut requires an owned, ready file and
-an owned unpublished draft; its destination is an enum, never a supplied redirect URL.
+Authored browser tests under tests/browser are optional development tools. Their
+Node/Playwright dependency is not an application dependency. Keep installations,
+fixtures, generated graphs, binaries, screenshots, logs and credentials ignored.
+Use installed free tools; do not launch Codex tasks, Codex CLI or paid APIs.
 
-Keep generated graphs, bundles, data, secrets, logs, screenshots and optional developer
-tools ignored. No unrelated Traffic City changes, expensive CI, force pushes or
-rewriting someone else's work. Commit as lkjsxc and review publication content first.
+Read docs/CHECKPOINT.md for accepted source/test evidence, docs/ENGLISH-READING.md
+for UX and media boundaries, and docs/RELEASE.md when a verified public release has
+been recorded. Media HEAD is deliberately unsupported until the native runtime
+can express representation metadata independently of a response body.

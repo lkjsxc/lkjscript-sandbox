@@ -17,12 +17,12 @@
   (function create message (visibility public)
     (parameter create message (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (text "<div class=\"notice danger\" role=\"alert\"><strong>入力はまだ保存されていません。</strong><p>") (call std::html-escape-text (local message)) (text "</p></div>")) (text ""))))
+    (body (call std::text-join (list Text (text "<div class=\"notice danger\" role=\"alert\"><strong>Your input has not been saved yet.</strong><p>") (call std::html-escape-text (local message)) (text "</p></div>")) (text ""))))
 
   (function create audience (visibility public)
     (parameter create value (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (text "<label class=\"audience\">公開範囲<select name=\"audience\" aria-describedby=\"audience-help\"><option value=\"members\"") (if (call std::text-equal (local value) (text "members")) (text " selected") (text "")) (text ">メンバー限定</option><option value=\"public\"") (if (call std::text-equal (local value) (text "public")) (text " selected") (text "")) (text ">公開（誰でも閲覧）</option></select></label><p class=\"field-help scope-help\" id=\"audience-help\">メンバー限定は、この場所に登録した全員が対象です。フォロワー限定ではありません。公開ではログインしていない人も本文・添付を閲覧できます。</p>")) (text ""))))
+    (body (call std::text-join (list Text (text "<label class=\"audience\">Audience<select name=\"audience\" aria-describedby=\"audience-help\"><option value=\"members\"") (if (call std::text-equal (local value) (text "members")) (text " selected") (text "")) (text ">Members</option><option value=\"public\"") (if (call std::text-equal (local value) (text "public")) (text " selected") (text "")) (text ">Public — anyone</option></select></label><p class=\"field-help scope-help\" id=\"audience-help\">Members means everyone registered here, not just your followers. Public posts and their attachments can be read without signing in.</p>")) (text ""))))
 
   (function create set-member (visibility public)
     (parameter create items (type (list Text)))
@@ -60,5 +60,11 @@
     (actual (call controls::schema (call util::parse (call std::bytes-from-text (text "a=1&b=2"))) (list Text (text "a") (text "b")))) (expected (bool true)))
 
   (test create escaped-textarea (visibility private)
-    (actual (call controls::area (text "body") (text "本文") (text "</textarea><script>"))) (expected (text "<label>本文<textarea name=\"body\" rows=\"5\">&lt;/textarea&gt;&lt;script&gt;</textarea></label>")))
+    (actual (call controls::area (text "body") (text "Body") (text "</textarea><script>"))) (expected (text "<label>Body<textarea name=\"body\" rows=\"5\">&lt;/textarea&gt;&lt;script&gt;</textarea></label>")))
+
+  (test create audience-explains-members (visibility private)
+    (actual (call std::text-contains (call controls::audience (text "members")) (text "not just your followers"))) (expected (bool true)))
+
+  (test create public-choice-is-explicit (visibility private)
+    (actual (call std::text-contains (call controls::audience (text "public")) (text "value=\"public\" selected>Public — anyone"))) (expected (bool true)))
 )

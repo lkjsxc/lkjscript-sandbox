@@ -1,84 +1,65 @@
 # lkjsns
 
-A native lkjscript social application inside lkjscript-sandbox: chronological notes,
-replies, persistent drafts, and a reusable private Drive, with a Japanese interface.
+An invitation-only community application built with native lkjscript inside
+lkjscript-sandbox. The interface is English-first, with a chronological feed,
+explicit audiences, private drafts and a reusable media Drive.
 
-**Status: runnable local candidate, not a verified public replacement.** The complete
-HTTP application now builds on checksum-pinned **lkjscript 0.1.89**. Native tests and
-anonymous HTTP checks have run; authenticated browser flows have not. The legacy
-service, store, repository and public entrypoint remain unchanged. The exact evidence
-and remaining release gates are in [CHECKPOINT.md](docs/CHECKPOINT.md).
+## What is implemented
 
-## Read, write, keep your place
+Accounts and invitations, profiles, following and muting, posts and replies,
+bookmarks, Likes and notifications are connected to persistent native data.
+Drive supports image, video and audio originals, folders, descriptions, sensitive
+media controls, and up to four attachments per post. Uploading alone does not make
+a file public. Versioned edits preserve submitted input when another tab wins.
 
-Home is chronological and refreshes only when requested. Writing, saving a draft,
-selecting attachments and publishing are separate actions. Opening the picker saves
-the draft first. File details retain that draft context and offer an explicit return
-to the composer; uploading alone never publishes a note. Validation/conflict pages
-retain submitted text instead of pretending a rejected write succeeded.
+Reading actions keep the current feed, page, profile or parent conversation.
+The responsive interface has light and dark modes, keyboard focus states and
+mobile navigation. Forms and rendering work without application JavaScript.
 
-Drive has file cards, folders, kind/name filters, quota, descriptions, sensitive-media
-controls and reverse usage lists. An unposted ready file is owner-private, including
-its byte URL. Deletion is rejected while any note or draft references the file.
-See [product decisions](docs/DESIGN.md) and [usability decisions](docs/USABLE-CORE.md).
+## Development
 
-## Build and check
-
-Linux x86-64, Bash, curl, tar, sha256sum and ordinary core utilities are required.
-The application and checked-in build need neither Node.js nor Python.
+The checksum-pinned public runtime is lkjscript 0.1.89. Setup downloads that pinned
+runtime; it does not silently switch to a moving latest release.
 
 ```sh
 ./sandbox lkjsns setup
 ./sandbox lkjsns build
 ./sandbox lkjsns check
+./sandbox lkjsns prepare
+./sandbox lkjsns run
 ```
 
-Build creates an isolated native graph using public proposal plan/apply operations,
-connects the real HTTP router, runs native tests, and builds a detached bundle. A
-selection is published only after success. Both source content and the entire source
-file set must still match before `check`, `prepare` or `run`. The bundle checksum is
-also checked. Build does not initialize a store, start a listener or deploy anything.
+The local development configuration binds loopback. The source manifest binds
+native fragments, authored CSS, operations scripts and deployment configuration to
+the selected detached bundle. Changed inputs require a new build.
 
-`test` is an alias for native `check`; it is not a browser acceptance suite.
-
-## Start an isolated local candidate
-
-Local operations additionally require `jq` and `flock`. This recipe intentionally has
-no public-host option and does not change DNS, tunnels, proxy routes or the old app.
+An optional browser suite uses an already-installed Node/Playwright toolchain:
 
 ```sh
-./sandbox lkjsns prepare   # once; refuses to overwrite an existing store
-./sandbox lkjsns run       # foreground; localhost only, port 19272
+LKJSNS_PLAYWRIGHT=/absolute/path/to/playwright ./sandbox lkjsns browser
 ```
 
-Open `http://127.0.0.1:19272` from the same machine. In a remote workspace, this address
-is on the workspace, not the reader's computer. Do not make an unverified fixture
-public merely to access it. Private data is under `runtime/development/`, ignored by
-Git. The one-time bootstrap invitation is in `bootstrap.secret` inside that directory;
-it is never printed, committed or inserted into a URL by the launcher. The recipe
-creates no user account. Keep test data synthetic until acceptance is complete.
+The browser suite creates isolated synthetic data, checks real HTTP/browser
+journeys, writes private evidence under `.build`, and stops its own process. It
+refuses non-loopback test URLs. Node is a development-test dependency only; the
+application server and its behavior remain native lkjscript. Normal CI stays a
+lightweight repository check.
 
-Rebuilding then running stages a new content-addressed bundle without reinitializing
-that development store. Stop the foreground process before running a new candidate.
-The local process lock rejects a second launcher. See [operations](docs/OPERATIONS.md)
-for the distinction between local rehearsal, backup and production release.
+## Important boundaries
 
-## Boundaries and limits
+Public means readable without signing in. Members means all registered members,
+not just followers. Unattached files are owner-only; posted file access is checked
+against a current readable post reference. Removing the last public reference
+revokes future anonymous delivery, not already downloaded copies.
 
-All application behavior, HTML generation, authentication, metadata transactions,
-media access checks and HTTP routing are native lkjscript. CSS is authored in
-`web/style.css` and embedded in `src/assets.lkjc`. Bash/jq are operations tooling,
-not an application backend. Accepted graphs, bundles, local credentials, data, logs,
-screenshots and optional development helpers stay out of Git.
+Limits are 32 MiB per file, 2 GiB of reserved/used storage per account and four
+attachments per post. Originals are not transcoded, compressed or stripped of
+location metadata. Codec support depends on the browser. There is no email-based
+password recovery, federation or promised physical erasure from retained history.
+Media GET and single byte ranges are supported. Media HEAD is explicitly unavailable
+with this runtime: authorized requests return 405/Allow: GET, not incorrect zero-
+length metadata. Unauthorized requests remain 404.
 
-Initial limits are 32 MiB of media payload, 2 GiB of charged storage per account and
-four attachments per note. Incomplete reservations count against quota. Object I/O
-and metadata are separate authorities, with explicit intermediate states rather
-than a claimed cross-store rollback. These limits are not measured capacity.
-
-There is no federation, direct messaging, passkey/email recovery, transcoding,
-thumbnail service, EXIF removal or guarantee of codec compatibility. Signature checks
-are not full decoding. HTTP media GET/HEAD/Range, authenticated revocation, interrupted
-upload cleanup, restart with populated data and backup/restore still require end-to-end
-acceptance. Logical deletion does not physically erase retained metadata history or
-backups. Do not treat this local candidate as production-ready.
+See [the current checkpoint](docs/CHECKPOINT.md),
+[English-first interaction decisions](docs/ENGLISH-READING.md), and
+[the native architecture](docs/DESIGN.md).

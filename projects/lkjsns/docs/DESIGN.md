@@ -12,7 +12,7 @@ place for files; saving a file must not make it public. The application owns pri
 identity, indexing, and UI in native lkjscript. An HTTP reverse proxy may terminate TLS;
 there must not be a hidden Python, Node, or other language application backend.
 
-Choose Japanese for the user-facing application. Keep the engineering documentation
+Choose English for every product-owned label, message, title and accessibility name. Keep the engineering documentation
 in English. The product's current job is a responsive web application, not federation,
 a native mobile app, an algorithmic feed, encrypted messaging, or a media editing suite.
 Those additions require their own evidence and are not prerequisites to the core loop.
@@ -22,7 +22,7 @@ Those additions require their own evidence and are not prerequisites to the core
 The references below were read on 2026-10-11. They inform decisions; no third-party
 source code, icons, photographs or visual assets were copied into this checkpoint.
 
-[Misskey Drive](https://misskey-hub.net/ja/docs/for-users/features/drive/) treats uploads
+[Misskey Drive](https://misskey-hub.net/en/docs/for-users/features/drive/) treats uploads
 as reusable files and exposes folders, downloading and attachment selection. Adopt
 those separate file-management and reuse workflows. Do **not** adopt the documented
 cascade where deleting a Drive file also removes content using it. Show the usage list

@@ -16,9 +16,9 @@ as a substitute for making that loop reliable.
 
 ## Borrow workflows, not entire products
 
-[Misskey Drive](https://misskey-hub.net/ja/docs/for-users/features/drive/) is the reference
+[Misskey Drive](https://misskey-hub.net/en/docs/for-users/features/drive/) is the reference
 for reusable files and folders. The deliberate difference is privacy and deletion:
-[Misskey's warning](https://misskey-hub.net/ja/docs/for-users/onboarding/warning/)
+[Misskey's warning](https://misskey-hub.net/en/docs/for-users/onboarding/warning/)
 explains the implications of an unposted file URL; lkjsns instead requires ownership
 or a currently readable referencing note. A referenced file cannot be deleted by an
 accidental storage-cleanup action. It must first be detached from its uses.
