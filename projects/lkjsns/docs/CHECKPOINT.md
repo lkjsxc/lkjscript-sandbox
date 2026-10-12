@@ -1,52 +1,49 @@
 # lkjsns checkpoint — October 13, 2026
 
-The direct-interaction release is live through
+The reply-rendering and favicon update is live through
 [Coder public port 8793](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
-Promotion completed at **2026-10-13 03:21:14 JST** with existing data preserved.
+Promotion completed at **2026-10-13 06:00:36 JST** with existing user state preserved.
 
-Executable source: `553ff649075c172b0e68bce9987b0bfd2df1ecd0`
+Executable source: `e36e471a71263f676cc5799ed94c7ff43710fa4d`
 
-Application SHA-256: `68f9ae90b43ec2e9be05c09569df4f0abdf307362ece12d2e187c10a019b27fb`
+Application SHA-256: `777bedfe7300593453775c88051fa6f4151cb77b6a8be2e3b260b1f76cd85051`
 
-Runtime: the unchanged checksum-pinned lkjscript 0.1.89 executable.
+Runtime remains the checksum-pinned lkjscript 0.1.89 executable.
 
-## Current product contract
+## Current repair
 
-Drive is in the primary desktop/mobile navigation. Normal page names do not
-appear as top banners; browser titles and assistive headings remain. Drafts are
-whole-item native links. Attachment and avatar selection uses the preview itself,
-not a second textual action strip. A linked parent preview replaces the explicit
-original-post button. Redundant file/profile/reply shortcuts are removed.
+Long parent previews are natively bounded and visually clamped to three lines;
+reply bodies are not shortened by that rule. Do not reintroduce a `display:block`
+override on `.parent-card .context-copy`. Feed, profile, Search and Bookmarks
+reply cards retain their immediate parent context. Reading and composing modes
+have separate link/message behavior. Hidden/deleted/muted parents do not leak
+content or show draft instructions in reading views.
 
-Resource IDs live in `/<id>` paths, with `/edit` and `/raw` suffixes for operations.
-Old resource query URLs redirect. The native router, not browser scripting,
-distinguishes record kinds and enforces current access. Incoming query IDs never
-overwrite path identity. Existing account/post/session/media records and IDs remain.
+`threadview` owns bounded readable reply-window selection and the detail page.
+`journalview` still owns reusable post/draft cards. Reply indexes and stored
+schemas are unchanged. The selected bundle includes SVG/ICO/PNG/touch icons in
+`icons`; all authored icon binaries and the SVG belong in source provenance.
+Normal and error-page heads use the same `icons::links` declarations.
 
-Invitation counts/durations no longer have 20/30 product caps. Blank count is
-unlimited; blank duration never expires. Finite exhaustion and explicit revocation
-still apply. Numeric parsing/expiry arithmetic remain checked. Existing finite
-invitations continue to be recognized.
+Drive remains primary. Normal page-title banners stay hidden. Item-native media
+selection, whole-draft links, root resource IDs, explicit invitation infinity,
+private tags, search, profile images, and bounded file transfer are retained.
+There is no new application server, external asset CDN or paid execution agent.
 
-`paths`, `resources`, and `invitations` own these native primitives. The prior
-native tagged Drive, bounded media parts, search, private previews, profile-image
-privacy, explicit saving, and data/objects transaction separation remain intact.
-No Node/Python application server or paid external execution was introduced.
+## Verification and operation
 
-## Verification and promotion
+The exact bundle passed 482 native tests and 83 synthetic browser groups, including
+ten new reply groups, four favicon groups and cold-restart reply/icon checks.
+Eleven axe scenarios reported no selected-rule violations. Read-only public
+verification passed 26 groups. See [RELEASE.md](RELEASE.md) for identities,
+measurements, scope and the preserved-data cutover.
 
-The exact bundle passed 472 native tests and 68 synthetic browser groups,
-including the new direct-interaction suite, 256 MiB integrity, and cold restart.
-Layout covered 96 combinations. Eight axe pages reported no selected-rule
-violations. Public read-only verification passed 25 groups. See
-[RELEASE.md](RELEASE.md) for identities, scope, and preserved-data cutover.
+Use `tests/ux/run.sh` via the normal browser command for optional local acceptance;
+`replies.cjs` and `favicons.cjs` are included. Regenerating icon rasters must be
+accompanied by the matching native payload update; exact-byte browser checks
+catch divergence. Never replace production with a synthetic test store or revive
+the stopped tunnel dependencies. Keep the Coder Host/Origin and port 8793.
 
-Use `tests/ux/run.sh` via the usual browser command for current optional local
-acceptance. Test stores and credentials remain private. Public verification is
-read-only and separate from authenticated loopback acceptance. Do not reintroduce
-stopped tunnel dependencies; retain the exact Coder Host/Origin and port 8793.
-
-A new browser script is delivered at the same no-store asset URLs; existing tabs
-should reload to use the updated interaction and resource-address behavior.
-Keep snapshots, credentials and private execution paths out of Git. See
-[DIRECT-INTERACTIONS.md](DIRECT-INTERACTIONS.md) for lasting UI/routing choices.
+Keep private test evidence, credentials and snapshots out of Git. See
+[REPLIES-FAVICON.md](REPLIES-FAVICON.md) for the reproduced regression and
+[DIRECT-INTERACTIONS.md](DIRECT-INTERACTIONS.md) for the retained UI/URL contract.
