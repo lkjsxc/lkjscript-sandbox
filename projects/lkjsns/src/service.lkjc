@@ -84,4 +84,8 @@
   (route create transfer-download (method GET) (path "/download") (port service::app::view))
   (route create transfer-transfer-js (method GET) (path "/transfer.js") (port service::app::view))
   (route create head-resource (method HEAD) (pattern "/{missing0}/{missing1}") (port service::app::unavailable-2))
+  (route create icon-svg (method GET) (path "/favicon.svg") (port service::app::view))
+  (route create icon-ico (method GET) (path "/favicon.ico") (port service::app::view))
+  (route create icon-png (method GET) (path "/favicon-32.png") (port service::app::view))
+  (route create icon-touch (method GET) (path "/apple-touch-icon.png") (port service::app::view))
 )

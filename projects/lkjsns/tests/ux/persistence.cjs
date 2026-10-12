@@ -21,6 +21,8 @@ const {resourceId,isResource,isEditor,chromium,base,assert,goto,pass,session,loa
   response=await clean.request.post(endpoint('finish').href,{headers:{Origin:base},maxRedirects:0});assert.equal(response.status(),303);
   response=await clean.request.get(base+'/media?id='+resourceId(url));assert.deepEqual(await response.body(),Buffer.concat([Buffer.alloc(4*1024*1024,33),Buffer.alloc(9,44)]));
   pass('A pending upload resumes from its durable part acknowledgement after native restart');
+  const replies=load('reply-regressions');await goto(p,'/'+replies.child);assert.equal(await p.locator('.note-detail .parent-card').getAttribute('href'),'/'+replies.parent);assert.equal(await p.locator('.reply-list #post-'+replies.nested).count(),1);assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),'/favicon.svg');
+  assert.equal((await clean.request.get(base+'/favicon.ico')).status(),200);pass('Reply context, nested thread membership and favicon delivery survive a native restart');
 
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

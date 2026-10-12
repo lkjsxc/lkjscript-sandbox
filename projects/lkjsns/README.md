@@ -78,6 +78,11 @@ work with JavaScript disabled. Files larger than 32 MiB require JavaScript for
 uploading and full-file downloading. Media HEAD is deliberately unsupported: an
 authorized request returns 405 with Allow: GET, not incorrect zero-length metadata.
 
+Reply cards show their immediate parent as a bounded, readable preview. Long
+parents do not push the reply body out of view, and warnings/private/deleted
+parents retain their access boundaries. The site includes native SVG/ICO favicons
+and a touch icon based on its existing mark.
+
 ## Development
 
 The checksum-pinned public runtime is lkjscript **0.1.89**. Setup verifies it and
@@ -125,7 +130,8 @@ interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [direct interactions and resource paths](docs/DIRECT-INTERACTIONS.md),
+See [reply rendering and favicon](docs/REPLIES-FAVICON.md),
+[direct interactions and resource paths](docs/DIRECT-INTERACTIONS.md),
 [community UX and transfer architecture](docs/COMMUNITY-UX.md),
 [the current checkpoint](docs/CHECKPOINT.md),
 [the release record](docs/RELEASE.md),

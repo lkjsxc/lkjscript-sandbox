@@ -48,7 +48,7 @@ apply_fragment() {
   printf '  ))\n'
 } > "$work/capabilities.lkjc"
 apply_fragment capabilities "$work/capabilities.lkjc" "$ROOT/src/health.lkjc"
-for name in util paths invitations db preferences page assets auth access codec social compose notes drive; do
+for name in util paths invitations icons db preferences page assets auth access codec social compose notes drive; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
 for name in controls navigation; do
@@ -87,6 +87,7 @@ apply_fragment confirmation "$ROOT/src/confirmation.lkjc"
 for name in flow download; do
   apply_fragment "transfer-$name" "$ROOT/src/transfers/$name.lkjc"
 done
+apply_fragment thread-view "$ROOT/src/reading/threadview.lkjc"
 apply_fragment resources "$ROOT/src/resources.lkjc"
 apply_fragment http "$ROOT/src/http.lkjc"
 apply_fragment unavailable "$ROOT/src/unavailable.lkjc"
