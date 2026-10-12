@@ -2,11 +2,14 @@
 
 ## Current public release
 
-The native writing/library release is live at
-[lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com).
-Promotion completed on October 12, 2026 at **15:38:03 JST**. A connector restart
-was checked at 15:39:26 JST without changing the application process or origin.
-The legacy application and temporary-tunnel service are stopped and disabled.
+The native writing/library release is live through
+[Coder public port 8793](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
+The user reaffirmed workspace hosting, and the previous Coder entrypoint was
+restored on October 12, 2026 at **17:22:50 JST**. The app already ran in the
+workspace; only listener/origin configuration and routing changed. The dedicated
+named tunnel was stopped at 17:25 JST. The old domain redirects GET/HEAD visits
+to Coder; the legacy app and quick tunnel remain stopped and disabled.
+See [CODER-HOSTING.md](CODER-HOSTING.md) for the current operating contract.
 
 Released source: `7a5d8032a2c5ff97f5407775b0f439e2cde70ec6`
 
@@ -41,10 +44,11 @@ circular dependency in native review. Published attachment immutability remains.
 selection retains filters and pagination, shows a persistent selected-file tray,
 and finds older ASCII-case-insensitive matches through bounded empty-window scans.
 
-`origin.sh`, `live-run.sh`, and the named-connector scripts support one exact
-configured HTTPS origin. Live systemd dependencies were replaced, not merely
-reset in a drop-in; empty dependency assignments do not remove old dependencies.
-The old temporary-tunnel unit must not be reintroduced through Wants or After.
+`origin.sh` and `live-run.sh` support the exact Coder HTTPS origin without an
+application rebuild. The current unit has no dependency on either dedicated
+tunnel. Do not reintroduce the stopped tunnel units through Wants or After.
+Read the effective dependency set; empty assignments in a drop-in do not remove
+existing dependencies.
 
 ## Evidence and source selection
 
@@ -67,7 +71,7 @@ reliable unsaved-input recovery, account recovery, and safer media handling.
 Do not claim autosave, recovery codes, EXIF removal, transcoding, or cross-browser
 support before those workflows are implemented and tested.
 
-The fixed hostname is complete; legacy account/data migration is intentionally
+The Coder entrypoint is restored; legacy account/data migration is intentionally
 absent. The native store was preserved with stopped-service snapshots. Keep all
 credentials, operator paths, backup contents, and private execution evidence out
 of the public repository. [RELEASE.md](RELEASE.md) is the current release authority.

@@ -4,10 +4,12 @@ An invitation-only community application built with native lkjscript inside
 lkjscript-sandbox. The product interface is English, with a chronological feed,
 explicit audiences, saved drafts, and a reusable media Drive.
 
-Open [lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com). The native writing/library
-release was published on October 12, 2026 using a fixed named tunnel. The legacy
-service and temporary tunnel are stopped. See [the release record](docs/RELEASE.md)
-for the exact source, verification scope, and operational limitations.
+Open [lkjsns on Coder](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
+The native app runs in workspace `tomato-ocelot-73` on public port **8793**.
+The custom domain now redirects to this Coder entrypoint. No Coder login is
+required for guest pages; application accounts are still invitation-only.
+See [Coder hosting](docs/CODER-HOSTING.md) for the verified October 12 routing
+correction and [the release record](docs/RELEASE.md) for the unchanged app bundle.
 
 ## What is implemented
 
@@ -89,7 +91,7 @@ length metadata. Unauthorized requests remain 404.
 See [the current checkpoint](docs/CHECKPOINT.md),
 [the verified release](docs/RELEASE.md),
 [writing and library decisions](docs/WRITING-LIBRARY.md),
-[fixed-hostname hosting](docs/HOSTING.md),
+[Coder workspace hosting](docs/CODER-HOSTING.md),
 [synthetic acceptance screenshots](docs/screenshots/README.md),
 [English-first interaction decisions](docs/ENGLISH-READING.md), and
 [the native architecture](docs/DESIGN.md).

@@ -1,10 +1,17 @@
 # lkjsns release — October 12, 2026
 
+**Hosting correction, 17:22:50 JST:** The unchanged release is now hosted through
+[Coder public port 8793](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
+The custom domain redirects read requests there. The dedicated connector was
+stopped at 17:25 JST; app and data checksums were preserved. The initial-release
+record below describes the earlier deployment. See
+[the verified Coder correction](CODER-HOSTING.md) for current routing and checks.
+
 ## Public release
 
 The writing/library application was promoted at **2026-10-12 15:38:03 JST**
-(06:38:03 UTC). Its canonical public origin is
-[https://lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com).
+(06:38:03 UTC). Its initial public origin was
+[https://lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com), now a redirect to Coder.
 
 This is an actual public-service update, not only a source commit or local build.
 The native application and its dedicated, remotely managed named tunnel were

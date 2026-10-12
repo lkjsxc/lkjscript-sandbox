@@ -1,5 +1,10 @@
 # Fixed-hostname native hosting
 
+Historical named-tunnel design. On October 12, 2026 at 17:22 JST, the user
+reaffirmed Coder workspace hosting and the existing public port was restored.
+[CODER-HOSTING.md](CODER-HOSTING.md) is the current operating contract. The
+dedicated connector described below is now stopped, not the active entrypoint.
+
 The product's canonical origin is an explicit operator setting, not a hostname
 scraped from a temporary tunnel log. Application accounts and data are separate
 from the connector, its token, and all synthetic browser fixtures.

@@ -34,8 +34,10 @@ for UX and media boundaries, and docs/RELEASE.md when a verified public release 
 been recorded. Media HEAD is deliberately unsupported until the native runtime
 can express representation metadata independently of a response body.
 
-Public hosting now uses a fixed named tunnel; consult docs/HOSTING.md. Do not
-reintroduce the stopped temporary-tunnel service through old systemd dependencies.
-Read the effective Wants/After set rather than assuming an empty drop-in removes
-dependencies. The native source/run selection and live service evidence remain
-separate authorities.
+The user requires hosting through the Coder workspace. The canonical entry is
+its existing public port 8793, not a dedicated custom-domain tunnel; consult
+docs/CODER-HOSTING.md. Both dedicated Cloudflare tunnel units are stopped and
+disabled. Do not reintroduce them through old systemd Wants/After dependencies.
+The custom domain is only a read-redirect alias. Keep the exact Coder Host/Origin
+checks and native session/CSRF validation. Source/run selection and live routing
+evidence remain separate authorities.
