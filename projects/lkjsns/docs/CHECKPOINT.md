@@ -1,49 +1,42 @@
 # lkjsns checkpoint — October 13, 2026
 
-The reply-rendering and favicon update is live through
+The profile-derived **lkjsns** favicon is live through
 [Coder public port 8793](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
-Promotion completed at **2026-10-13 06:00:36 JST** with existing user state preserved.
+Promotion completed at **2026-10-13 07:04:03 JST** with existing data and the original lkjsxc
+profile image preserved.
 
-Executable source: `e36e471a71263f676cc5799ed94c7ff43710fa4d`
+Executable source: `72ff3cbbeb8483b06e5b9e66d32e3a80c6c8d234`
 
-Application SHA-256: `777bedfe7300593453775c88051fa6f4151cb77b6a8be2e3b260b1f76cd85051`
+Application SHA-256: `beaf52afd7e20ce5d03c742b9ecd9202c128be2a8255357c68b33472946396d2`
 
-Runtime remains the checksum-pinned lkjscript 0.1.89 executable.
+Runtime remains the unchanged checksum-pinned lkjscript 0.1.89 executable.
 
-## Current repair
+## Current favicon contract
 
-Long parent previews are natively bounded and visually clamped to three lines;
-reply bodies are not shortened by that rule. Do not reintroduce a `display:block`
-override on `.parent-card .context-copy`. Feed, profile, Search and Bookmarks
-reply cards retain their immediate parent context. Reading and composing modes
-have separate link/message behavior. Hidden/deleted/muted parents do not leak
-content or show draft instructions in reading views.
+Use the four-panel/white-circle personal icon, slightly recolored with outlined
+**lkjsns** lettering. Do not revert to the generic lk/ mark. The current content
+revision is `b7cf1e2c2a49`; document heads use versioned icon filenames, and legacy
+icon paths remain compatible. All SVG/ICO/PNG variants are first-party native
+assets, not runtime font-dependent text or user avatar replacements.
 
-`threadview` owns bounded readable reply-window selection and the detail page.
-`journalview` still owns reusable post/draft cards. Reply indexes and stored
-schemas are unchanged. The selected bundle includes SVG/ICO/PNG/touch icons in
-`icons`; all authored icon binaries and the SVG belong in source provenance.
-Normal and error-page heads use the same `icons::links` declarations.
+The reviewed SVG is the source artwork. The optional render-icons.cjs generator
+creates its small indexed PNG/ICO representations. Then embed-icons.cjs updates
+the split native icondata payloads, native links and versioned routes together.
+The ordinary build manifest and exact-byte browser tests bind these to a selected
+bundle. No original avatar image or font file is part of the public source export.
 
-Drive remains primary. Normal page-title banners stay hidden. Item-native media
-selection, whole-draft links, root resource IDs, explicit invitation infinity,
-private tags, search, profile images, and bounded file transfer are retained.
-There is no new application server, external asset CDN or paid execution agent.
+The release passed 487 native tests, 86 synthetic browser groups and 27 read-only
+public groups. Data/object hashes and the original avatar bytes were preserved.
+See [RELEASE.md](RELEASE.md) and [PERSONAL-FAVICON.md](PERSONAL-FAVICON.md).
 
-## Verification and operation
+## Retained application behavior
 
-The exact bundle passed 482 native tests and 83 synthetic browser groups, including
-ten new reply groups, four favicon groups and cold-restart reply/icon checks.
-Eleven axe scenarios reported no selected-rule violations. Read-only public
-verification passed 26 groups. See [RELEASE.md](RELEASE.md) for identities,
-measurements, scope and the preserved-data cutover.
+Bounded readable reply previews, root resource IDs, Drive in primary navigation,
+no normal page-title banners, direct attachment/avatar selection, whole-draft
+links, uncapped/explicitly unlimited invitations, search, private tags and bounded
+256 MiB transfer remain unchanged. Keep object effects outside retried metadata
+transactions and preserve the existing Coder Host/Origin and port 8793.
 
-Use `tests/ux/run.sh` via the normal browser command for optional local acceptance;
-`replies.cjs` and `favicons.cjs` are included. Regenerating icon rasters must be
-accompanied by the matching native payload update; exact-byte browser checks
-catch divergence. Never replace production with a synthetic test store or revive
-the stopped tunnel dependencies. Keep the Coder Host/Origin and port 8793.
-
-Keep private test evidence, credentials and snapshots out of Git. See
-[REPLIES-FAVICON.md](REPLIES-FAVICON.md) for the reproduced regression and
-[DIRECT-INTERACTIONS.md](DIRECT-INTERACTIONS.md) for the retained UI/URL contract.
+Keep private fixtures, raw source-avatar captures, fonts, credentials and snapshots
+out of Git. Do not restart or enable stopped tunnel dependencies. Public smoke
+checks remain read-only and distinct from authenticated synthetic acceptance.
