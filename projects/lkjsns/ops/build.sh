@@ -48,7 +48,14 @@ apply_fragment() {
   printf '  ))\n'
 } > "$work/capabilities.lkjc"
 apply_fragment capabilities "$work/capabilities.lkjc" "$ROOT/src/health.lkjc"
-for name in util paths invitations icons db preferences page assets auth access codec social compose notes drive; do
+for name in util paths invitations; do
+  apply_fragment "$name" "$ROOT/src/$name.lkjc"
+done
+for name in ico png touch; do
+  apply_fragment "icon-$name" "$ROOT/src/icondata/$name.lkjc"
+done
+apply_fragment icons "$ROOT/src/icons.lkjc"
+for name in db preferences page assets auth access codec social compose notes drive; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
 for name in controls navigation; do

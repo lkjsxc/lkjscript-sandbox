@@ -88,4 +88,12 @@
   (route create icon-ico (method GET) (path "/favicon.ico") (port service::app::view))
   (route create icon-png (method GET) (path "/favicon-32.png") (port service::app::view))
   (route create icon-touch (method GET) (path "/apple-touch-icon.png") (port service::app::view))
+
+
+
+
+  (route create icon-current-svg (method GET) (path "/favicon-b7cf1e2c2a49.svg") (port service::app::view))
+  (route create icon-current-ico (method GET) (path "/favicon-b7cf1e2c2a49.ico") (port service::app::view))
+  (route create icon-current-png (method GET) (path "/favicon-b7cf1e2c2a49-32.png") (port service::app::view))
+  (route create icon-current-touch (method GET) (path "/apple-touch-icon-b7cf1e2c2a49.png") (port service::app::view))
 )

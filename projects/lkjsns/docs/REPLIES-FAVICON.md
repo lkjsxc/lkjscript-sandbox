@@ -1,5 +1,8 @@
 # Reply rendering and favicon
 
+> The favicon artwork is superseded by the [profile-derived design](PERSONAL-FAVICON.md).
+> The reply rendering repair described below remains unchanged.
+
 ## Reproduced display regression
 
 The direct-interaction stylesheet changed `.parent-card .context-copy` to

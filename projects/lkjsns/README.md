@@ -81,7 +81,9 @@ authorized request returns 405 with Allow: GET, not incorrect zero-length metada
 Reply cards show their immediate parent as a bounded, readable preview. Long
 parents do not push the reply body out of view, and warnings/private/deleted
 parents retain their access boundaries. The site includes native SVG/ICO favicons
-and a touch icon based on its existing mark.
+and a touch icon based on lkjsxc's personal four-panel/white-circle artwork,
+with slightly adjusted colors and outlined lkjsns lettering. Content-versioned
+icon URLs replace the preceding cached mark while old asset URLs still work.
 
 ## Development
 
@@ -130,7 +132,8 @@ interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [reply rendering and favicon](docs/REPLIES-FAVICON.md),
+See [the profile-derived favicon](docs/PERSONAL-FAVICON.md),
+[reply rendering and favicon](docs/REPLIES-FAVICON.md),
 [direct interactions and resource paths](docs/DIRECT-INTERACTIONS.md),
 [community UX and transfer architecture](docs/COMMUNITY-UX.md),
 [the current checkpoint](docs/CHECKPOINT.md),

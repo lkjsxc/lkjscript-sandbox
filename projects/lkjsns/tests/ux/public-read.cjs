@@ -1,3 +1,4 @@
+const {iconPaths,iconRevision}=require('./icon-paths.cjs');
 // Read-only public verification. Never creates an account, draft, or upload.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {chromium}=require(process.env.LKJSNS_PLAYWRIGHT||'playwright');
@@ -15,7 +16,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
    for(const route of ['/','/login','/join','/about','/search']) {
     const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');
     assert.equal(await p.locator('.page-header').count(),0,route);assert((await p.locator('main h1').getAttribute('class')).includes('sr-only'),route);
-    assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),'/favicon.svg');
+    assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),iconPaths.svg);
     const geometry=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert(geometry.scroll<=geometry.width+1,route);
     assert(response.headers()['content-security-policy'].includes("script-src 'self'"));checks.push(`${scheme} ${width}px ${route}`);
    }
@@ -33,6 +34,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
   const absent='f'.repeat(64);const legacy=await context.request.get(origin+'/note?id='+absent,{maxRedirects:0});assert.equal(legacy.status(),303);assert.equal(legacy.headers().location,'/'+absent);
   const duplicate=await context.request.get(origin+'/'+absent+'?id='+absent);assert.equal(duplicate.status(),400);checks.push('Root-ID redirects and path-authoritative query validation');
   for(const [route,file] of [['/favicon.svg','favicon.svg'],['/favicon.ico','favicon.ico'],['/favicon-32.png','favicon-32.png'],['/apple-touch-icon.png','apple-touch-icon.png']]) {const r=await context.request.get(origin+route);assert.equal(r.status(),200);assert.deepEqual(await r.body(),fs.readFileSync(path.join(root,'web',file)));}checks.push('Public favicon/touch assets exactly match the selected source');
+  for(const [key,file]of [['svg','favicon.svg'],['ico','favicon.ico'],['png','favicon-32.png'],['touch','apple-touch-icon.png']]){const r=await context.request.get(origin+iconPaths[key]);assert.equal(r.status(),200);assert.deepEqual(await r.body(),fs.readFileSync(path.join(root,'web',file)));}checks.push('Content-versioned personal favicon aliases match the outlined lkjsns artwork');
   assert.equal((await context.request.get(origin+'/healthz')).status(),200);assert.deepEqual(errors,[]);checks.push('Public health and browser scripts');
   const report={at:new Date().toISOString(),origin,checks,passed:checks.length,authenticatedWrites:false};
   fs.writeFileSync(path.join(output,'public-read.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
