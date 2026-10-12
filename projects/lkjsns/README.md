@@ -13,9 +13,9 @@ separates local acceptance from public-service verification.
 
 ## Reading, writing, and settings
 
-Home, Search, Notifications, Bookmarks, and Settings are the primary destinations.
-Clicking the account identity opens its profile. Drive, Drafts, and Members are
-reachable from Settings. Profile, profile image, and password changes have their
+Home, Search, Notifications, Bookmarks, Drive, and Settings are the primary destinations.
+Clicking the account identity opens its profile. Drafts and Members remain reachable from Settings. Drive also keeps its
+Settings shortcut. Profile, profile image, and password changes have their
 own settings pages. Admin has an overview and an Invitations child page.
 
 The composer is focused on entry and has a visible text boundary. Save draft,
@@ -51,6 +51,15 @@ Profile images can be selected from ready, nonsensitive Drive images up to 8 MiB
 Their selected representation is public; that does not make the original's private
 Drive URL public. Files currently used by a profile or post cannot be deleted
 until those references are removed.
+
+Normal pages do not repeat their name in a visible top banner. Draft previews are
+whole-card links. Attachment and profile-image pickers use the preview itself as
+the selection control, without separate Attach or Use as profile image buttons.
+
+Posts and files use `/<id>` addresses, with `/<id>/edit` for published editing and
+`/<id>/raw` for originals. Existing query-style resource links redirect to these
+addresses. Invitation counts and durations no longer have the old 20-person/
+30-day caps; blank fields explicitly mean unlimited uses or no expiration.
 
 ## Native server and bounded transfer
 
@@ -116,7 +125,8 @@ interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [community UX and transfer architecture](docs/COMMUNITY-UX.md),
+See [direct interactions and resource paths](docs/DIRECT-INTERACTIONS.md),
+[community UX and transfer architecture](docs/COMMUNITY-UX.md),
 [the current checkpoint](docs/CHECKPOINT.md),
 [the release record](docs/RELEASE.md),
 [Coder workspace hosting](docs/CODER-HOSTING.md), and

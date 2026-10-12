@@ -28,9 +28,9 @@
         (text "<section class=\"panel attachment-next\" id=\"attachment-next\"><h2>Continue writing</h2>")
         (if (call util::has (field (local draft) (name media)) (field (local media) (name id)) (i64 0))
           (call std::text-join (list Text
-            (text "<p class=\"field-help\">This file is already attached to your draft. Its text and audience are unchanged.</p><a class=\"button primary\" href=\"/compose?id=")
+            (text "<p class=\"field-help\">This file is already attached to your draft. Its text and audience are unchanged.</p><a class=\"button primary\" href=\"/")
             (field (local draft) (name id))
-            (text "&amp;saved=1\">Back to writing</a>")) (text ""))
+            (text "/edit&amp;saved=1\">Back to writing</a>")) (text ""))
           (if (call std::less (call std::list-length (types Text) (field (local draft) (name media))) (i64 4))
             (call std::text-join (list Text
               (text "<p class=\"field-help\">Your text is safe in the draft. Save any changes to the file details above first. The action below attaches the file without publishing the post.</p>")

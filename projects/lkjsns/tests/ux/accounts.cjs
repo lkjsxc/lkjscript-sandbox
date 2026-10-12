@@ -1,4 +1,4 @@
-const {chromium,base,fixture,output,fs,path,assert,form,click,goto,pass,save,crypto}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,assert,form,click,goto,pass,save,crypto}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -14,7 +14,7 @@ const {chromium,base,fixture,output,fs,path,assert,form,click,goto,pass,save,cry
    invite:fs.readFileSync(path.join(fixture,'bootstrap.secret'),'utf8').trim()})) await p.locator(`[name=${name}]`).fill(value);
   await click(p,form(p,'join').locator('button')); assert.equal(new URL(p.url()).pathname,'/');
   pass('Real browser bootstrap registration');
-  assert.deepEqual(await p.locator('.nav a').allTextContents(),['Home','Search','Notifications','Bookmarks','Settings']);
+  assert.deepEqual(await p.locator('.nav a').allTextContents(),['Home','Search','Notifications','Bookmarks','Drive','Settings']);
   assert.equal(await p.locator('.account-identity').getAttribute('href'),'/profile?user=testowner');
   assert((await p.locator('h1').getAttribute('class')).includes('sr-only')); assert.equal(await p.getByRole('link',{name:'Refresh',exact:true}).count(),0);
   pass('Primary navigation and account identity destinations');

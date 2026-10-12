@@ -61,7 +61,7 @@
     if(paused)throw new Error('Upload paused. Resume to continue.');
     status.textContent='Saving file…';pause.hidden=true;
     const done=await send('finish',null);const destination=new URL(done.url);
-    if(destination.origin!==location.origin||!['/file','/compose','/pick'].includes(destination.pathname))
+    if(destination.origin!==location.origin||!(/^\/[a-f0-9]{64}(?:\/edit)?$/.test(destination.pathname)||destination.pathname==='/pick'))
      throw new Error('Check Drive before repeating this upload.');
     active=false;location.assign(destination.href);
    }catch(error){status.textContent=error.message;button.textContent=started?'Resume upload':'Retry upload';}
@@ -73,7 +73,7 @@
   if(!link||event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;
   const size=Number(link.dataset.size);if(!Number.isSafeInteger(size)||size<=DIRECT||size>LIMIT)return;
   event.preventDefault();if(link.getAttribute('aria-busy')==='true')return;
-  const url=new URL(link.href);if(url.origin!==location.origin||url.pathname!=='/media')return;
+  const url=new URL(link.href);if(url.origin!==location.origin||!(url.pathname==='/media'||/^\/[a-f0-9]{64}\/raw$/.test(url.pathname)))return;
   const scope=link.closest('.download-workspace,.media-original,.file-detail')||link.parentElement;
   const {progress,status}=feedback(scope);progress.max=size;progress.value=0;link.setAttribute('aria-busy','true');
   let writer;

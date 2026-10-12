@@ -23,8 +23,11 @@ async function createPost(page, body, audience='members', mode='publish') {
   await page.locator('select[name=audience]').selectOption(audience);
   const response=await submit(page,'note',{body,audience,mode});
   const location=response.headers().location; await s.goto(page,location);
-  return new URL(location,s.base).searchParams.get('id');
+  return resourceId(location);
 }
 function save(name,value) {s.fs.writeFileSync(s.path.join(s.fixture,name+'.json'),JSON.stringify(value,null,2),{mode:0o600});}
 function load(name) {return JSON.parse(s.fs.readFileSync(s.path.join(s.fixture,name+'.json')));}
-module.exports={...s,crypto,pass,session,submit,createPost,save,load};
+function resourceId(value){const u=new URL(value,s.base);return u.pathname.match(/^\/([a-f0-9]{64})(?:\/|$)/)?.[1]||u.searchParams.get('id');}
+const isResource=value=>/^\/[a-f0-9]{64}$/.test(new URL(value,s.base).pathname);
+const isEditor=value=>/^\/[a-f0-9]{64}\/edit$/.test(new URL(value,s.base).pathname);
+module.exports={resourceId,isResource,isEditor,...s,crypto,pass,session,submit,createPost,save,load};

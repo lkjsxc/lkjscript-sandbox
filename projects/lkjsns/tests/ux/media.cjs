@@ -1,10 +1,10 @@
-const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,submit,save,load}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,submit,save,load}=require('./support.cjs');
 async function upload(page,file,draft='') {
  await goto(page,'/upload'+(draft?'?draft='+draft:''));
  assert.equal(await page.locator('input[type=file]').getAttribute('accept'),null);
  await page.locator('input[type=file]').setInputFiles(file);
  await click(page,page.getByRole('button',{name:'Upload',exact:true}));
- const url=new URL(page.url());assert(['/file','/compose'].includes(url.pathname));return url.searchParams.get('id');
+ const url=new URL(page.url());assert(isResource(url)||isEditor(url));return resourceId(url);
 }
 (async()=>{
  const browser=await chromium.launch({headless:true});
@@ -33,13 +33,13 @@ async function upload(page,file,draft='') {
   const unsafeIds=[];
   for(const name of ['document.svg','document.html','opaque.bin','empty.txt']) {
    const id=await upload(p,path.join(files,name));unsafeIds.push(id);
-   const r=await context.request.get(base+'/media?id='+id);assert.equal(r.status(),200);
+   const r=await context.request.get(base+'/'+id+'/raw');assert.equal(r.status(),200);
    assert.deepEqual(await r.body(),fs.readFileSync(path.join(files,name)));assert(r.headers()['content-type'].startsWith('application/octet-stream'));
    assert(r.headers()['content-disposition'].startsWith('attachment'));
   }
   pass('SVG, HTML, arbitrary binary and zero-byte files are accepted as safe downloads');
   const avatarId=await upload(p,path.join(files,'sample-0.png'));
-  await click(p,p.getByRole('button',{name:'Use as profile image',exact:true}));
+  await goto(p,'/settings/avatar');await click(p,form(p,'avatar').filter({has:p.locator('input[name=id][value="'+avatarId+'"]')}).locator('.media-choice'));
   assert.equal(new URL(p.url()).pathname,'/settings/profile');
   const guest=await browser.newContext();const publicAvatar=await guest.request.get(base+'/avatar?user=testowner');assert.equal(publicAvatar.status(),200);
   assert.deepEqual(await publicAvatar.body(),fs.readFileSync(path.join(files,'sample-0.png')));
@@ -52,15 +52,15 @@ async function upload(page,file,draft='') {
   await click(p,p.getByRole('link',{name:/Upload/,exact:false}).first());
   await p.locator('input[type=file]').setInputFiles(path.join(files,'sample-1.png'));
   await click(p,p.getByRole('button',{name:'Upload',exact:true}));
-  assert.equal(new URL(p.url()).pathname,'/compose');assert.equal(new URL(p.url()).searchParams.get('id'),draft);
+  assert(isEditor(p.url())||new URL(p.url()).pathname==='/compose');assert.equal(resourceId(p.url()),draft);
   assert.equal(await p.locator('.composer-attachments img').count(),1);
   assert.equal(await p.locator('[name=body]').inputValue(),'Attachment journey through one writing workspace.');
   pass('Upload from the picker attaches to the saved draft and returns directly to writing');
   const attachmentURL=await p.locator('.composer-attachments img').getAttribute('src');
-  const attached=new URL(attachmentURL,base).searchParams.get('id');
+  const attached=resourceId(attachmentURL,base);
   assert.equal((await guest.request.get(base+attachmentURL)).status(),404);
   await p.locator('select[name=audience]').selectOption('public');
-  await click(p,p.getByRole('button',{name:'Post',exact:true}));const postId=new URL(p.url()).searchParams.get('id');
+  await click(p,p.getByRole('button',{name:'Post',exact:true}));const postId=resourceId(p.url());
   const publicFile=await guest.request.get(base+'/media?id='+attached+'&note='+postId);assert.equal(publicFile.status(),200);
   const range=await guest.request.get(base+'/media?id='+attached+'&note='+postId,{headers:{Range:'bytes=2-15'}});assert.equal(range.status(),206);
   assert.deepEqual(await range.body(),fs.readFileSync(path.join(files,'sample-1.png')).subarray(2,16));

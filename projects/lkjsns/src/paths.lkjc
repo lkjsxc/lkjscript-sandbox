@@ -1,0 +1,52 @@
+(module create paths
+  (function create id (visibility public)
+    (parameter create path (type Text))
+    (returns Text) (effect pure)
+    (body (if (if (call std::less-equal (i64 65) (call util::size (local path))) (if (call std::less-equal (call util::size (local path)) (i64 73)) (bool true) (bool false)) (bool false)) (let (binding id (call util::slice (local path) (i64 1) (i64 65))) (binding tail (call util::slice (local path) (i64 65) (call util::size (local path)))) (in (if (if (call std::text-starts-with (local path) (text "/")) (if (call util::token (local id)) (if (call util::has (list Text (text "") (text "/edit") (text "/preview") (text "/raw")) (local tail) (i64 0)) (bool true) (bool false)) (bool false)) (bool false)) (local id) (text "")))) (text ""))))
+
+  (function create suffix (visibility public)
+    (parameter create path (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::text-equal (call paths::id (local path)) (text "")) (text "") (call util::slice (local path) (i64 65) (call util::size (local path))))))
+
+  (function create resource (visibility public)
+    (parameter create id (type Text))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "/") (local id)) (text ""))))
+
+  (function create tail (visibility public)
+    (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::text-starts-with (local value) (text "&")) (call std::text-join (list Text (text "?") (call util::slice (local value) (i64 1) (call util::size (local value)))) (text "")) (local value))))
+
+  (function create convert (visibility public)
+    (parameter create value (type Text))
+    (parameter create prefix (type Text))
+    (parameter create suffix (type Text))
+    (returns Text) (effect pure)
+    (body (if (if (call std::text-starts-with (local value) (local prefix)) (if (call std::less-equal (call std::add (call util::size (local prefix)) (i64 64)) (call util::size (local value))) (bool true) (bool false)) (bool false)) (let (binding end (call std::add (call util::size (local prefix)) (i64 64))) (binding id (call util::slice (local value) (call util::size (local prefix)) (local end))) (binding rest (call util::slice (local value) (local end) (call util::size (local value)))) (in (if (if (call util::token (local id)) (if (if (call std::text-equal (local rest) (text "")) (bool true) (if (call std::text-starts-with (local rest) (text "&")) (bool true) (if (call std::text-starts-with (local rest) (text "#")) (bool true) (bool false)))) (bool true) (bool false)) (bool false)) (call std::text-join (list Text (call paths::resource (local id)) (local suffix) (call paths::tail (local rest))) (text "")) (local value)))) (local value))))
+
+  (function create canonical (visibility public)
+    (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (call paths::convert (call paths::convert (call paths::convert (call paths::convert (local value) (text "/note?id=") (text "")) (text "/file?id=") (text "")) (text "/compose?id=") (text "/edit")) (text "/media?id=") (text "/raw"))))
+
+  (test create root-id (visibility private) (actual (call paths::id (text "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))) (expected (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")))
+
+  (test create edit-id (visibility private) (actual (call paths::id (text "/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/edit"))) (expected (text "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")))
+
+  (test create reject-reserved (visibility private) (actual (call paths::id (text "/settings"))) (expected (text "")))
+
+  (test create reject-suffix (visibility private) (actual (call paths::id (text "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/missing"))) (expected (text "")))
+
+  (test create note-query (visibility private) (actual (call paths::canonical (text "/note?id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&cursor=30#conversation"))) (expected (text "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?cursor=30#conversation")))
+
+  (test create file-context (visibility private) (actual (call paths::canonical (text "/file?id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&draft=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))) (expected (text "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?draft=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")))
+
+  (test create edit-query (visibility private) (actual (call paths::canonical (text "/compose?id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&preview=1"))) (expected (text "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/edit?preview=1")))
+
+  (test create non-resource-unchanged (visibility private) (actual (call paths::canonical (text "/pick?draft=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))) (expected (text "/pick?draft=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")))
+
+  (test create invalid-id-unchanged (visibility private) (actual (call paths::canonical (text "/note?id=bad"))) (expected (text "/note?id=bad")))
+
+)

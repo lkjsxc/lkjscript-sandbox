@@ -1,4 +1,4 @@
-const {chromium,base,output,path,assert,form,click,goto,pass,session,createPost,load,save}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,output,path,assert,form,click,goto,pass,session,createPost,load,save}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -8,7 +8,7 @@ const {chromium,base,output,path,assert,form,click,goto,pass,session,createPost,
   await goto(p,'/search');assert.equal(await p.locator('form.search-form input:not([type=hidden])').count(),1);
   assert.equal(await p.locator('form.search-form select').count(),0);assert.equal(await p.locator('#search-query').evaluate(e=>e===document.activeElement),true);
   await p.locator('#search-query').fill('RIVERSIDE');await click(p,p.locator('.search-form button'));
-  assert.equal(await p.locator('article.note[data-href="/note?id='+posts.publicId+'"]').count(),1);
+  assert.equal(await p.locator('article.note[data-href="/'+posts.publicId+'"]').count(),1);
   await goto(g,'/search?q=RIVERSIDE');assert.equal(await g.locator('article.note').count(),1);
   pass('Query-only search, autofocus and case-insensitive public post matching');
   await goto(p,'/search?q=constellation');assert.equal(await p.locator('article.note').count(),1);

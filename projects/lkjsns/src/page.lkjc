@@ -32,7 +32,7 @@
   (function create nav (visibility public)
     (parameter create title (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (call page::link (text "/") (text "Home") (text "home") (call std::text-equal (local title) (text "Home"))) (call page::link (text "/search") (text "Search") (text "search") (call std::text-equal (local title) (text "Search"))) (call page::link (text "/notifications") (text "Notifications") (text "bell") (call std::text-equal (local title) (text "Notifications"))) (call page::link (text "/saved") (text "Bookmarks") (text "bookmark") (call std::text-equal (local title) (text "Bookmarks"))) (call page::link (text "/settings") (text "Settings") (text "settings") (call std::text-equal (local title) (text "Settings")))) (text ""))))
+    (body (call std::text-join (list Text (call page::link (text "/") (text "Home") (text "home") (call std::text-equal (local title) (text "Home"))) (call page::link (text "/search") (text "Search") (text "search") (call std::text-equal (local title) (text "Search"))) (call page::link (text "/notifications") (text "Notifications") (text "bell") (call std::text-equal (local title) (text "Notifications"))) (call page::link (text "/saved") (text "Bookmarks") (text "bookmark") (call std::text-equal (local title) (text "Bookmarks"))) (call page::link (text "/drive") (text "Drive") (text "drive") (call std::text-equal (local title) (text "Drive"))) (call page::link (text "/settings") (text "Settings") (text "settings") (call std::text-equal (local title) (text "Settings")))) (text ""))))
 
   (function create guest-nav (visibility public)
     (parameter create title (type Text)) (returns Text) (effect pure)
@@ -49,7 +49,7 @@
     (parameter create ctx (type Context))
     (parameter create title (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (if (call util::signed (local ctx)) (call std::text-join (list Text (text "<nav class=\"mobile-nav\" aria-label=\"Main navigation\">") (call page::link (text "/") (text "Home") (text "home") (call std::text-equal (local title) (text "Home"))) (call page::link (text "/search") (text "Search") (text "search") (call std::text-equal (local title) (text "Search"))) (call page::link (text "/compose") (text "Post") (text "plus") (call std::text-equal (local title) (text "Post"))) (call page::link (text "/notifications") (text "Activity") (text "bell") (call std::text-equal (local title) (text "Activity"))) (call page::link (text "/saved") (text "Bookmarks") (text "bookmark") (call std::text-equal (local title) (text "Bookmarks"))) (call page::link (text "/settings") (text "Settings") (text "settings") (call std::text-equal (local title) (text "Settings")))) (text "")) (call std::text-join (list Text (text "<nav class=\"mobile-nav guest-nav\" aria-label=\"Main navigation\">") (call page::guest-nav (local title))) (text ""))) (text "</nav>")) (text ""))))
+    (body (call std::text-join (list Text (if (call util::signed (local ctx)) (call std::text-join (list Text (text "<nav class=\"mobile-nav\" aria-label=\"Main navigation\">") (call page::link (text "/") (text "Home") (text "home") (call std::text-equal (local title) (text "Home"))) (call page::link (text "/search") (text "Search") (text "search") (call std::text-equal (local title) (text "Search"))) (call page::link (text "/compose") (text "Post") (text "plus") (call std::text-equal (local title) (text "Write"))) (call page::link (text "/notifications") (text "Activity") (text "bell") (call std::text-equal (local title) (text "Notifications"))) (call page::link (text "/saved") (text "Bookmarks") (text "bookmark") (call std::text-equal (local title) (text "Bookmarks"))) (call page::link (text "/drive") (text "Drive") (text "drive") (call std::text-equal (local title) (text "Drive"))) (call page::link (text "/settings") (text "Settings") (text "settings") (call std::text-equal (local title) (text "Settings")))) (text "")) (call std::text-join (list Text (text "<nav class=\"mobile-nav guest-nav\" aria-label=\"Main navigation\">") (call page::guest-nav (local title))) (text ""))) (text "</nav>")) (text ""))))
 
   (function create frame-at (visibility public)
     (parameter create ctx (type Context)) (parameter create title (type Text))
@@ -76,7 +76,7 @@
         (call std::text-join (list Text (call std::text-join (list Text (text "<a class=\"account-identity\" href=\"/profile?user=") (call std::html-escape-text (field (local ctx) (name user))) (text "\">")) (text ""))
           (call page::avatar (field (local ctx) (name user))) (text "<strong>@")
           (call std::html-escape-text (field (local ctx) (name user))) (text "</strong></a>")) (text "")) (text ""))
-      (call std::text-join (list Text (text "<small><a href=\"/about\">About</a></small></div></aside><main id=\"main\" class=\"content\" tabindex=\"-1\">") (if (call util::has (list Text (text "Home") (text "Profile") (text "Notifications")) (local place) (i64 0)) (call std::text-join (list Text (text "<h1 class=\"sr-only\">") (call std::html-escape-text (local title)) (text "</h1>")) (text "")) (call std::text-join (list Text (text "<header class=\"page-header\"><h1>") (call std::html-escape-text (local title)) (text "</h1></header>")) (text "")))) (text "")) (local body) (text "</main></div>")
+      (call std::text-join (list Text (text "<small><a href=\"/about\">About</a></small></div></aside><main id=\"main\" class=\"content\" tabindex=\"-1\">") (call std::text-join (list Text (text "<h1 class=\"sr-only\">") (call std::html-escape-text (local title)) (text "</h1>")) (text ""))) (text "")) (local body) (text "</main></div>")
       (call page::mobile (local ctx) (local place)) (text "</body></html>")) (text ""))))
 
   (function create frame (visibility public)
@@ -98,7 +98,7 @@
   (function create reply
     (visibility public) (parameter create status (type I64)) (parameter create body (type Text)) (parameter create location (type Text)) (parameter create cookie (type Text))
     (returns Response) (effect pure)
-    (body (call page::raw (local status) (call std::bytes-from-text (local body)) (text "text/html; charset=utf-8") (call page::append-headers (if (call std::text-equal (local location) (text "")) (list Header) (list Header (call editor::header (text "location") (local location)))) (if (call std::text-equal (local cookie) (text "")) (list Header) (list Header (call editor::header (text "set-cookie") (local cookie)))) (i64 0)))))
+    (body (call page::raw (local status) (call std::bytes-from-text (local body)) (text "text/html; charset=utf-8") (call page::append-headers (if (call std::text-equal (local location) (text "")) (list Header) (list Header (call editor::header (text "location") (call paths::canonical (local location))))) (if (call std::text-equal (local cookie) (text "")) (list Header) (list Header (call editor::header (text "set-cookie") (local cookie)))) (i64 0)))))
 
   (function create redirect
     (visibility public) (parameter create location (type Text))

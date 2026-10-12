@@ -14,6 +14,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
    await p.emulateMedia({colorScheme:scheme,reducedMotion:'reduce'});await p.setViewportSize({width,height:900});
    for(const route of ['/','/login','/join','/about','/search']) {
     const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');
+    assert.equal(await p.locator('.page-header').count(),0,route);assert((await p.locator('main h1').getAttribute('class')).includes('sr-only'),route);
     const geometry=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert(geometry.scroll<=geometry.width+1,route);
     assert(response.headers()['content-security-policy'].includes("script-src 'self'"));checks.push(`${scheme} ${width}px ${route}`);
    }
@@ -28,6 +29,8 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
    const response=await p.goto(origin+route);assert.equal(response.status(),404);assert.equal(await p.locator('main h1').innerText(),'This page is unavailable');
    assert.equal(await p.getByRole('link',{name:'Sign in',exact:true}).count(),0);
   }checks.push('Unknown public paths render the branded unavailable page');
+  const absent='f'.repeat(64);const legacy=await context.request.get(origin+'/note?id='+absent,{maxRedirects:0});assert.equal(legacy.status(),303);assert.equal(legacy.headers().location,'/'+absent);
+  const duplicate=await context.request.get(origin+'/'+absent+'?id='+absent);assert.equal(duplicate.status(),400);checks.push('Root-ID redirects and path-authoritative query validation');
   assert.equal((await context.request.get(origin+'/healthz')).status(),200);assert.deepEqual(errors,[]);checks.push('Public health and browser scripts');
   const report={at:new Date().toISOString(),origin,checks,passed:checks.length,authenticatedWrites:false};
   fs.writeFileSync(path.join(output,'public-read.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

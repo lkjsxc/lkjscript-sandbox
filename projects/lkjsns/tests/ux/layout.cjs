@@ -1,4 +1,4 @@
-const {chromium,base,root,output,fs,path,assert,goto,pass,session,load}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,root,output,fs,path,assert,goto,pass,session,load}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -35,14 +35,14 @@ const {chromium,base,root,output,fs,path,assert,goto,pass,session,load}=require(
    assert(fs.existsSync(axePath),'The requested axe script does not exist.');
    const script=fs.readFileSync(axePath,'utf8');const reports=[];
    await p.emulateMedia({colorScheme:'light'});await p.setViewportSize({width:1280,height:950});
-   for(const route of ['/','/compose','/settings','/settings/profile','/drive','/notifications','/search']) {
+   for(const route of ['/','/compose','/settings','/settings/profile','/drive','/notifications','/search','/settings/avatar']) {
     await goto(p,route);await p.evaluate(script);
     const report=await p.evaluate(async()=>axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}));
     reports.push({route,violations:report.violations.map(v=>({id:v.id,impact:v.impact,help:v.help,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))});
    }
    fs.writeFileSync(path.join(output,'accessibility.json'),JSON.stringify(reports,null,2));
    const serious=reports.flatMap(r=>r.violations.filter(v=>['critical','serious'].includes(v.impact)).map(v=>({route:r.route,...v})));
-   assert.deepEqual(serious,[],JSON.stringify(serious,null,2));pass('Automated accessibility checks: no serious or critical findings on seven primary routes');
+   assert.deepEqual(serious,[],JSON.stringify(serious,null,2));pass('Automated accessibility checks: no serious or critical findings on eight primary routes');
   } else {console.log('SKIP optional accessibility audit: set LKJSNS_AXE to an installed axe.min.js.');}
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

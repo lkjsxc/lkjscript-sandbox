@@ -1,4 +1,4 @@
-const {chromium,base,fixture,output,path,assert,form,fields,click,goto,pass,session,submit,createPost,save}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,fixture,output,path,assert,form,fields,click,goto,pass,session,submit,createPost,save}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -20,31 +20,31 @@ const {chromium,base,fixture,output,path,assert,form,fields,click,goto,pass,sess
   pass('Unsaved audience selection persists in the server, not just local storage');
   await p.locator('[name=body]').fill('A small observation from the riverside.');
   await click(p,p.getByRole('button',{name:'Save & preview',exact:true}));
-  assert.equal(new URL(p.url()).pathname,'/compose');assert.equal(new URL(p.url()).searchParams.get('preview'),'1');
+  assert(isEditor(p.url())||new URL(p.url()).pathname==='/compose');assert.equal(new URL(p.url()).searchParams.get('preview'),'1');
   const order=await p.evaluate(()=>document.querySelector('.preview-card').getBoundingClientRect().top<document.querySelector('.preview-summary').getBoundingClientRect().top);
   assert(order);await p.screenshot({path:path.join(output,'preview-desktop.png'),fullPage:true});
-  const draft=new URL(p.url()).searchParams.get('id');assert(draft);
+  const draft=resourceId(p.url());assert(draft);
   pass('Preview shows the post before its audience summary');
   await goto(p,'/compose?id='+draft);
   const actions=await p.locator('.form-actions').innerText();
   assert(actions.indexOf('Delete post')<actions.indexOf('Save draft'));assert(actions.indexOf('Save draft')<actions.indexOf('Post'));
   await p.locator('[name=body]').fill('Unsubmitted text must survive Cancel.');
-  await p.getByRole('link',{name:'Delete post',exact:true}).click();await p.getByRole('dialog').waitFor();assert.equal(new URL(p.url()).pathname,'/compose');
+  await p.getByRole('link',{name:'Delete post',exact:true}).click();await p.getByRole('dialog').waitFor();assert(isEditor(p.url())||new URL(p.url()).pathname==='/compose');
   assert.equal(await p.locator('input[type=checkbox]').count(),0);
-  await p.getByRole('dialog').getByRole('button',{name:'Cancel',exact:true}).click();assert.equal(new URL(p.url()).pathname,'/compose');
+  await p.getByRole('dialog').getByRole('button',{name:'Cancel',exact:true}).click();assert(isEditor(p.url())||new URL(p.url()).pathname==='/compose');
   assert.equal(await p.locator('[name=body]').inputValue(),'Unsubmitted text must survive Cancel.');
   await p.locator('[name=body]').fill('A small observation from the riverside.');
   pass('Direct delete action opens a single native confirmation; Cancel preserves unsubmitted writing');
-  await click(p,p.getByRole('button',{name:'Post',exact:true}));assert.equal(new URL(p.url()).pathname,'/note');
-  const publicId=new URL(p.url()).searchParams.get('id');
+  await click(p,p.getByRole('button',{name:'Post',exact:true}));assert(isResource(p.url()));
+  const publicId=resourceId(p.url());
   await goto(p,'/');const card=p.locator('article.note').filter({hasText:'A small observation from the riverside.'});
   await click(p,card.getByText('A small observation from the riverside.',{exact:true}));
-  assert.equal(new URL(p.url()).searchParams.get('id'),publicId);
+  assert.equal(resourceId(p.url()),publicId);
   pass('Clicking a post body opens its permalink');
   const member=await session(browser,'member');const mp=await member.newPage();await goto(mp,'/note?id='+publicId);
   const attention=form(mp,'eyes');assert.equal(await attention.count(),1);
   assert((await attention.innerText()).includes('Attention'));
-  await click(mp,attention.locator('button'));assert.equal(new URL(mp.url()).pathname,'/note');
+  await click(mp,attention.locator('button'));assert(isResource(mp.url()));
   assert.equal(await form(mp,'eyes').locator('button').getAttribute('aria-pressed'),'true');
   await goto(p,'/notifications');assert((await p.locator('body').innerText()).includes('attention'));
   assert((await p.locator('h1').getAttribute('class')).includes('sr-only'));

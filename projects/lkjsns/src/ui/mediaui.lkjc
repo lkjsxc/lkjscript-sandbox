@@ -3,7 +3,7 @@
     (parameter create media (type Media))
     (parameter create note-id (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (text "/media?id=") (field (local media) (name id)) (text "&note=") (local note-id)) (text ""))))
+    (body (call paths::canonical (call std::text-join (list Text (text "/media?id=") (field (local media) (name id)) (text "&note=") (local note-id)) (text "")))))
 
   (function create original (visibility public)
     (parameter create media (type Media))
@@ -68,7 +68,7 @@
 
   (test create owner-url-has-no-session (visibility private)
     (actual (call mediaui::url (call mediaui::fixture-media (text "ready")) (text "")))
-    (expected (text "/media?id=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff&note=")))
+    (expected (text "/ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff/raw?note=")))
 
   (test create private-owner-can-open (visibility private)
     (actual (call access::media (call mediaui::fixture-viewer (text "alice"))

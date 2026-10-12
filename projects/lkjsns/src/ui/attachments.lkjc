@@ -9,12 +9,12 @@
     (parameter create draft (type Text))
     (parameter create destination (type Text))
     (returns Text) (effect pure)
-    (body (if (call util::token (local draft))
+    (body (call paths::canonical (if (call util::token (local draft))
       (call std::text-join (list Text
         (if (call std::text-equal (local destination) (text "compose"))
           (text "/compose?id=") (text "/pick?draft="))
         (local draft) (text "&saved=1")) (text ""))
-      (text "/drive"))))
+      (text "/drive")))))
 
   (function create destination (visibility public)
     (parameter create value (type Text))
@@ -57,7 +57,7 @@
   (test create return-to-composer-is-local (visibility private)
     (actual (call attachments::location
       (text "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") (text "compose")))
-    (expected (text "/compose?id=eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&saved=1")))
+    (expected (text "/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/edit?saved=1")))
 
   (test create invalid-draft-cannot-inject-query (visibility private)
     (actual (call attachments::location (text "abc&next=https://example.invalid") (text "compose")))

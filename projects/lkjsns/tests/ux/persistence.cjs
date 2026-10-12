@@ -1,4 +1,4 @@
-const {chromium,base,assert,goto,pass,session,load}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,assert,goto,pass,session,load}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -19,7 +19,7 @@ const {chromium,base,assert,goto,pass,session,load}=require('./support.cjs');
   const part=endpoint('part');part.searchParams.set('part','1');
   response=await clean.request.post(part.href,{headers:{Origin:base,'Content-Type':'application/octet-stream'},data:Buffer.alloc(9,44),maxRedirects:0});assert.equal(response.status(),204);
   response=await clean.request.post(endpoint('finish').href,{headers:{Origin:base},maxRedirects:0});assert.equal(response.status(),303);
-  response=await clean.request.get(base+'/media?id='+url.searchParams.get('id'));assert.deepEqual(await response.body(),Buffer.concat([Buffer.alloc(4*1024*1024,33),Buffer.alloc(9,44)]));
+  response=await clean.request.get(base+'/media?id='+resourceId(url));assert.deepEqual(await response.body(),Buffer.concat([Buffer.alloc(4*1024*1024,33),Buffer.alloc(9,44)]));
   pass('A pending upload resumes from its durable part acknowledgement after native restart');
 
  } finally {await browser.close();}

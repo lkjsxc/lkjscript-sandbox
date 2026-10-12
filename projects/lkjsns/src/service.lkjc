@@ -83,4 +83,5 @@
   (route create transfer-upload-finish (method POST) (path "/upload/finish") (port service::app::view))
   (route create transfer-download (method GET) (path "/download") (port service::app::view))
   (route create transfer-transfer-js (method GET) (path "/transfer.js") (port service::app::view))
+  (route create head-resource (method HEAD) (pattern "/{missing0}/{missing1}") (port service::app::unavailable-2))
 )

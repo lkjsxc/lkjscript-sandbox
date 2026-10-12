@@ -1,0 +1,57 @@
+(module create invitations
+  (function create digits (visibility public)
+    (parameter create bytes (type Bytes))
+    (parameter create index (type I64))
+    (parameter create out (type I64))
+    (returns I64) (effect pure)
+    (body (if (call std::less (local index) (call std::bytes-length (local bytes))) (let (binding digit (call std::subtract (call std::bytes-get (local bytes) (local index)) (i64 48))) (in (if (if (call std::less-equal (i64 0) (local digit)) (if (call std::less-equal (local digit) (i64 9)) (if (call std::less-equal (local out) (call std::divide (call std::subtract (i64 9223372036854775807) (local digit)) (i64 10))) (bool true) (bool false)) (bool false)) (bool false)) (call invitations::digits (local bytes) (call std::add (local index) (i64 1)) (call std::add (call std::multiply (local out) (i64 10)) (local digit))) (i64 -2)))) (if (call std::less (i64 0) (local out)) (local out) (i64 -2)))))
+
+  (function create amount (visibility public)
+    (parameter create value (type Text))
+    (returns I64) (effect pure)
+    (body (if (call std::text-equal (local value) (text "")) (i64 -1) (if (call std::less-equal (call util::size (local value)) (i64 19)) (call invitations::digits (call std::bytes-from-text (local value)) (i64 0) (i64 0))  (i64 -2)))))
+
+  (function create expires (visibility public)
+    (parameter create now (type I64))
+    (parameter create days (type I64))
+    (returns I64) (effect pure)
+    (body (if (call std::i64-equal (local days) (i64 -1)) (i64 -1) (if (if (call std::less-equal (i64 0) (local now)) (if (call std::less (i64 0) (local days)) (if (call std::less-equal (local days) (call std::divide (call std::subtract (i64 9223372036854775807) (local now)) (i64 86400000))) (bool true) (bool false)) (bool false)) (bool false)) (call std::add (local now) (call std::multiply (local days) (i64 86400000))) (i64 -2)))))
+
+  (function create usable (visibility public)
+    (parameter create invite (type Invite))
+    (parameter create now (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call util::token (field (local invite) (name id))) (if (call std::bool-not (field (local invite) (name revoked))) (if (if (call std::i64-equal (field (local invite) (name expires)) (i64 -1)) (bool true) (if (call std::less (local now) (field (local invite) (name expires))) (bool true) (bool false))) (if (if (call std::i64-equal (field (local invite) (name remaining)) (i64 -1)) (bool true) (if (call std::less (i64 0) (field (local invite) (name remaining))) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool false)) (bool false))))
+
+  (function create consume (visibility public)
+    (parameter create remaining (type I64))
+    (returns I64) (effect pure)
+    (body (if (call std::i64-equal (local remaining) (i64 -1)) (i64 -1) (call std::subtract (local remaining) (i64 1)))))
+
+  (test create blank-is-unlimited (visibility private) (actual (call invitations::amount (text ""))) (expected (i64 -1)))
+
+  (test create above-old-people-limit (visibility private) (actual (call invitations::amount (text "1000"))) (expected (i64 1000)))
+
+  (test create above-old-day-limit (visibility private) (actual (call invitations::amount (text "36500"))) (expected (i64 36500)))
+
+  (test create full-i64 (visibility private) (actual (call invitations::amount (text "9223372036854775807"))) (expected (i64 9223372036854775807)))
+
+  (test create overflow-rejected (visibility private) (actual (call invitations::amount (text "9223372036854775808"))) (expected (i64 -2)))
+
+  (test create zero-rejected (visibility private) (actual (call invitations::amount (text "0"))) (expected (i64 -2)))
+
+  (test create negative-rejected (visibility private) (actual (call invitations::amount (text "-1"))) (expected (i64 -2)))
+
+  (test create fraction-rejected (visibility private) (actual (call invitations::amount (text "1.5"))) (expected (i64 -2)))
+
+  (test create exponent-rejected (visibility private) (actual (call invitations::amount (text "1e3"))) (expected (i64 -2)))
+
+  (test create unlimited-remains-unlimited (visibility private) (actual (call invitations::consume (i64 -1))) (expected  (i64 -1)))
+
+  (test create finite-decrement (visibility private) (actual (call invitations::consume (i64 1))) (expected  (i64 0)))
+
+  (test create never-expires (visibility private) (actual (call invitations::expires (i64 1790000000000) (i64 -1))) (expected  (i64 -1)))
+
+  (test create expiry-overflow-rejected (visibility private) (actual (call invitations::expires (i64 1790000000000) (i64 9223372036854775807))) (expected  (i64 -2)))
+
+)

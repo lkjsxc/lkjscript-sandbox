@@ -1,4 +1,4 @@
-const {chromium,base,root,fixture,fs,path,assert,form,fields,click,goto,pass,session,load,save,crypto}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,root,fixture,fs,path,assert,form,fields,click,goto,pass,session,load,save,crypto}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -18,7 +18,7 @@ const {chromium,base,root,fixture,fs,path,assert,form,fields,click,goto,pass,ses
   assert.equal((await owner.request.get(base+'/',{headers:{Host:'example.invalid'}})).status(),400);
   assert.equal((await owner.request.get(base+'/note?id=a&id=b')).status(),400);
   const media=load('media'),posts=load('posts');
-  for(const route of ['/file?id='+media.textId,'/media?id='+media.textId,'/compose?id='+posts.protectedDraft,'/delete?kind=post&id='+posts.protectedDraft]) {
+  for(const route of ['/'+media.textId,'/'+media.textId+'/raw','/'+posts.protectedDraft+'/edit','/delete?kind=post&id='+posts.protectedDraft]) {
    assert.equal((await member.request.get(base+route,{maxRedirects:0})).status(),404,route);
   }
   assert.equal((await guest.request.get(base+'/media?id='+media.textId)).status(),404);

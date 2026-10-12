@@ -1,5 +1,5 @@
 // Transfer/recovery checks only ever touch the isolated synthetic store.
-const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,save,load}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,save,load}=require('./support.cjs');
 const CHUNK=4*1024*1024;
 (async()=>{
  const browser=await chromium.launch({headless:true});
@@ -15,11 +15,11 @@ const CHUNK=4*1024*1024;
   });
   await goto(p,'/upload');await p.locator('input[type=file]').setInputFiles(file);await p.getByRole('button',{name:'Upload',exact:true}).click();
   await p.getByRole('button',{name:'Resume upload',exact:true}).waitFor({state:'visible'});assert(lost);
-  await Promise.all([p.waitForURL(url=>url.pathname==='/file'),p.getByRole('button',{name:'Resume upload',exact:true}).click()]);
-  const id=new URL(p.url()).searchParams.get('id');const downloaded=await context.request.get(base+'/media?id='+id);assert.deepEqual(await downloaded.body(),content);
+  await Promise.all([p.waitForURL(url=>isResource(url)),p.getByRole('button',{name:'Resume upload',exact:true}).click()]);
+  const id=resourceId(p.url());const downloaded=await context.request.get(base+'/'+id+'/raw');assert.deepEqual(await downloaded.body(),content);
   assert.deepEqual(seen,[0,1,2]);await p.unroute('**/upload/part?**');
   pass('Browser resume recovers a lost acknowledgement without resending saved parts');
-  const guest=await browser.newContext();assert.equal((await guest.request.get(base+'/media?id='+id)).status(),404);
+  const guest=await browser.newContext();assert.equal((await guest.request.get(base+'/'+id+'/raw')).status(),404);
   await goto(p,'/file?id='+id);const before=await fields(p,'file');await p.locator('[name=tags]').fill('first');await click(p,form(p,'file').locator('button'));
   const conflict=await context.request.post(base+'/action',{headers:{Origin:base},form:{...before,tags:'submitted, retry'},maxRedirects:0});assert.equal(conflict.status(),409);
   const html=await conflict.text();assert(html.includes('submitted, retry'));await goto(p,'/file?id='+id);assert.equal(await p.locator('[name=tags]').inputValue(),'first');
@@ -35,7 +35,7 @@ const CHUNK=4*1024*1024;
   // Existing browser codecs still work on chunk-backed originals.
   for(const [name,kind] of [['tone.wav','audio'],['motion.webm','video']]) {
    await goto(p,'/upload');await p.locator('input[type=file]').setInputFiles(path.join(output,'media',name));
-   await Promise.all([p.waitForURL(url=>url.pathname==='/file'),p.getByRole('button',{name:'Upload',exact:true}).click()]);
+   await Promise.all([p.waitForURL(url=>isResource(url)),p.getByRole('button',{name:'Upload',exact:true}).click()]);
    assert.equal(await p.locator(kind).count(),1);await p.locator(kind).evaluate(el=>el.load());
    await p.waitForFunction(kind=>{const e=document.querySelector(kind);return e&&e.readyState>=1;},kind);
    const metadata=await p.locator(kind).evaluate(e=>({duration:e.duration,error:e.error?.code}));assert(!metadata.error);assert(metadata.duration>0);
