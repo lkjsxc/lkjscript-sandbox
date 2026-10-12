@@ -1,5 +1,9 @@
 # Community UX and bounded media transfer
 
+> Superseded in part by [direct interactions](DIRECT-INTERACTIONS.md): Drive is
+> again primary, all normal page banners are hidden, picker items are direct
+> controls, and resources use root-ID URLs. The transfer architecture below remains.
+
 This work replaces the inventory-like navigation with five primary destinations:
 Home, Search, Notifications, Bookmarks, and Settings. The account identity opens
 its public profile, not its settings. Drive, Drafts, and Members remain available
