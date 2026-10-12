@@ -51,14 +51,24 @@ apply_fragment capabilities "$work/capabilities.lkjc" "$ROOT/src/health.lkjc"
 for name in util db page assets auth access codec social compose notes drive delivery; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
-for name in controls navigation admission mediaui; do
+for name in controls navigation; do
+  apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
+done
+apply_fragment library-path "$ROOT/src/reading/librarypath.lkjc"
+for name in admission mediaui; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
 for name in conversation activity; do
   apply_fragment "$name" "$ROOT/src/reading/$name.lkjc"
 done
-# These two modules are one semantic dependency component, not separate mock APIs.
-apply_fragment journal-workflows "$ROOT/src/ui/journal.lkjc" "$ROOT/src/ui/journalview.lkjc"
+for name in intents workspace; do
+  apply_fragment "writing-$name" "$ROOT/src/writing/$name.lkjc"
+done
+# Domain operations and rendering do not depend on the submission/recovery handler.
+# Keeping these components separate bounds the pinned native review workload.
+apply_fragment journal "$ROOT/src/ui/journal.lkjc"
+apply_fragment journal-view "$ROOT/src/ui/journalview.lkjc"
+apply_fragment journal-submit "$ROOT/src/writing/submit.lkjc"
 for name in attachments relations adminview accounts fileactions driveview mediaflow recovery; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done

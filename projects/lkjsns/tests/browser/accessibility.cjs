@@ -5,12 +5,13 @@ assert(fs.existsSync(source),'Use an installed axe-core; this test never downloa
 (async()=>{const browser=await chromium.launch({headless:true});try{
  const state=JSON.parse(fs.readFileSync(path.join(fixture,'flow-state.json')));
  const reading=JSON.parse(fs.readFileSync(path.join(fixture,'reading-state.json')));
+ const writing=JSON.parse(fs.readFileSync(path.join(fixture,"writing-state.json")));
  const checks=[],violations=[];
  for(const signed of [false,true]){
   // The production policy remains script-src 'none'. Only axe's inspection needs this.
   const ctx=await browser.newContext({locale:'en-US',bypassCSP:true,...(signed?{storageState:path.join(fixture,'owner.session.json')}:{})});
   const page=await ctx.newPage();
-  const routes=signed?['/','/drive','/compose','/compose?reply='+reading.visible,'/settings','/notifications?kind=replies','/file?id='+state.image,'/note?id='+reading.visible]:['/','/login','/join','/about'];
+  const routes=signed?['/','/drive','/compose','/compose?reply='+reading.visible,'/settings','/notifications?kind=replies','/file?id='+state.image,'/note?id='+reading.visible,'/compose?id='+writing.draft,writing.preview,writing.picker]:['/','/login','/join','/about'];
   for(const colorScheme of ['light','dark'])for(const width of [390,1440]){
    await page.emulateMedia({colorScheme,reducedMotion:'reduce'});await page.setViewportSize({width,height:960});
    for(const route of routes){

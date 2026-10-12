@@ -5,9 +5,9 @@ not design mockups. They use synthetic loopback accounts, text, and media; they
 do not show public-service users or private operator data.
 
 The original captures were taken on October 12, 2026 against the accepted
-433-test candidate, application SHA-256
-`b4401dfb32a1585ac23629a197d73fff3f15f96ff0a7e511cd0699e48faecbbb`.
-Later source-only formatting does not imply these images were recaptured.
+435-test candidate, application SHA-256
+`ad675ced642e2d621dff7ff3b0500575af621c6877980080586777210a929393`.
+The screenshots were recaptured after the native keyboard-submission fix.
 
 [Desktop preview](preview-desktop.png) shows the saved owner-only review step.
 [Mobile writing](writing-mobile.png) shows explicit save-before-media actions.

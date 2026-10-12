@@ -31,7 +31,7 @@ old_sha=$(sha256sum "$previous/candidate.lkja" | cut -d ' ' -f 1)
 [[ "$old_sha" == "$(head -n 1 "$previous/bundle.sha256")" ]]
 printf 'Source fixture: %s\nCopied fixture: %s\nEvidence: %s\nOld bundle: %s\nNew bundle: %s\n' \
   "$previous" "$LKJSNS_TEST_FIXTURE" "$LKJSNS_TEST_OUTPUT" "$old_sha" "$selected_sha"
-sha256sum "$ROOT/tests/browser/upgrade.sh" "$ROOT/tests/browser/persistence.cjs" > "$LKJSNS_TEST_OUTPUT/test-sources.sha256"
+sha256sum "$ROOT/tests/browser/upgrade.sh" "$ROOT/tests/browser/"*.cjs > "$LKJSNS_TEST_OUTPUT/test-sources.sha256"
 jq --arg origin "$LKJSNS_TEST_URL" --arg listen "127.0.0.1:$port" \
   '.listen=$listen | .artifact="candidate.lkja" | .configuration.origin.value=$origin' \
   "$previous/service.json" > "$LKJSNS_TEST_FIXTURE/service.json"
@@ -63,6 +63,12 @@ phase() {
   curl --fail --silent "$LKJSNS_TEST_URL/healthz" >/dev/null
   export LKJSNS_PERSISTENCE_PHASE="$name"
   node "$ROOT/tests/browser/persistence.cjs" 2>&1 | tee "$LKJSNS_TEST_OUTPUT/persistence-$name.log"
+  if [[ "$name" == upgrade ]]; then
+    # New writing and media operations must work on the preceding native store.
+    node "$ROOT/tests/browser/writing-library.cjs" 2>&1 | tee "$LKJSNS_TEST_OUTPUT/writing-library.log"
+  fi
+  # The previous binary must also be able to read and edit those newly saved drafts.
+  node "$ROOT/tests/browser/writing-persistence.cjs" 2>&1 | tee "$LKJSNS_TEST_OUTPUT/writing-persistence-$name.log"
   stop
 }
 phase upgrade "$selected/lkjsns.lkja" "$selected_sha"

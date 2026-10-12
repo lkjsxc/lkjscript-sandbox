@@ -32,7 +32,7 @@
   (function create part-header
     (visibility public) (parameter create data (type Bytes)) (parameter create start (type I64)) (parameter create end (type I64))
     (returns Text) (effect pure)
-    (body (let (binding header (call std::bytes-slice (local data) (local start) (local end))) (binding quote (call codec::find (local header) (call std::bytes-from-text (text "\"")) (i64 55) (call std::bytes-length (local header)))) (in (if (if (call codec::at (local header) (i64 0) (call std::bytes-from-text (text "Content-Disposition: form-data; name=\"file\"; filename=\""))) (if (call std::less-equal (i64 56) (local quote)) (bool true) (bool false)) (bool false)) (let (binding name (call std::bytes-to-text-result (call std::bytes-slice (local header) (i64 55) (local quote)))) (binding tail (call std::bytes-slice (local header) (call std::add (local quote) (i64 1)) (call std::bytes-length (local header)))) (in (if (if (field (local name) (name valid)) (if (call util::clean (field (local name) (name value)) (i64 1) (i64 255)) (if (if (call std::i64-equal (call std::bytes-length (local tail)) (i64 0)) (bool true) (if (if (call codec::at (local tail) (i64 0) (call std::bytes-from-text (text "\r\nContent-Type: "))) (if (call std::less (call codec::find (local tail) (call std::bytes-from-text (text "\r\n")) (i64 2) (call std::bytes-length (local tail))) (i64 0)) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool false)) (field (local name) (name value)) (text "")))) (text ""))))))
+    (body (let (binding header (call std::bytes-slice (local data) (local start) (local end))) (binding quote (call codec::find (local header) (call std::bytes-from-text (text "\"")) (i64 55) (call std::bytes-length (local header)))) (in (if (if (if (call codec::field-at (local header) (i64 0) (text "Content-Disposition")) (call codec::at (local header) (i64 19) (call std::bytes-from-text (text ": form-data; name=\"file\"; filename=\""))) (bool false)) (if (call std::less-equal (i64 56) (local quote)) (bool true) (bool false)) (bool false)) (let (binding name (call std::bytes-to-text-result (call std::bytes-slice (local header) (i64 55) (local quote)))) (binding tail (call std::bytes-slice (local header) (call std::add (local quote) (i64 1)) (call std::bytes-length (local header)))) (in (if (if (field (local name) (name valid)) (if (call util::clean (field (local name) (name value)) (i64 1) (i64 255)) (if (if (call std::i64-equal (call std::bytes-length (local tail)) (i64 0)) (bool true) (if (if (if (call codec::at (local tail) (i64 0) (call std::bytes-from-text (text "\r\n"))) (if (call codec::field-at (local tail) (i64 2) (text "Content-Type")) (call codec::at (local tail) (i64 14) (call std::bytes-from-text (text ": "))) (bool false)) (bool false)) (if (call std::less (call codec::find (local tail) (call std::bytes-from-text (text "\r\n")) (i64 2) (call std::bytes-length (local tail))) (i64 0)) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool false)) (field (local name) (name value)) (text "")))) (text ""))))))
 
   (function create part
     (visibility public) (parameter create data (type Bytes)) (parameter create boundary (type Text))
@@ -107,4 +107,69 @@
     (visibility public) (parameter create data (type Bytes)) (parameter create needle (type Bytes)) (parameter create offset (type I64))
     (returns Bool) (effect pure)
     (body (if (call std::less (local offset) (call std::bytes-length (local data))) (if (call std::text-contains (call std::bytes-to-hex (call std::bytes-slice (local data) (local offset) (call codec::min (call std::bytes-length (local data)) (call std::add (call std::add (local offset) (i64 65536)) (call std::bytes-length (local needle)))))) (call std::bytes-to-hex (local needle))) (bool true) (if (call codec::contains-boundary (local data) (local needle) (call std::add (local offset) (i64 65536))) (bool true) (bool false))) (bool false))))
+
+  (function create fold-byte (visibility private)
+    (parameter create byte (type I64)) (returns I64) (effect pure)
+    (body (if (if (call std::less-equal (i64 65) (local byte))
+      (call std::less-equal (local byte) (i64 90)) (bool false))
+      (call std::add (local byte) (i64 32)) (local byte))))
+
+  (function create field-letters (visibility private)
+    (parameter create data (type Bytes)) (parameter create start (type I64))
+    (parameter create needle (type Bytes)) (parameter create index (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local index) (call std::bytes-length (local needle)))
+      (if (call std::i64-equal
+        (call codec::fold-byte (call std::bytes-get (local data) (call std::add (local start) (local index))))
+        (call codec::fold-byte (call std::bytes-get (local needle) (local index))))
+        (call codec::field-letters (local data) (local start) (local needle) (call std::add (local index) (i64 1)))
+        (bool false)) (bool true))))
+
+  (function create field-at (visibility private)
+    (parameter create data (type Bytes)) (parameter create start (type I64))
+    (parameter create name (type Text)) (returns Bool) (effect pure)
+    (body (if (call std::less-equal (i64 0) (local start))
+      (if (call std::less-equal (call std::add (local start) (call util::size (local name))) (call std::bytes-length (local data)))
+        (call codec::field-letters (local data) (local start) (call std::bytes-from-text (local name)) (i64 0))
+        (bool false)) (bool false))))
+
+  (test create normal-part-field-case (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "Content-Disposition: form-data; name=\"file\"; filename=\"Case.PNG\"\r\nContent-Type: image/png")) (i64 0) (i64 89)))
+    (expected (text "Case.PNG")))
+
+  (test create lower-part-field-case (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "content-disposition: form-data; name=\"file\"; filename=\"Case.PNG\"\r\ncontent-type: image/png")) (i64 0) (i64 89)))
+    (expected (text "Case.PNG")))
+
+  (test create mixed-part-field-case (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "cOnTeNt-DiSpOsItIoN: form-data; name=\"file\"; filename=\"Case.PNG\"\r\ncOnTeNt-TyPe: image/png")) (i64 0) (i64 89)))
+    (expected (text "Case.PNG")))
+
+  (test create field-value-stays-case-sensitive (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "content-disposition: form-data; name=\"FILE\"; filename=\"Case.PNG\"\r\ncontent-type: image/png")) (i64 0) (i64 89)))
+    (expected (text "")))
+
+  (test create unicode-file-name-kept (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "content-disposition: form-data; name=\"file\"; filename=\"Café.PNG\"\r\ncontent-type: image/png")) (i64 0) (i64 90)))
+    (expected (text "Café.PNG")))
+
+  (test create additional-lowercase-header-denied (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "content-disposition: form-data; name=\"file\"; filename=\"Case.PNG\"\r\ncontent-type: image/png\r\nx-extra: value")) (i64 0) (i64 105)))
+    (expected (text "")))
+
+  (test create header-name-suffix-denied (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "Content-DispositionX: form-data; name=\"file\"; filename=\"Case.PNG\"\r\nContent-Type: image/png")) (i64 0) (i64 90)))
+    (expected (text "")))
+
+  (test create missing-header-colon-denied (visibility private)
+    (actual (call codec::part-header (call std::bytes-from-text (text "content-disposition: form-data; name=\"file\"; filename=\"Case.PNG\"\r\ncontent-type image/png")) (i64 0) (i64 88)))
+    (expected (text "")))
+
+  (test create negative-field-offset (visibility private)
+    (actual (call codec::field-at (call std::bytes-from-text (text "short")) (i64 -1) (text "Content-Type")))
+    (expected (bool false)))
+
+  (test create field-offset-outside-data (visibility private)
+    (actual (call codec::field-at (call std::bytes-from-text (text "short")) (i64 10) (text "Content-Type")))
+    (expected (bool false)))
 )
