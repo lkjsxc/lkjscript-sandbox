@@ -1,5 +1,11 @@
 # Coder workspace hosting — October 12, 2026
 
+> The community UX application was subsequently promoted on October 13, 2026
+> at 00:24:41 JST without changing this Coder routing contract. Its current bundle,
+> preserved-data cutover, and verification are recorded in [RELEASE.md](RELEASE.md).
+> The October 12 configuration-only repair below is historical, not the current
+> executable identity.
+
 ## Current entrypoint
 
 The user's intended public entrypoint is the existing Coder workspace port:

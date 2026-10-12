@@ -1,77 +1,66 @@
-# lkjsns checkpoint — 2026-10-12
+# lkjsns checkpoint — October 13, 2026
 
-## Current public release
+## Current public application
 
-The native writing/library release is live through
+The community UX release is live through
 [Coder public port 8793](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
-The user reaffirmed workspace hosting, and the previous Coder entrypoint was
-restored on October 12, 2026 at **17:22:50 JST**. The app already ran in the
-workspace; only listener/origin configuration and routing changed. The dedicated
-named tunnel was stopped at 17:25 JST. The old domain redirects GET/HEAD visits
-to Coder; the legacy app and quick tunnel remain stopped and disabled.
-See [CODER-HOSTING.md](CODER-HOSTING.md) for the current operating contract.
+Promotion completed at **2026-10-13 00:24:41 JST**. The existing native account,
+post, session, and object data was preserved with a stopped-service snapshot.
+No synthetic store was deployed. The custom domain remains a read redirect.
 
-Released source: `7a5d8032a2c5ff97f5407775b0f439e2cde70ec6`
+Executable source: `1656119117b6de975daeed9c01d46cc74f07f652`
 
-Application SHA-256:
-`60fce5fc6ec5b9acb52d061ccdabfdf62dafaf3ea2cbf42d4a94fa6ab28dba11`
+Application SHA-256: `f1ac426364ebc7f9ba28ee4b21a101b5690454d47a91dbd98abfcb7174f0e451`
 
-Runtime: checksum-pinned public lkjscript 0.1.89, executable SHA-256
+Pinned executable: lkjscript 0.1.89,
 `e24c054f9b3e44a71a8875aba5385aad82dc391a1eae88a6c115fca75bc5c9a9`.
 
-The exact selected bundle passed 435 native tests, 77 grouped browser checks,
-60 automated accessibility combinations with zero detected violations, and 44
-persistence checks across restart, restoration, upgrade, and binary rollback.
-The upgraded preceding store also passed 12 new-workflow checks. Shell and actual
-native launcher checks were separate; see [RELEASE.md](RELEASE.md) for scope.
-
-Public checks used HTTPS and read-only guest browsing: 16 page/theme/width
-combinations, a private-route redirect, and exact stylesheet byte equality.
-Authenticated acceptance stayed on isolated synthetic loopback stores.
+The exact bundle passed **450 native tests**, **60 synthetic browser groups**,
+96 responsive combinations, seven automated accessibility pages with no reported
+violations, exact 256 MiB upload/download integrity, and native restart/resumption.
+Read-only public acceptance passed 24 groups. Public checks are not described as
+authenticated production upload tests. See [RELEASE.md](RELEASE.md) for the complete
+scope, identities, measurements, and cutover evidence.
 
 ## Connected implementation
 
-Accounts, invitations, profiles, posts, replies, following, muting, Likes,
-bookmarks, private drafts, and reusable image/video/audio Drive are native
-lkjscript. Rendering and forms do not require application browser JavaScript.
+Primary navigation separates reading from Settings, private Drive, and drafts.
+Profile/password settings and Invitations have real child pages; Admin is an
+overview. Composer focus/borders, persisted audience, grouped save actions,
+content-first preview, Attention, post-card navigation, and in-page delete
+confirmation are connected. Cancelling deletion retains unsubmitted writing.
+Native confirmation pages and core forms still work without JavaScript.
 
-`writingintents` and `writingview` provide save-before-media actions and an
-owner-only saved-draft preview. `journalsubmit` separates submission/conflict
-handling from the journal domain and view modules, avoiding an unnecessary
-circular dependency in native review. Published attachment immutability remains.
+Drive accepts arbitrary file types up to 256 MiB, uses private multi-tags instead
+of a folder UI, and offers directly visible file deletion. Profile-image selection
+has a separate public avatar rule without exposing private originals. Query-only
+search checks current readability and excludes unpublished/deleted/muted content.
 
-`librarypath` validates picker filter context and local return locations. Drive
-selection retains filters and pagination, shows a persistent selected-file tray,
-and finds older ASCII-case-insensitive matches through bounded empty-window scans.
+`preferences`, `tags`, `identity`, `searchtext`, and `searchview` own additive native
+metadata and views. `transfers` contains bounded part plans, native object I/O,
+admission/finalization, and range download. Part writes and deletion stay outside
+retried metadata transactions. A bounded optimistic metadata-only retry prevents
+preference/post overlap from spuriously losing a submission; stale versions still
+require explicit recovery.
 
-`origin.sh` and `live-run.sh` support the exact Coder HTTPS origin without an
-application rebuild. The current unit has no dependency on either dedicated
-tunnel. Do not reintroduce the stopped tunnel units through Wants or After.
-Read the effective dependency set; empty assignments in a drop-in do not remove
-existing dependencies.
+The source manifest includes all native fragments, CSS, both browser scripts,
+operations scripts, and the deployment descriptor. Changed executable inputs
+require a fresh native build. `tests/ux/run.sh`, reached through the normal browser
+command, is the current optional release suite. Legacy tests/browser UI suites
+are historical rather than implicitly compatible with the redesign.
 
-## Evidence and source selection
+## Operations and next boundaries
 
-`./sandbox lkjsns browser` runs the optional installed Playwright suites.
-`tests/browser/restart.sh` checks restart or independent offline restoration.
-`tests/browser/upgrade.sh` exercises the new flows on a preceding native fixture,
-then checks the preceding binary against that updated data.
-`tests/ops/native-origin.sh` checks the actual detached launcher on loopback;
-`tests/ops/public-read.cjs` is a separate, write-blocked public guest smoke runner.
+Keep the exact Coder Host/Origin and port 8793. Do not reintroduce the stopped
+Cloudflare tunnel units through systemd dependencies. Preserve the current store,
+objects, and secret during promotion. The old binary cannot read new chunk-backed
+files; do not improvise an old-binary rollback against a post-release store.
 
-The manifest binds all native source inputs, authored CSS, operations scripts,
-and the development descriptor. Executable-input changes need a fresh build.
-Documentation/test-runner-only commits do not change the released source identity.
+General autosave, account recovery, federation, transcoding/metadata stripping,
+and ranked/fuzzy search remain separate future work. Browser transfer resumption
+requires the current page/file handle. The application logo is unchanged pending
+the original lkjsxc image; profile-image settings are already implemented.
 
-## Remaining priorities
-
-Preserve the quiet chronological feed and the distinction between reading,
-writing, and organizing reusable files. The next substantial usability needs are
-reliable unsaved-input recovery, account recovery, and safer media handling.
-Do not claim autosave, recovery codes, EXIF removal, transcoding, or cross-browser
-support before those workflows are implemented and tested.
-
-The Coder entrypoint is restored; legacy account/data migration is intentionally
-absent. The native store was preserved with stopped-service snapshots. Keep all
-credentials, operator paths, backup contents, and private execution evidence out
-of the public repository. [RELEASE.md](RELEASE.md) is the current release authority.
+Keep operator paths, snapshots, credentials, and private test evidence out of Git.
+[RELEASE.md](RELEASE.md) is the deployment authority;
+[COMMUNITY-UX.md](COMMUNITY-UX.md) records the design/transport boundaries.

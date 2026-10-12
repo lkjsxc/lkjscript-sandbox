@@ -1,169 +1,182 @@
-# lkjsns release — October 12, 2026
+# Community UX release — October 13, 2026
 
-**Hosting correction, 17:22:50 JST:** The unchanged release is now hosted through
-[Coder public port 8793](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
-The custom domain redirects read requests there. The dedicated connector was
-stopped at 17:25 JST; app and data checksums were preserved. The initial-release
-record below describes the earlier deployment. See
-[the verified Coder correction](CODER-HOSTING.md) for current routing and checks.
+The community UX and bounded-media release was promoted to the existing Coder
+service at **2026-10-13 00:24:41 JST** (2026-10-12T15:24:41Z).
+[Open lkjsns](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
+The application runs in the same Coder workspace on public port **8793**; the
+custom domain remains a read-redirect alias. This record describes an actual
+public cutover, not only a committed source tree or loopback candidate.
 
-## Public release
+## Exact release identity
 
-The writing/library application was promoted at **2026-10-12 15:38:03 JST**
-(06:38:03 UTC). Its initial public origin was
-[https://lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com), now a redirect to Coder.
+Executable source commit: `1656119117b6de975daeed9c01d46cc74f07f652`
 
-This is an actual public-service update, not only a source commit or local build.
-The native application and its dedicated, remotely managed named tunnel were
-verified running. The legacy standalone application and temporary-tunnel service
-are stopped and disabled. Legacy data was not migrated. The newer native store
-and its objects were preserved through promotion, with stopped-service snapshots.
+Executable source tree: `2f00919b5d55ef0e9046504fa0bfb7824d760e84`
 
-Released source commit: `7a5d8032a2c5ff97f5407775b0f439e2cde70ec6`
+Application SHA-256: `f1ac426364ebc7f9ba28ee4b21a101b5690454d47a91dbd98abfcb7174f0e451`
 
-Released source tree: `8345a7b95820220814a819fcfd9a0ad612ea06a8`
-
-Application SHA-256:
-`60fce5fc6ec5b9acb52d061ccdabfdf62dafaf3ea2cbf42d4a94fa6ab28dba11`
-
-Application size: **7,902,878 bytes**.
+Application size: **8,992,945 bytes**.
 
 Pinned runtime: **lkjscript 0.1.89**. Runtime executable SHA-256:
-`e24c054f9b3e44a71a8875aba5385aad82dc391a1eae88a6c115fca75bc5c9a9`
+`e24c054f9b3e44a71a8875aba5385aad82dc391a1eae88a6c115fca75bc5c9a9`.
 
-Selected graph revision:
-`rev_66b5e455d59099a6dc8325e7bfd5a1605c0eaa3f0ebc1c79565dd9b6185666a0`
+Selected native graph: `rev_7a7228fa47fe9351ca5896163c3fb94217cf841ad6c9a49b086735a235e5a9bb`
 
-Internal artifact identity:
-`artifact_bundle_acad68f078030361e4787bdb60e30b47b4ad607d28327a01bf0ff53622fb179e`
+Internal bundle identity: `artifact_bundle_8b36e352199ccad3a9226ca32c624488aee02ab38cdd278c44b477d85599a5a1`
 
-The internal artifact identity is not the application file checksum. The source
-was normally fast-forwarded to main and independently read back through GitHub.
-Subsequent documentation and test-runner changes do not change this released
-executable identity. The preceding release is archived in
-[the October 11 record](releases/2026-10-11.md).
+The internal bundle identity is not the file checksum. Subsequent release-record
+commits do not change the executable source identity above. The feature commit
+was normally fast-forwarded to main and its reference independently checked with
+GitHub. The preceding application SHA-256 was
+`60fce5fc6ec5b9acb52d061ccdabfdf62dafaf3ea2cbf42d4a94fa6ab28dba11`; its historical acceptance remains in
+[the preceding writing/library record](RELEASE-WRITING-2026-10-12.md).
 
-## Writing and library changes
+## Product changes
 
-The product-owned interface remains English throughout, including labels,
-confirmations, errors, document language, and accessibility names. User-authored
-content may use any language. The chronological, reading-first layout retains
-its desktop sidebar, compact mobile navigation, and light/dark appearance.
+Primary navigation is Home, Search, Notifications, Bookmarks, and Settings.
+The account identity opens its profile. Drive, Drafts, and Members are settings
+destinations rather than primary navigation items. Profile, profile-image, and
+password settings have child pages. Admin has an overview, with Invitations as a
+child and an accurately labeled Admin entry.
 
-Writing now has **Save & preview**, an owner-only saved-draft review using the
-same body and media renderer as a real post. It explicitly describes the audience,
-keeps content warnings closed initially, and calls out missing media descriptions.
-Previewing does not publish. Publishing rechecks the current version, attachment
-ownership, audience, and access to the original post when replying.
+The composer receives focus on entry, has a visible text boundary, and no longer
+requires a redundant Your post label or a long audience explanation. The next
+post remembers the chosen audience, including a changed audience followed by
+navigation without saving a draft. Save draft, Save & preview, Save & choose
+files, and Post share one action group; Upload belongs in the attachment picker.
+A preview renders the actual post before its audience summary.
 
-**Save & upload**, **Save & choose files**, **Save & edit details**, and
-**Save & remove** preserve submitted writing before moving between media steps.
-Attachment removal saves the text and both reference directions in the same
-metadata transaction. It does not delete the original from Drive. A stale edit
-or preview opens conflict recovery rather than silently overwriting another tab.
+Delete post and Delete file lead directly to a confirmation. In supported
+browsers a dialog preserves unsubmitted writing when cancelled. Native
+confirmation pages remain available without JavaScript. Post-body clicks open
+the permalink without taking over links, text selection, or media controls.
+The reaction is Attention. Visible redundant Home, Notifications, and profile
+headers are removed, as is the Refresh action. Feed/activity tabs have large
+interactive areas.
 
-Enter in a single-line field saves a new draft instead of opening the picker or
-posting it. Published text edits keep their separate Save changes behavior.
-The full writing/preview flow was also exercised in a touch-sized Chromium
-viewport with application JavaScript disabled.
+Drive accepts all file types up to **256 MiB**. The chooser has no `accept` type
+restriction, so it does not initially narrow the picker to a custom media list.
+Private multi-tags replace the folder UI. Drive has no name/type/folder search
+form. Filename and media-description editors are removed from the normal media
+workflow; existing metadata is retained, and generic file downloads still keep
+their original filenames. A file's Delete action is directly visible.
 
-The picker retains its file-name query, media type, folder, and cursor when
-attachments change. A separate selected-file tray remains available when the
-current filter hides a selected file. Search ignores ASCII letter case and can
-skip empty windows, considering at most four 30-entry windows per request. Older
-matches remain reachable with Next page; an empty bounded window does not claim
-that the whole Drive has no match.
+The single-query Search page finds readable published posts and, for signed-in
+viewers, handles/display names. It preserves Unicode text and folds ASCII case.
+Visibility is checked against current records: unpublished drafts, deleted posts,
+and muted authors are not exposed. Profile images can be selected from owned,
+ready, nonsensitive images up to 8 MiB. Their public avatar representation does
+not grant access to the private original's generic media URL.
 
-MIME part-header names now accept ordinary lowercase and mixed-case spelling.
-The change preserves filename bytes and the existing single-file, header-shape,
-size, media-signature, and authorization checks.
+## Transfer implementation
 
-See [the writing/library decisions](WRITING-LIBRARY.md) and
-[reviewed synthetic screenshots](screenshots/README.md).
+A 256 MiB file uses **64 immutable 4 MiB parts**. Each part is admitted against an
+owner-bound pending upload and acknowledged in native metadata. Finalization
+requires every part. Object writes/deletes remain outside retried metadata
+transactions. The whole file size is reserved against the existing 2 GiB account
+allowance before parts are accepted.
 
-## Acceptance on the released artifact
+Recognized images/audio/video can render inline. Unrecognized formats, including
+text, HTML, SVG, and arbitrary binary files, are stored as safe downloadable
+attachments with application/octet-stream, Content-Disposition, and nosniff.
+Uploading alone never posts a file. Uploading from the picker attaches the
+completed file to the saved draft and returns to writing, without publishing.
 
-| Verification | Result |
+Full responses remain bounded to 32 MiB; ranges are bounded to 8 MiB. Larger full
+requests lead to a native download screen whose browser control retrieves and
+validates ranges. The portable browser fallback accumulates a Blob; supported
+file-system writers save progressively. This avoids an invalid attempt to raise
+the native transport descriptor to a 256 MiB HTTP envelope.
+
+Authentication, authorization, search, settings, posts, tags, object operations,
+and HTML rendering remain native lkjscript. Browser scripts handle interaction
+conveniences and byte transfer. There is no Node/Python application server and
+no paid external agent/API in this work.
+
+## Acceptance on this exact bundle
+
+| Verification | Observed result |
 | --- | --- |
-| Native graph tests | 435 passed, 0 failed; production/reference outcomes equal |
-| Account browser checks | 12 passed |
-| Content and media browser checks | 17 passed |
-| Reading-location browser checks | 8 passed |
-| Conversation and activity browser checks | 15 passed |
-| Writing and library browser checks | 12 passed |
-| Responsive and request-security browser checks | 13 passed |
-| Automated accessibility inspection | 60 page/theme/width combinations, 0 detected violations |
-| Shell origin/launcher contracts | 28 passed |
-| Actual prepared native custom-origin launcher | 6 grouped checks passed |
-| Cold restart | 11 persistence checks passed |
-| Independent offline restoration | 11 persistence checks passed |
-| Upgrade from the preceding native bundle | 11 persistence checks passed |
-| Binary rollback after that upgrade | 11 persistence checks passed |
-| New writing/library actions on the upgraded preceding store | 12 grouped checks passed again |
+| Native tests | 450 passed, 0 failed; production/reference outcomes equal |
+| Synthetic browser groups | 60 passed across accounts, writing, media, search, request security, transfer recovery, layout, large files, no-script operation, and restart |
+| Responsive layout | 12 routes × 4 widths × 2 color schemes = 96 combinations; no horizontal overflow |
+| Automated accessibility | 7 primary routes checked; 0 reported violations in the selected WCAG A/AA rules |
+| Largest original | 268,435,456 bytes uploaded through 64 parts; 256 MiB + 1 byte rejected in browser and server |
+| Download integrity | All 256 MiB returned, including cross-part ranges and the portable browser save path; SHA-256 matched |
+| Interrupted transfer | Lost acknowledgement recovered without resending confirmed parts |
+| Native restart | Profile, private tags, avatar, query results, audience and large-file access preserved; an incomplete upload resumed after restart |
+| No-script operation | Native writing, preview, picker, multipart attachment, cancellation, deletion, and audience defaults passed |
+| Native data verification | Synthetic retained store and stopped-service production snapshot verified |
+| Repository publication | Syntax, tracked-path policy, documentation links, dispatcher checks, and staged credential-pattern review passed |
 
-The six main browser suites total **77 grouped checks**. The four persistence
-phases total **44 checks**. The additional 12 writing checks after upgrade are a
-repeat on a different store, not 12 new kinds of behavior. These counts are
-separate from native tests, accessibility combinations, and launcher checks.
+The 60 browser groups comprise 7 account, 7 writing, 7 media, 6 search, 6 request
+security, 4 transfer-recovery, 10 layout/accessibility, 7 large-file, 3 no-script,
+and 3 restart groups. The 96 layout combinations and accessibility pages are
+included in those grouped checks, not an additional 103 independent test suites.
 
-The synthetic suites ran on loopback using the exact selected bundle. They
-exercise real forms and HTTP actions, not direct fixture insertion into public
-storage. The library suite uploads 125 additional private originals to test
-bounded search and older matching files. Both upgrade and rollback operate on
-one copied, stopped synthetic store; rollback changes the binary without
-restoring an earlier data snapshot. Test-source hashes were checked afterward.
+The deterministic 256 MiB fixture SHA-256 was
+`3f13c3ef45598616756bcb55f8fb0a9fc2115ccdee314d03df82ce54beefbc17`.
+In the final **loopback synthetic run**, browser upload took
+**1,879 ms**; the sampled native-server peak RSS during
+the measured large-transfer phase was **48,648 KiB**.
+These are observations on the test host, not Internet throughput, a concurrency
+benchmark, a memory guarantee, or physical-device/cross-browser certification.
 
-The accessibility run covers four guest and eleven authenticated routes at 390
-and 1440 CSS pixels, in both light and dark themes. Additional layout checks cover
-320, 390, 768, and 1440 pixels. These are Chromium and automated checks, not full
-WCAG conformance, physical-device coverage, cross-browser certification, or a
-community load limit. Normal CI remains the small repository publication check.
+The suite verifies private-media denial, ownership, Host/Origin/CSRF checks,
+exact form schemas, stale-edit input retention, repeated transfer finalization,
+wrong-size/out-of-order part rejection, post-delete access revocation, profile
+image access, WAV/WebM browser metadata, and safe delivery of text/HTML/SVG/binary
+and empty files. Tests run against private synthetic loopback stores, not live
+user accounts. The older historical browser suites were not misrepresented as
+newly rerun against the redesigned UI.
 
-## Public verification and deployment incident
+## Public cutover and preservation
 
-Public verification checked exact-Host loopback health, external HTTPS health,
-four anonymous routes, native executable and bundle hashes, and byte equality
-between externally served CSS and the selected authored stylesheet. A separate
-read-only public Chromium run checked **16 page/theme/width combinations**, the
-private-route sign-in redirect, and exact stylesheet bytes. It did not register
-accounts, upload fixtures, or exercise authenticated writes on live user data.
+Only the existing lkjsns public service was stopped and restarted. A quiescent
+snapshot retained the exact preceding binary, bundle, descriptor, secret,
+metadata, and object storage. All data/object file paths and SHA-256 values were
+identical before and after replacing the application files. The bootstrap secret
+and canonical origin were unchanged. No synthetic store was promoted, no user
+account was reset, and no unrelated service or workspace was restarted.
 
-At **15:39:26 JST**, a named-connector restart was verified to leave the native
-application process and canonical origin unchanged; external health recovered.
-The connector is separately supervised and enabled for startup. This does not
-claim uninterrupted service during tunnel restarts or origin-host failure.
+The native runtime binary and all decoded capability grants are unchanged.
+Application concurrency changes from eight to four tasks and the deadline from
+120 to 300 seconds. The 768 MiB service memory limit stays in place. There is no
+new tunnel dependency; the same 8793 Coder entry and custom-domain read redirect
+were verified after the update. The restart is not a zero-downtime guarantee.
 
-The preceding temporary hostname had stopped resolving, and its connector logged
-that its tunnel no longer existed. The first fixed-hostname promotion attempt
-then found a second problem: old systemd dependencies survived the attempted
-empty dependency reset in a drop-in. Starting the app restarted the old tunnel,
-which overwrote the public-origin file with another temporary URL. The exact-Host
-check rejected the resulting mismatch, and the promotion returned to the prior
-binary without reverting or deleting stored data.
+Read-only public Chromium acceptance passed **24 groups**: 20 guest page/theme/
+width combinations, eleven private-route sign-in checks grouped together, exact
+CSS and both script bytes, branded unavailable routes, and health/script checks.
+It did not register a user or upload authenticated synthetic data to production.
 
-The service definition was then replaced and obsolete dependency drop-ins were
-archived. The effective dependency set was inspected to confirm that it no longer
-starts the old tunnel. The final promotion and connector-restart verification
-above passed. The update was not zero-downtime; a connection refusal during the
-native restart was observed before health checks succeeded. Exact Host/Origin
-checks, CSRF, and TLS verification were not weakened to make promotion pass.
-
-Operator paths, snapshots, credentials, internal account/tunnel identifiers,
-and private logs are not published in this repository. See
-[fixed-hostname hosting](HOSTING.md) for the operating model.
+A separate 4 MiB unauthenticated public POST reached the native transfer endpoint
+and was rejected with 403, without reserving or publishing a file. This confirms
+that the public proxy accepts the part-sized envelope. **The authenticated 256 MiB
+round trip was verified on loopback, not against the public user store.**
 
 ## Remaining boundaries
 
-Saving is explicit, not automatic. Closing a tab or leaving through an unrelated
-link can still lose unsubmitted edits. Members means all registered members,
-not followers-only or end-to-end encryption. Mute is not a block.
+Post saving is explicit; this is not general autosave or cross-tab draft recovery.
+Transfer resumption in the browser requires the same page and selected file.
+Files larger than 32 MiB require JavaScript for upload/full download. The native
+core forms and small multipart fallback work without it.
 
-There is no email-based account recovery or federation. Media limits remain
-32 MiB per original, 2 GiB per account, and four attachments per post. Originals
-are not transcoded, compressed, or stripped of location metadata. Codec playback
-depends on the browser. Authorized media HEAD remains explicitly unsupported
-with 405 and Allow: GET; GET and single byte ranges are supported.
+Search is bounded literal substring search, not ranked/fuzzy/federated full-text
+search. The router provides branded capture fallbacks for one through eight
+nonempty path segments, not an arbitrary-depth transport fallback. Media HEAD
+remains accurately unsupported with 405/Allow: GET. Originals are not transcoded,
+compressed, or stripped of location metadata. Published post attachments remain
+immutable; four attachments and 2 GiB total account storage are unchanged.
 
-Deleting a post or file does not recall downloaded copies or promise physical
-erasure from retained history or backups. Fixed DNS removes the temporary-URL
-dependency, not the need to operate and back up the origin host.
+Core account/post/session/legacy-media record layouts are preserved, but the old
+binary does not understand new chunk-backed media. After new writes, an old-binary
+rollback is not claimed safe; recovery needs an explicit compatible strategy and
+must not discard newer user data automatically.
+
+The requested recolored lkjsxc-derived application logo is not included. The
+existing application mark was retained pending an identified original image.
+Profile-image configuration is implemented and tested independently.
+
+See [the UX and architecture decisions](COMMUNITY-UX.md),
+[operations](OPERATIONS.md), and [Coder hosting](CODER-HOSTING.md).
