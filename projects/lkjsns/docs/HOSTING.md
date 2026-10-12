@@ -23,6 +23,10 @@ file. It passes the token by file path, not a command-line secret or log message
 `named-ready.sh` checks the connector's loopback readiness endpoint. The supervisor
 must not treat only an existing PID as evidence of a working external connection.
 The public service is not restarted merely because its connector reconnects.
+When retiring the old tunnel, inspect the effective systemd Wants and After
+dependencies. Empty dependency assignments in drop-ins do not remove existing
+dependencies. Replace the full unit and archive obsolete dependency drop-ins;
+otherwise the old connector can be started again and overwrite the origin.
 
 The connector grants connection access to one tunnel, not general account or DNS
 administration. Its credential belongs in a private service directory, never in

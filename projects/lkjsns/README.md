@@ -4,9 +4,10 @@ An invitation-only community application built with native lkjscript inside
 lkjscript-sandbox. The product interface is English, with a chronological feed,
 explicit audiences, saved drafts, and a reusable media Drive.
 
-The legacy service is stopped. See [the release record](docs/RELEASE.md) for the
-exact publicly released source, accepted bundle, verification scope, and
-temporary-hostname limitation. Source changes alone do not establish a rollout.
+Open [lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com). The native writing/library
+release was published on October 12, 2026 using a fixed named tunnel. The legacy
+service and temporary tunnel are stopped. See [the release record](docs/RELEASE.md)
+for the exact source, verification scope, and operational limitations.
 
 ## What is implemented
 
@@ -88,6 +89,7 @@ length metadata. Unauthorized requests remain 404.
 See [the current checkpoint](docs/CHECKPOINT.md),
 [the verified release](docs/RELEASE.md),
 [writing and library decisions](docs/WRITING-LIBRARY.md),
+[fixed-hostname hosting](docs/HOSTING.md),
 [synthetic acceptance screenshots](docs/screenshots/README.md),
 [English-first interaction decisions](docs/ENGLISH-READING.md), and
 [the native architecture](docs/DESIGN.md).

@@ -1,55 +1,73 @@
-# lkjsns checkpoint — 2026-10-11
+# lkjsns checkpoint — 2026-10-12
 
-## Current released source
+## Current public release
 
-Application source `1a859236e9036f9e9900fd9d1161c59e9c97984f` was promoted to
-the public native service on October 11, 2026 at 20:18:34 JST. The legacy service
-is stopped and disabled. The temporary HTTPS tunnel was retained.
+The native writing/library release is live at
+[lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com).
+Promotion completed on October 12, 2026 at **15:38:03 JST**. A connector restart
+was checked at 15:39:26 JST without changing the application process or origin.
+The legacy application and temporary-tunnel service are stopped and disabled.
 
-The selected application file SHA-256 is
-`55745f7ead25bfff5bc33295876af0a8ef89ac262c8627fe346b2a023d634d03`.
-The runtime is the checksum-pinned public lkjscript 0.1.89 executable, SHA-256
+Released source: `7a5d8032a2c5ff97f5407775b0f439e2cde70ec6`
+
+Application SHA-256:
+`60fce5fc6ec5b9acb52d061ccdabfdf62dafaf3ea2cbf42d4a94fa6ab28dba11`
+
+Runtime: checksum-pinned public lkjscript 0.1.89, executable SHA-256
 `e24c054f9b3e44a71a8875aba5385aad82dc391a1eae88a6c115fca75bc5c9a9`.
 
-Acceptance completed on that exact application bundle: 392 native tests,
-65 grouped browser checks, 48 automated accessibility combinations with zero
-violations, and 28 persistence checks across restart, offline restoration,
-cross-build upgrade, and binary rollback. The repository publication check passed.
-See [the release record](RELEASE.md) for the precise scope and qualifications.
+The exact selected bundle passed 435 native tests, 77 grouped browser checks,
+60 automated accessibility combinations with zero detected violations, and 44
+persistence checks across restart, restoration, upgrade, and binary rollback.
+The upgraded preceding store also passed 12 new-workflow checks. Shell and actual
+native launcher checks were separate; see [RELEASE.md](RELEASE.md) for scope.
+
+Public checks used HTTPS and read-only guest browsing: 16 page/theme/width
+combinations, a private-route redirect, and exact stylesheet byte equality.
+Authenticated acceptance stayed on isolated synthetic loopback stores.
 
 ## Connected implementation
 
-Accounts, invitations, profiles, chronological posts, replies, following, muting,
-Likes, bookmarks, drafts, and reusable media Drive are native lkjscript. Product
-rendering and forms have no browser application JavaScript dependency.
+Accounts, invitations, profiles, posts, replies, following, muting, Likes,
+bookmarks, private drafts, and reusable image/video/audio Drive are native
+lkjscript. Rendering and forms do not require application browser JavaScript.
 
-`src/reading/conversation.lkjc` provides admitted original-post context and
-reading-first reply destinations. `src/reading/activity.lkjc` provides filtered,
-visibility-checked activity with bounded empty-window scanning. Profile headings
-are distinct from navigation location. Product-owned UI text remains English.
+`writingintents` and `writingview` provide save-before-media actions and an
+owner-only saved-draft preview. `journalsubmit` separates submission/conflict
+handling from the journal domain and view modules, avoiding an unnecessary
+circular dependency in native review. Published attachment immutability remains.
 
-Browser tests in `tests/browser` are optional development tools, not application
-runtime dependencies. `./sandbox lkjsns browser` runs the core suites using an
-installed Playwright package. Set `LKJSNS_AXE` to an installed `axe.min.js` to add
-the automated accessibility audit. `tests/browser/upgrade.sh` checks a selected
-candidate against a copied, stopped synthetic fixture and then the preceding
-binary against the same data. It does not operate on public storage.
+`librarypath` validates picker filter context and local return locations. Drive
+selection retains filters and pagination, shows a persistent selected-file tray,
+and finds older ASCII-case-insensitive matches through bounded empty-window scans.
 
-Source selection binds the complete native input set, CSS, operations scripts,
-and configuration. Changed executable inputs require a new build. A test report
-from another candidate is not sufficient for promotion.
+`origin.sh`, `live-run.sh`, and the named-connector scripts support one exact
+configured HTTPS origin. Live systemd dependencies were replaced, not merely
+reset in a drop-in; empty dependency assignments do not remove old dependencies.
+The old temporary-tunnel unit must not be reintroduced through Wants or After.
 
-## Scope and unfinished work
+## Evidence and source selection
 
-Legacy account/data migration is intentionally absent. Public state is separate
-from all synthetic fixtures. The latest promotion preserved the new application's
-state and retained a stopped-service snapshot.
+`./sandbox lkjsns browser` runs the optional installed Playwright suites.
+`tests/browser/restart.sh` checks restart or independent offline restoration.
+`tests/browser/upgrade.sh` exercises the new flows on a preceding native fixture,
+then checks the preceding binary against that updated data.
+`tests/ops/native-origin.sh` checks the actual detached launcher on loopback;
+`tests/ops/public-read.cjs` is a separate, write-blocked public guest smoke runner.
 
-A permanent hostname, account recovery, automatic draft saving, federation, media
-transcoding, and location-metadata removal are not complete. Media HEAD remains
-explicitly unsupported after authorization; GET and single ranges are verified.
-There is no guarantee of physical erasure from all retained copies.
+The manifest binds all native source inputs, authored CSS, operations scripts,
+and the development descriptor. Executable-input changes need a fresh build.
+Documentation/test-runner-only commits do not change the released source identity.
 
-The [release record](RELEASE.md) supersedes the earlier candidate-only checkpoint.
-Keep runtime data, private evidence, owner invitations, and machine-specific
-operator details out of the public repository.
+## Remaining priorities
+
+Preserve the quiet chronological feed and the distinction between reading,
+writing, and organizing reusable files. The next substantial usability needs are
+reliable unsaved-input recovery, account recovery, and safer media handling.
+Do not claim autosave, recovery codes, EXIF removal, transcoding, or cross-browser
+support before those workflows are implemented and tested.
+
+The fixed hostname is complete; legacy account/data migration is intentionally
+absent. The native store was preserved with stopped-service snapshots. Keep all
+credentials, operator paths, backup contents, and private execution evidence out
+of the public repository. [RELEASE.md](RELEASE.md) is the current release authority.

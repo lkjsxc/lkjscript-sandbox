@@ -1,5 +1,9 @@
 # Local operations and release boundaries
 
+This document defines build and candidate-test discipline. The current public
+service, completed promotion, and hosting topology are recorded in
+[RELEASE.md](RELEASE.md) and [HOSTING.md](HOSTING.md).
+
 ## Selection and initialization
 
 `setup` installs a checksum-pinned executable. `build` creates a fresh native graph,
@@ -91,4 +95,4 @@ After the separate candidate passes acceptance, record the old deployment identi
 stop it gracefully, switch the proxy deliberately, and verify the external origin.
 Rollback is a routing/process operation unless data migration has also occurred.
 Never restart the old store against an incompatible new runtime to improvise recovery.
-No public cutover has been performed by this checkpoint.
+Public cutover status is recorded separately in [RELEASE.md](RELEASE.md).

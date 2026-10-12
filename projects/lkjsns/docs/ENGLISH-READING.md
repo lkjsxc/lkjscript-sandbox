@@ -99,7 +99,8 @@ certification or a large-community load test. Restart and offline restore must b
 verified against populated data as separate gates.
 
 A live service is a detached, checksum-verified executable and bundle with its own
-fresh data and object roots. It must not reuse the browser fixture. The tunnel's
-current HTTPS origin is recorded atomically and consumed before the app starts.
-A quick-tunnel restart may change that URL; the stable long-term deployment target
-is a named hostname, not a promise that an ephemeral address will remain forever.
+fresh data and object roots. It must not reuse the browser fixture. The selected
+HTTPS origin is read explicitly before the app starts. The public service now uses
+a fixed named hostname rather than a temporary URL. Connector restarts do not
+rewrite the origin or restart the application. See [HOSTING.md](HOSTING.md) and
+[RELEASE.md](RELEASE.md) for the deployed topology and actual verification.

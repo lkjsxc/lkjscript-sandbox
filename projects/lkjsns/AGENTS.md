@@ -24,10 +24,18 @@ conflicts. Do not weaken exact Host, Origin or CSRF checks to make a test pass.
 
 Authored browser tests under tests/browser are optional development tools. Their
 Node/Playwright dependency is not an application dependency. Keep installations,
-fixtures, generated graphs, binaries, screenshots, logs and credentials ignored.
+fixtures, generated graphs, binaries, unreviewed screenshots, logs and credentials
+ignored. The small reviewed synthetic set in docs/screenshots is an explicit
+exception; never publish real-user data, credentials, or operator information.
 Use installed free tools; do not launch Codex tasks, Codex CLI or paid APIs.
 
 Read docs/CHECKPOINT.md for accepted source/test evidence, docs/ENGLISH-READING.md
 for UX and media boundaries, and docs/RELEASE.md when a verified public release has
 been recorded. Media HEAD is deliberately unsupported until the native runtime
 can express representation metadata independently of a response body.
+
+Public hosting now uses a fixed named tunnel; consult docs/HOSTING.md. Do not
+reintroduce the stopped temporary-tunnel service through old systemd dependencies.
+Read the effective Wants/After set rather than assuming an empty drop-in removes
+dependencies. The native source/run selection and live service evidence remain
+separate authorities.
