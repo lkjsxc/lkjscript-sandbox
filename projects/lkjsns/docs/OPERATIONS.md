@@ -2,7 +2,7 @@
 
 This document defines build and candidate-test discipline. The current public
 service, completed promotion, and hosting topology are recorded in
-[RELEASE.md](RELEASE.md) and [HOSTING.md](HOSTING.md).
+[RELEASE.md](RELEASE.md) and [CODER-HOSTING.md](CODER-HOSTING.md).
 
 ## Selection and initialization
 
@@ -12,7 +12,7 @@ and writes a bundle. The permanent health port makes capability bootstrap valid;
 there is no temporary fake SNS target. The service target is created only when the
 real router can be linked. Do not add a placeholder responder to make a build green.
 
-`ops/selection.sh` records all native source files, the CSS, operation scripts,
+`ops/selection.sh` records all native source files, the CSS, both browser scripts, operation scripts,
 development descriptor and dispatcher. The complete current manifest must equal the
 record, so adding a new native file also invalidates an old selection. The selected
 bundle is checked independently, and the graph revision must still equal the native
@@ -50,7 +50,8 @@ Never label a public smoke check as full end-to-end acceptance.
 
 Use synthetic users and actual valid/malformed media in a new isolated store. Exercise
 invite registration and exhaustion, login/logout, failed login, draft save, conflict
-recovery, upload, description edit, attach/detach, publication, replies and deletion.
+recovery, upload, private tag edits, profile-image selection, attach/detach,
+publication, replies and deletion.
 Test both attachment destinations, repeated submissions, stale draft versions, full
 selection, two users, guests, and revocation after the final readable reference ends.
 Compare GET/range bytes with the input; check suffix/open/invalid/multiple ranges and
@@ -96,3 +97,36 @@ stop it gracefully, switch the proxy deliberately, and verify the external origi
 Rollback is a routing/process operation unless data migration has also occurred.
 Never restart the old store against an incompatible new runtime to improvise recovery.
 Public cutover status is recorded separately in [RELEASE.md](RELEASE.md).
+
+
+## Current community UX gate
+
+Use `tests/ux/run.sh` with an installed Playwright package. It uses only a fresh
+loopback store; `tests/ux/public-read.cjs` is read-only verification at the exact
+public HTTPS origin. Normal CI must not acquire the full native/browser build.
+
+The new media representation keeps core account, post, session, and legacy-media
+record layouts unchanged. Additive metadata stores preferences, tags, search text,
+and pending chunk receipts. A negative media offset marks chunk-backed files.
+Old binaries do not understand that representation: after new uploads, do not
+claim an old-binary rollback is compatible with the updated store. Keep a complete
+quiescent snapshot and decide recovery explicitly rather than discarding newer
+user writes.
+
+The current Coder service must continue to bind port 8793 with its exact public
+origin. Updating an established service must preserve its data, objects, bootstrap
+secret, and origin. The historical fresh-service `prepare-live.sh` helper has
+different initial-host assumptions; it is not a shortcut for this promotion.
+No dedicated Cloudflare tunnel should be started or enabled by the application.
+
+A 256 MiB file must not be implemented by raising the native HTTP descriptor
+above its transport ceiling. Native upload parts are 4 MiB; full responses are
+bounded to 32 MiB, and byte ranges to 8 MiB. Keep object effects outside retried
+data transactions, enforce pending-plan ownership before each part, and only
+publish a complete acknowledged plan. The full file size is reserved against the
+account allowance before accepting any part.
+
+A selected profile image is an explicit public representation. The general
+media URL still uses current readable post references or ownership; never make
+all of an owner's files public because one is their avatar. The file UI must not
+claim a selected profile image is visible only to its owner.

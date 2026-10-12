@@ -41,3 +41,12 @@ disabled. Do not reintroduce them through old systemd Wants/After dependencies.
 The custom domain is only a read-redirect alias. Keep the exact Coder Host/Origin
 checks and native session/CSRF validation. Source/run selection and live routing
 evidence remain separate authorities.
+
+The community UX release uses narrow first-party browser scripts for transfer,
+preference delivery, post-card navigation, and confirmation dialogs. These are not
+an alternative application server. Keep CSS and both script assets byte-identical
+to their authored web files. Read docs/COMMUNITY-UX.md for private tags, the public
+avatar exception, bounded search, 4 MiB transfers, and no-script boundaries.
+Use tests/ux/run.sh via the normal browser command for current acceptance; the
+older tests/browser flow suites retain historical UI assumptions and are not the
+current release gate. Do not claim every historical suite was rerun.

@@ -1,0 +1,80 @@
+(module create tags
+  (function create trim-end (visibility public)
+    (parameter create value (type Text))
+    (parameter create end (type I64))
+    (returns Text) (effect pure)
+    (body (if (call std::less (i64 0) (local end)) (if (call std::i64-equal (call std::bytes-get (call std::bytes-from-text (local value)) (call std::subtract (local end) (i64 1))) (i64 32)) (call tags::trim-end (local value) (call std::subtract (local end) (i64 1))) (call util::slice (local value) (i64 0) (local end))) (text ""))))
+
+  (function create normalize (visibility public)
+    (parameter create value (type Text))
+    (returns Text) (effect pure)
+    (body (call librarypath::lower (call util::trim (call tags::trim-end (local value) (call util::size (local value))) (i64 0)))))
+
+  (function create split (visibility public)
+    (parameter create value (type Text))
+    (parameter create start (type I64))
+    (parameter create index (type I64))
+    (parameter create out (type (list Text)))
+    (returns (list Text)) (effect pure)
+    (body (let (binding comma (call codec::find (call std::bytes-from-text (local value)) (call std::bytes-from-text (text ",")) (local start) (call util::size (local value)))) (binding end (if (call std::less (local comma) (i64 0)) (call util::size (local value)) (local comma))) (binding part (call tags::normalize (call util::slice (local value) (local start) (local end)))) (binding next (if (if (call std::text-equal (local part) (text "")) (bool true) (if (call util::has (local out) (local part) (i64 0)) (bool true) (bool false))) (local out) (call std::list-append (types Text) (local out) (local part)))) (in (if (call std::less (local comma) (i64 0)) (local next) (call tags::split (local value) (call std::add (local comma) (i64 1)) (call std::add (local comma) (i64 1)) (local next)))))))
+
+  (function create items (visibility public)
+    (parameter create value (type Text))
+    (returns (list Text)) (effect pure)
+    (body (if (call util::clean (local value) (i64 0) (i64 512)) (call tags::split (local value) (i64 0) (i64 0) (list Text)) (list Text))))
+
+  (function create valid-items (visibility public)
+    (parameter create items (type (list Text)))
+    (parameter create index (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types Text) (local items))) (if (call util::clean (call std::list-get (types Text) (local items) (local index)) (i64 1) (i64 40)) (if (call tags::valid-items (local items) (call std::add (local index) (i64 1))) (bool true) (bool false)) (bool false)) (bool true))))
+
+  (function create valid (visibility public)
+    (parameter create value (type Text))
+    (returns Bool) (effect pure)
+    (body (if (call util::clean (local value) (i64 0) (i64 512)) (if (call std::less-equal (call std::list-length (types Text) (call tags::items (local value))) (i64 12)) (if (call tags::valid-items (call tags::items (local value)) (i64 0)) (bool true) (bool false)) (bool false)) (bool false))))
+
+  (function create read (visibility public)
+    (parameter create id (type Text))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (call preferences::read (text "file-tags") (local id))))
+
+  (function create merge (visibility public)
+    (parameter create items (type (list Text)))
+    (parameter create index (type I64))
+    (parameter create out (type (list Text)))
+    (returns (list Text)) (effect pure)
+    (body (if (if (call std::less (local index) (call std::list-length (types Text) (local items))) (if (call std::less (call std::list-length (types Text) (local out)) (i64 128)) (bool true) (bool false)) (bool false)) (let (binding tag (call std::list-get (types Text) (local items) (local index))) (in (call tags::merge (local items) (call std::add (local index) (i64 1)) (if (call util::has (local out) (local tag) (i64 0)) (local out) (call std::list-append (types Text) (local out) (local tag)))))) (local out))))
+
+  (function create save (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create id (type Text))
+    (parameter create value (type Text))
+    (returns Unit) (effect (task (requirement service::app::store)))
+    (body (let (binding items (call tags::items (local value))) (binding palette (call tags::split (call preferences::read (text "tag-palette") (field (local ctx) (name user))) (i64 0) (i64 0) (list Text))) (in (sequence (call preferences::save (text "file-tags") (local id) (call std::text-join (local items) (text ", "))) (call preferences::save (text "tag-palette") (field (local ctx) (name user)) (call std::text-join (call tags::merge (local items) (i64 0) (local palette)) (text ", "))) (unit))))))
+
+  (function create chips (visibility public)
+    (parameter create items (type (list Text)))
+    (parameter create index (type I64))
+    (parameter create base (type Text))
+    (parameter create selected (type Text))
+    (parameter create out (type Text))
+    (returns Text) (effect pure)
+    (body (if (call std::less (local index) (call std::list-length (types Text) (local items))) (let (binding tag (call std::list-get (types Text) (local items) (local index))) (in (call tags::chips (local items) (call std::add (local index) (i64 1)) (local base) (local selected) (call std::text-join (list Text (local out) (call page::link (call std::text-join (list Text (local base) (text "tag=") (call navigation::encode (local tag))) (text "")) (local tag) (text "") (call std::text-equal (local tag) (local selected)))) (text ""))))) (local out))))
+
+  (function create navigation (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create request (type Request))
+    (parameter create draft (type Note))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (let (binding base (if (call util::token (field (local draft) (name id))) (call std::text-join (list Text (text "/pick?draft=") (field (local draft) (name id)) (text "&")) (text "")) (text "/drive?"))) (binding items (call tags::split (call preferences::read (text "tag-palette") (field (local ctx) (name user))) (i64 0) (i64 0) (list Text))) (in (if (call std::less (i64 0) (call std::list-length (types Text) (local items))) (call std::text-join (list Text (text "<nav class=\"tag-chips\" aria-label=\"File tags\">") (call page::link (local base) (text "All files") (text "") (call std::text-equal (call util::query (local request) (text "tag")) (text ""))) (call tags::chips (local items) (i64 0) (local base) (call util::query (local request) (text "tag")) (text "")) (text "</nav>")) (text "")) (text ""))))))
+
+  (test create trim-and-deduplicate (visibility private) (actual (call tags::items (text " Travel, work, travel , 日本語 "))) (expected (list Text (text "travel") (text "work") (text "日本語"))))
+
+  (test create empty-tags (visibility private) (actual (call tags::items (text "  , , "))) (expected (list Text)))
+
+  (test create oversized-tag-rejected (visibility private) (actual (call tags::valid (text "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"))) (expected (bool false)))
+
+  (test create too-many-tags-rejected (visibility private) (actual (call tags::valid (text "0,1,2,3,4,5,6,7,8,9,10,11,12"))) (expected (bool false)))
+
+)

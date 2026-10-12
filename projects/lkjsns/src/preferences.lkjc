@@ -1,0 +1,20 @@
+(module create preferences
+  (function create read (visibility public)
+    (parameter create kind (type Text))
+    (parameter create id (type Text))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (let (binding entries (call db::read (local kind) (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (text "") (call std::data-decode-or (types Text) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (text "")))))))
+
+  (function create save (visibility public)
+    (parameter create kind (type Text))
+    (parameter create id (type Text))
+    (parameter create value (type Text))
+    (returns Bool) (effect (task (requirement service::app::store)))
+    (body (call db::put (local kind) (local id) (call std::data-encode (types Text) (local value)))))
+
+  (function create audience (visibility public)
+    (parameter create ctx (type Context))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (if (call std::text-equal (call preferences::read (text "audience") (field (local ctx) (name user))) (text "public")) (text "public") (text "members"))))
+
+)

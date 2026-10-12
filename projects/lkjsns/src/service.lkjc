@@ -17,10 +17,26 @@
       (operations std::ByteStream::read-all std::ByteStream::close) (limits (maximum_calls 16 calls)))
     (requirement create objects (interface std::ObjectStorage)
       (operations std::ObjectStorage::put-new std::ObjectStorage::get std::ObjectStorage::range std::ObjectStorage::reconcile-put std::ObjectStorage::delete)
-      (limits (maximum_calls 32 calls)))
+      (limits (maximum_calls 128 calls)))
     (port create health (type (task-function (Request) Response (row))) (function health::respond))
     (port create view (type (task-function (Request) Response
       (row (requirement store) (requirement entropy) (requirement clock) (requirement config) (requirement passwords) (requirement bootstrap) (requirement streams) (requirement objects)))) (function http::view))
+    (port create unavailable-1 (type (task-function (Request Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-1))
+    (port create unavailable-2 (type (task-function (Request Text Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-2))
+    (port create unavailable-3 (type (task-function (Request Text Text Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-3))
+    (port create unavailable-4 (type (task-function (Request Text Text Text Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-4))
+    (port create unavailable-5 (type (task-function (Request Text Text Text Text Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-5))
+    (port create unavailable-6 (type (task-function (Request Text Text Text Text Text Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-6))
+    (port create unavailable-7 (type (task-function (Request Text Text Text Text Text Text Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-7))
+    (port create unavailable-8 (type (task-function (Request Text Text Text Text Text Text Text Text) Response
+      (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-8))
   ))
 (target create lkjsns (component service::app) (runner http)
   (route create get-0 (method GET) (path "/style.css") (port service::app::view))
@@ -45,4 +61,26 @@
   (route create get-19 (method GET) (path "/healthz") (port service::app::view))
   (route create head-media (method HEAD) (path "/media") (port service::app::view))
   (route create action (method POST) (path "/action") (port service::app::view))
-  (route create upload (method POST) (path "/upload") (port service::app::view)))
+  (route create upload (method POST) (path "/upload") (port service::app::view))  (route create ux-search (method GET) (path "/search") (port service::app::view))
+  (route create ux-settings-profile (method GET) (path "/settings/profile") (port service::app::view))
+  (route create ux-settings-security (method GET) (path "/settings/security") (port service::app::view))
+  (route create ux-settings-avatar (method GET) (path "/settings/avatar") (port service::app::view))
+  (route create ux-admin-invitations (method GET) (path "/admin/invitations") (port service::app::view))
+  (route create ux-avatar (method GET) (path "/avatar") (port service::app::view))
+  (route create ux-delete (method GET) (path "/delete") (port service::app::view))
+  (route create ux-ui-js (method GET) (path "/ui.js") (port service::app::view))
+  (route create ux-not-found (method GET) (path "/not-found") (port service::app::view))
+  (route create unavailable-1 (method GET) (pattern "/{missing0}") (port service::app::unavailable-1))
+  (route create unavailable-2 (method GET) (pattern "/{missing0}/{missing1}") (port service::app::unavailable-2))
+  (route create unavailable-3 (method GET) (pattern "/{missing0}/{missing1}/{missing2}") (port service::app::unavailable-3))
+  (route create unavailable-4 (method GET) (pattern "/{missing0}/{missing1}/{missing2}/{missing3}") (port service::app::unavailable-4))
+  (route create unavailable-5 (method GET) (pattern "/{missing0}/{missing1}/{missing2}/{missing3}/{missing4}") (port service::app::unavailable-5))
+  (route create unavailable-6 (method GET) (pattern "/{missing0}/{missing1}/{missing2}/{missing3}/{missing4}/{missing5}") (port service::app::unavailable-6))
+  (route create unavailable-7 (method GET) (pattern "/{missing0}/{missing1}/{missing2}/{missing3}/{missing4}/{missing5}/{missing6}") (port service::app::unavailable-7))
+  (route create unavailable-8 (method GET) (pattern "/{missing0}/{missing1}/{missing2}/{missing3}/{missing4}/{missing5}/{missing6}/{missing7}") (port service::app::unavailable-8))
+  (route create transfer-upload-start (method POST) (path "/upload/start") (port service::app::view))
+  (route create transfer-upload-part (method POST) (path "/upload/part") (port service::app::view))
+  (route create transfer-upload-finish (method POST) (path "/upload/finish") (port service::app::view))
+  (route create transfer-download (method GET) (path "/download") (port service::app::view))
+  (route create transfer-transfer-js (method GET) (path "/transfer.js") (port service::app::view))
+)

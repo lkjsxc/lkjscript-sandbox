@@ -1,42 +1,78 @@
 # lkjsns
 
-An invitation-only community application built with native lkjscript inside
-lkjscript-sandbox. The product interface is English, with a chronological feed,
-explicit audiences, saved drafts, and a reusable media Drive.
+An invitation-only community built with native lkjscript inside lkjscript-sandbox.
+The interface is English, with chronological posts, explicit audiences, reusable
+files, private tags, and a focused writing workspace.
 
 Open [lkjsns on Coder](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
 The native app runs in workspace `tomato-ocelot-73` on public port **8793**.
-The custom domain now redirects to this Coder entrypoint. No Coder login is
-required for guest pages; application accounts are still invitation-only.
-See [Coder hosting](docs/CODER-HOSTING.md) for the verified October 12 routing
-correction and [the release record](docs/RELEASE.md) for the unchanged app bundle.
+The custom domain redirects to this Coder entrypoint. Guest pages do not require
+Coder authentication; community accounts require an application invitation.
+[The release record](docs/RELEASE.md) identifies the exact deployed bundle and
+separates local acceptance from public-service verification.
 
-## What is implemented
+## Reading, writing, and settings
 
-Accounts and invitations, profiles, following and muting, posts and replies,
-bookmarks, Likes, and notifications are connected to persistent native data.
-Drive supports image, video, and audio originals, folders, descriptions, sensitive
-media controls, and up to four attachments per post. Uploading alone does not make
-a file public. Versioned edits preserve submitted input when another tab wins.
+Home, Search, Notifications, Bookmarks, and Settings are the primary destinations.
+Clicking the account identity opens its profile. Drive, Drafts, and Members are
+reachable from Settings. Profile, profile image, and password changes have their
+own settings pages. Admin has an overview and an Invitations child page.
 
-Writing has a saved, owner-only preview with the actual post renderer and explicit
-audience information. Save & upload, Save & choose files, Save & edit details, and
-Save & remove submit the current writing before changing steps or attachments.
-The preview never bypasses the normal publishing and conflict checks.
+The composer is focused on entry and has a visible text boundary. Save draft,
+Save & preview, Save & choose files, and Post share one action group. The selected
+audience persists for the next post. Preview shows the actual post before its
+audience summary. Uploading from the picker saves the file, attaches it to the
+saved draft, and returns to writing without publishing.
 
-The picker retains its name query, type, folder, and page after a selection
-changes. A separate tray shows selected attachments independently of those
-filters. ASCII case-insensitive file-name matching and bounded empty-window
-scanning keep older files reachable without an unbounded per-request search.
+Posts support replies, following, muting, Attention, private bookmarks, and
+notifications. Clicking a post's body opens its permalink without taking over
+links, media controls, or text selection. Deletion asks for confirmation after
+the delete action; cancelling the browser dialog retains unsubmitted writing.
+Stale-version conflicts preserve submitted text or tags rather than overwriting
+another tab's work.
 
-Reading actions keep the current feed, page, profile, or parent conversation.
-The responsive interface has light and dark modes, keyboard focus states, and
-mobile navigation. Forms and rendering work without application JavaScript.
+Search has a single query field. It finds readable published posts and, for signed-in
+viewers, people by handle or display name. It supports literal substring matching,
+ASCII case folding, and Unicode text. Drafts, deleted posts, and muted authors are
+not exposed. Work per request is bounded; older results remain paginated.
+
+## Drive and profile images
+
+Drive accepts **any file type up to 256 MiB**. Multiple private tags replace the
+folder interface. The main library has no name-search, type, or folder form.
+Uploading does not publish a file. Up to four files can be attached to a post.
+
+Recognized images, audio, and video can render inline. Other formats, including
+text, HTML, and SVG, are downloadable attachments rather than executable pages.
+Original filenames are preserved for downloads, but uploading does not require
+editing a filename or description. Existing descriptions and files are retained.
+
+Profile images can be selected from ready, nonsensitive Drive images up to 8 MiB.
+Their selected representation is public; that does not make the original's private
+Drive URL public. Files currently used by a profile or post cannot be deleted
+until those references are removed.
+
+## Native server and bounded transfer
+
+Authentication, authorization, posts, settings, tags, search, storage, and HTML
+rendering remain native lkjscript. There is no Node/Python application server.
+Browser JavaScript provides post-card navigation, preference delivery, confirmation
+dialogs, and file-transfer progress/resumption.
+
+Large files use native 4 MiB upload parts, not a 256 MiB HTTP body. Completed parts
+are acknowledged durably; the browser can resume an interrupted transfer while
+the upload page and selected file remain available. Downloads use validated byte
+ranges. The portable browser save path can temporarily buffer a large file.
+
+Core forms, writing, preview, confirmation pages, and the multipart upload fallback
+work with JavaScript disabled. Files larger than 32 MiB require JavaScript for
+uploading and full-file downloading. Media HEAD is deliberately unsupported: an
+authorized request returns 405 with Allow: GET, not incorrect zero-length metadata.
 
 ## Development
 
-The checksum-pinned public runtime is lkjscript 0.1.89. Setup downloads that pinned
-runtime; it does not silently switch to a moving latest release.
+The checksum-pinned public runtime is lkjscript **0.1.89**. Setup verifies it and
+does not silently switch to a moving latest release.
 
 ```sh
 ./sandbox lkjsns setup
@@ -46,52 +82,42 @@ runtime; it does not silently switch to a moving latest release.
 ./sandbox lkjsns run
 ```
 
-The local development configuration binds loopback. The source manifest binds
-native fragments, authored CSS, operations scripts, and deployment configuration
-to the selected detached bundle. Changed inputs require a new build.
+The source manifest binds every native source fragment, authored stylesheet,
+browser script, operation script, and deployment configuration to the selected
+bundle. Executable-input changes require rebuilding. Development binds loopback;
+prepare/run do not deploy the public service.
 
-An optional browser suite uses an already-installed Node/Playwright toolchain:
+Optional browser acceptance uses an already-installed Node/Playwright toolchain:
 
 ```sh
-LKJSNS_PLAYWRIGHT=/absolute/path/to/playwright ./sandbox lkjsns browser
+LKJSNS_PLAYWRIGHT=/absolute/path/to/playwright \
+LKJSNS_AXE=/absolute/path/to/axe.min.js \
+./sandbox lkjsns browser
 ```
 
-Set `LKJSNS_AXE` to an installed `axe.min.js` to include the optional automated
-accessibility audit. Without it, the browser runner explicitly reports that the
-axe audit was not run.
+`LKJSNS_AXE` is optional; omission explicitly skips the automated accessibility
+audit. `tests/ux/run.sh` creates a fresh private synthetic store and exercises real
+forms, media, search, request security, responsive layout, a 256 MiB upload/download,
+no-script operation, and native restart. It stops its own service afterward.
+`tests/ux/public-read.cjs` is a separate read-only public check, not authenticated
+production acceptance. Normal repository CI remains lightweight.
 
-The browser suite creates isolated synthetic data, checks real HTTP/browser
-journeys, writes private evidence under `.build`, and stops its own process. It
-refuses non-loopback test URLs. `tests/browser/restart.sh` checks a stopped fixture
-or an independent offline copy. `tests/browser/upgrade.sh` checks the new binary
-against a preceding native fixture, then checks binary rollback against the same
-updated data. Neither script accepts public-service storage paths.
+## Boundaries
 
-Node is a development-test dependency only; the application server and its
-behavior remain native lkjscript. Normal CI stays a lightweight repository check.
+Post saving is explicit, not automatic. Navigating away can lose unsubmitted text;
+cancelling a delete dialog does not. A Members post is readable by all registered
+members, not followers only. Public posts and their attachments are readable
+without signing in. Removing a reference revokes future access, not copies that
+someone already downloaded.
 
-## Important boundaries
+The account allowance is **2 GiB**, including incomplete upload reservations.
+Incomplete uploads can be removed after the existing five-minute stale-upload
+interval. Originals are not transcoded, compressed, or stripped of location
+metadata. Browser codec support varies. There is no federation, email-based
+password recovery, or promise of physical erasure from retained history/backups.
 
-Saving is explicit, not automatic. Closing a tab or leaving through an unrelated
-link can lose unsubmitted edits. The preview is not a browser-local recovery copy.
-
-Public means readable without signing in. Members means all registered members,
-not just followers. Unattached files are owner-only; posted file access is checked
-against a current readable post reference. Removing the last public reference
-revokes future anonymous delivery, not already downloaded copies.
-
-Limits are 32 MiB per file, 2 GiB of reserved/used storage per account, and four
-attachments per post. Originals are not transcoded, compressed, or stripped of
-location metadata. Codec support depends on the browser. There is no email-based
-password recovery, federation, or promised physical erasure from retained history.
-Media GET and single byte ranges are supported. Media HEAD is explicitly unavailable
-with this runtime: authorized requests return 405/Allow: GET, not incorrect zero-
-length metadata. Unauthorized requests remain 404.
-
-See [the current checkpoint](docs/CHECKPOINT.md),
-[the verified release](docs/RELEASE.md),
-[writing and library decisions](docs/WRITING-LIBRARY.md),
-[Coder workspace hosting](docs/CODER-HOSTING.md),
-[synthetic acceptance screenshots](docs/screenshots/README.md),
-[English-first interaction decisions](docs/ENGLISH-READING.md), and
-[the native architecture](docs/DESIGN.md).
+See [community UX and transfer architecture](docs/COMMUNITY-UX.md),
+[the current checkpoint](docs/CHECKPOINT.md),
+[the release record](docs/RELEASE.md),
+[Coder workspace hosting](docs/CODER-HOSTING.md), and
+[operations](docs/OPERATIONS.md).

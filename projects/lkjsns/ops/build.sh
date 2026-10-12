@@ -48,13 +48,19 @@ apply_fragment() {
   printf '  ))\n'
 } > "$work/capabilities.lkjc"
 apply_fragment capabilities "$work/capabilities.lkjc" "$ROOT/src/health.lkjc"
-for name in util db page assets auth access codec social compose notes drive delivery; do
+for name in util db preferences page assets auth access codec social compose notes drive; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
 for name in controls navigation; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
+for name in math store io; do
+  apply_fragment "transfer-$name" "$ROOT/src/transfers/$name.lkjc"
+done
+apply_fragment delivery "$ROOT/src/delivery.lkjc"
 apply_fragment library-path "$ROOT/src/reading/librarypath.lkjc"
+apply_fragment tags "$ROOT/src/tags.lkjc"
+apply_fragment search-text "$ROOT/src/searchtext.lkjc"
 for name in admission mediaui; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
@@ -69,10 +75,20 @@ done
 apply_fragment journal "$ROOT/src/ui/journal.lkjc"
 apply_fragment journal-view "$ROOT/src/ui/journalview.lkjc"
 apply_fragment journal-submit "$ROOT/src/writing/submit.lkjc"
-for name in attachments relations adminview accounts fileactions driveview mediaflow recovery; do
+for name in attachments relations adminview accounts fileactions; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
+apply_fragment identity "$ROOT/src/identity.lkjc"
+for name in driveview mediaflow recovery; do
+  apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
+done
+apply_fragment search-view "$ROOT/src/searchview.lkjc"
+apply_fragment confirmation "$ROOT/src/confirmation.lkjc"
+for name in flow download; do
+  apply_fragment "transfer-$name" "$ROOT/src/transfers/$name.lkjc"
+done
 apply_fragment http "$ROOT/src/http.lkjc"
+apply_fragment unavailable "$ROOT/src/unavailable.lkjc"
 # The link step edits a complete public draft, keeping existing exact requirement
 # identities, and adds the authored port/routes. It never edits canonical storage.
 source "$ROOT/ops/link.sh"

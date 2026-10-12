@@ -16,3 +16,5 @@
 (type-alias Part (record (valid Bool) (start I64) (end I64) (next I64) (name Text) (file Bool)))
 (type-alias Range (record (valid Bool) (partial Bool) (start I64) (length I64)))
 (type-alias LibraryWindow (record (rows Text) (next I64)))
+(type-alias ChunkPlan (record (total I64) (hashes (list Text))))
+(type-alias PutReceipt (record (blake3 Text) (cleanup_pending Bool) (key Text) (size I64) (version Text)))

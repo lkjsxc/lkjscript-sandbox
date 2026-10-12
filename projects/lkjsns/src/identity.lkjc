@@ -1,0 +1,46 @@
+(module create identity
+  (function create eligible (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create media (type Media))
+    (returns Bool) (effect pure)
+    (body (if (call util::signed (local ctx)) (if (call std::text-equal (field (local media) (name owner)) (field (local ctx) (name user))) (if (call std::text-equal (field (local media) (name state)) (text "ready")) (if (call std::text-starts-with (field (local media) (name mime)) (text "image/")) (if (call std::bool-not (field (local media) (name sensitive))) (if (call std::less-equal (field (local media) (name size)) (i64 8388608)) (bool true) (bool false)) (bool false)) (bool false)) (bool false)) (bool false)) (bool false))))
+
+  (function create button (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create media (type Media))
+    (returns Text) (effect pure)
+    (body (if (call identity::eligible (local ctx) (local media)) (call std::text-join (list Text (call page::begin (local ctx) (text "avatar")) (call page::hidden (text "id") (field (local media) (name id))) (text "<button>Use as profile image</button></form>")) (text "")) (text ""))))
+
+  (function create set (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create form (type Form))
+    (returns Response) (effect (task (requirement service::app::store)))
+    (body (let (binding id (call util::value (local form) (text "id"))) (in (if (if (call util::signed (local ctx)) (if (if (call std::text-equal (local id) (text "")) (bool true) (if (call identity::eligible (local ctx) (call db::media (local id))) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (sequence (call preferences::save (text "avatar") (field (local ctx) (name user)) (local id)) (call page::redirect (text "/settings/profile"))) (call page::error (i64 422) (text "Choose an image from your Drive, up to 8 MiB, without a sensitive-content warning.")))))))
+
+  (function create deliver (visibility public)
+    (parameter create request (type Request))
+    (returns Response) (effect (task (requirement service::app::store) (requirement service::app::objects)))
+    (body (let (binding handle (call util::query (local request) (text "user"))) (binding owner (call db::user (local handle))) (binding media (call db::media (call preferences::read (text "avatar") (local handle)))) (in (if (if (call util::handle (field (local owner) (name handle))) (if (call std::bool-not (field (local owner) (name suspended))) (if (call std::text-equal (field (local media) (name owner)) (local handle)) (if (call std::text-equal (field (local media) (name state)) (text "ready")) (if (call std::text-starts-with (field (local media) (name mime)) (text "image/")) (if (call std::bool-not (field (local media) (name sensitive))) (if (call std::less-equal (field (local media) (name size)) (i64 8388608)) (bool true) (bool false)) (bool false)) (bool false)) (bool false)) (bool false)) (bool false)) (bool false)) (call page::raw (i64 200) (call identity::bytes (local media)) (field (local media) (name mime)) (list Header)) (call page::raw (i64 200) (call std::bytes-from-text (call std::text-join (list Text (text "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" rx=\"32\" fill=\"#e7ecff\"/><text x=\"32\" y=\"42\" font-family=\"sans-serif\" font-size=\"32\" text-anchor=\"middle\" fill=\"#315bce\">") (call std::html-escape-text (if (call util::handle (local handle)) (call util::slice (local handle) (i64 0) (i64 1)) (text "·"))) (text "</text></svg>")) (text ""))) (text "image/svg+xml") (list Header)))))))
+
+  (function create bytes (visibility public)
+    (parameter create media (type Media))
+    (returns Bytes) (effect (task (requirement service::app::objects)))
+    (body (call chunkio::read (local media) (i64 0) (field (local media) (name size)))))
+
+  (function create rows (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create ids (type (list Text)))
+    (parameter create index (type I64))
+    (parameter create out (type Text))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (if (call std::less (local index) (call std::list-length (types Text) (local ids))) (let (binding media (call db::media (call std::list-get (types Text) (local ids) (local index)))) (in (call identity::rows (local ctx) (local ids) (call std::add (local index) (i64 1)) (call std::text-join (list Text (local out) (if (call identity::eligible (local ctx) (local media)) (call std::text-join (list Text (text "<article class=\"file-card\"><div class=\"file-thumb\">") (call mediaui::thumbnail (local media)) (text "</div>") (call identity::button (local ctx) (local media)) (text "</article>")) (text "")) (text ""))) (text ""))))) (local out))))
+
+  (function create choose (visibility public)
+    (parameter create ctx (type Context))
+    (parameter create request (type Request))
+    (returns Response) (effect (task (requirement service::app::store)))
+    (body (let (binding listing (call db::listing (call std::text-join (list Text (text "drive/") (field (local ctx) (name user))) (text "")) (call util::query (local request) (text "cursor")) (i64 30))) (in (call page::ok-at (local ctx) (text "Profile image") (text "Settings") (call std::text-join (list Text (text "<nav class=\"crumbs\" aria-label=\"Breadcrumb\"><a href=\"/settings\">Settings</a> / Profile image</nav>") (text "<section class=\"panel\"><div class=\"row spread\"><a class=\"button primary\" href=\"/upload\">Upload image</a>") (call page::begin (local ctx) (text "avatar")) (call page::hidden (text "id") (text "")) (text "<button class=\"subtle\">Use default image</button></form></div><p class=\"field-help\">Choose an image from Drive, up to 8 MiB. It becomes visible on your public profile.</p></section><div class=\"drive-grid\">") (call identity::rows (local ctx) (field (local listing) (name ids)) (i64 0) (text "")) (text "</div>") (call page::pager (field (local listing) (name next)) (text "/settings/avatar?"))) (text "")))))))
+
+  (test create guest-cannot-select-profile-image (visibility private) (actual (call identity::eligible (call auth::guest (i64 0)) (call db::empty-media))) (expected (bool false)))
+
+)

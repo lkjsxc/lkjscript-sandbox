@@ -2,16 +2,17 @@
 # Operational assembly of authored native fragments into a complete public draft.
 # Sourced by build.sh; no application behavior is generated in a host language.
 link_http_target() {
-  local module
+  local module draft
+  draft="$work/service.draft.$(date +%s%N).lkjc"
   "$LKJ" --project "$project" query find module service > "$work/service.query.log"
   mapfile -t modules < <(grep -oE 'mod_[0-9a-f]{32}' "$work/service.query.log" | sort -u)
   [[ ${#modules[@]} == 1 ]] || { echo 'The service module was not resolved uniquely.' >&2; return 1; }
   module=${modules[0]}
-  "$LKJ" --project "$project" change draft --owner "$module" --output "$work/service.draft.lkjc" > "$work/service.draft.log"
-  [[ "$(grep -c '^[[:space:]]*(component edit ' "$work/service.draft.lkjc")" == 1 ]]
+  "$LKJ" --project "$project" change draft --owner "$module" --output "$draft" > "$work/service.draft.log"
+  [[ "$(grep -c '^[[:space:]]*(component edit ' "$draft")" == 1 ]]
   # The only existing port is the permanent, non-routing health port. Preserve
   # its exact identity; attach the real router as a second port in this draft.
-  [[ "$(grep -c '^[[:space:]]*(port edit ' "$work/service.draft.lkjc")" == 1 ]] || {
+  [[ "$(grep -c '^[[:space:]]*(port edit ' "$draft")" == 1 ]] || {
     echo 'Expected exactly the existing health port.' >&2
     return 1
   }
@@ -37,7 +38,7 @@ link_http_target() {
     $0 == ")" {emit(target); endings++}
     {print}
     END {if (failed || units != 1 || components != 1 || endings != 1) exit 2}
-  ' "$work/service.draft.lkjc" > "$work/http-link.request.lkjc" || {
+  ' "$draft" > "$work/http-link.request.lkjc" || {
     echo 'Public draft shape changed; inspect it without editing canonical storage.' >&2
     return 1
   }

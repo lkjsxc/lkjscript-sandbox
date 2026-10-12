@@ -6,9 +6,9 @@
     (returns Text) (effect pure)
     (body (if (local ready)
       (if (local uploaded)
-        (text "<div class=\"notice\" role=\"status\"><strong>Saved to Drive.</strong><p>This file is not posted. Review its description and sensitive-content setting before attaching it.</p></div>")
+        (text "<div class=\"notice\" role=\"status\"><strong>Saved to Drive.</strong><p>This file is not posted.</p></div>")
         (if (local saved)
-          (text "<div class=\"notice\" role=\"status\">File details saved. The current details are shown below.</div>")
+          (text "<div class=\"notice\" role=\"status\">Changes saved.</div>")
           (text "")))
       (text ""))))
 
@@ -105,4 +105,16 @@
       (call journal::blank (call fileactions::sample-viewer)
         (text "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"))))
     (expected (text "")))
+  (function create privacy (visibility public)
+    (parameter create profile (type Bool))
+    (parameter create used (type Bool))
+    (returns Text) (effect pure)
+    (body (if (local profile) (text "<p class=\"field-help\">Used as your public profile image. <a href=\"/settings/avatar\">Change image</a> before deleting this file.</p>") (if (local used) (text "<p class=\"field-help\">Files in use cannot be deleted. Public posts make their attachments readable to anyone.</p>") (text "<p class=\"field-help\">Not attached to a post. Only you can access this file.</p>")))))
+
+  (test create profile-image-is-public (visibility private) (actual (call std::text-contains (call fileactions::privacy (bool true) (bool false)) (text "public profile image"))) (expected (bool true)))
+
+  (test create profile-image-does-not-claim-private (visibility private) (actual (call std::text-contains (call fileactions::privacy (bool true) (bool false)) (text "Only you"))) (expected (bool false)))
+
+  (test create unused-image-is-private (visibility private) (actual (call std::text-contains (call fileactions::privacy (bool false) (bool false)) (text "Only you"))) (expected (bool true)))
+
 )

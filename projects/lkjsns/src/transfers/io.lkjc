@@ -1,0 +1,45 @@
+(module create chunkio
+  (external create concat (visibility public) (implementation core.bytes.concat) (parameter create left (type Bytes)) (parameter create right (type Bytes)) (returns Bytes))
+
+  (function create parts (visibility public)
+    (parameter create id (type Text))
+    (parameter create start (type I64))
+    (parameter create length (type I64))
+    (parameter create out (type Bytes))
+    (returns Bytes) (effect (task (requirement service::app::objects)))
+    (body (if (call std::less (i64 0) (local length)) (let (binding index (call std::divide (local start) (i64 4194304))) (binding offset (call std::subtract (local start) (call std::multiply (local index) (i64 4194304)))) (binding take (call codec::min (local length) (call std::subtract (i64 4194304) (local offset)))) (binding data (capability-call service::app::objects std::ObjectStorage::range (call chunkmath::key (local id) (local index)) (local offset) (local take))) (in (call chunkio::parts (local id) (call std::add (local start) (local take)) (call std::subtract (local length) (local take)) (call chunkio::concat (local out) (local data))))) (local out))))
+
+  (function create read (visibility public)
+    (parameter create media (type Media))
+    (parameter create start (type I64))
+    (parameter create length (type I64))
+    (returns Bytes) (effect (task (requirement service::app::objects)))
+    (body (if (call std::i64-equal (local length) (i64 0)) (call std::bytes-from-text (text "")) (if (call std::i64-equal (field (local media) (name offset)) (i64 -1)) (call chunkio::parts (field (local media) (name id)) (local start) (local length) (call std::bytes-from-text (text ""))) (capability-call service::app::objects std::ObjectStorage::range (call drive::key (field (local media) (name id))) (call std::add (field (local media) (name offset)) (local start)) (local length))))))
+
+  (function create erase-parts (visibility public)
+    (parameter create id (type Text))
+    (parameter create index (type I64))
+    (parameter create count (type I64))
+    (returns Unit) (effect (task (requirement service::app::objects)))
+    (body (if (call std::less (local index) (local count)) (sequence (capability-call service::app::objects std::ObjectStorage::delete (call chunkmath::key (local id) (local index))) (call chunkio::erase-parts (local id) (call std::add (local index) (i64 1)) (local count))) (unit))))
+
+  (function create erase (visibility public)
+    (parameter create media (type Media))
+    (returns Unit) (effect (task (requirement service::app::objects)))
+    (body (if (call std::i64-equal (field (local media) (name offset)) (i64 -1)) (call chunkio::erase-parts (field (local media) (name id)) (i64 0) (call chunkmath::count (field (local media) (name stored)))) (capability-call service::app::objects std::ObjectStorage::delete (call drive::key (field (local media) (name id)))))))
+
+  (function create put (visibility public)
+    (parameter create request (type Request))
+    (parameter create id (type Text))
+    (parameter create index (type I64))
+    (returns PutReceipt) (effect (task (requirement service::app::objects) (requirement service::app::streams)))
+    (body (let (binding receipts (capability-call service::app::objects std::ObjectStorage::reconcile-put (call chunkmath::key (local id) (local index)))) (in (if (call std::i64-equal (call std::list-length (types PutReceipt) (local receipts)) (i64 1)) (call std::list-get (types PutReceipt) (local receipts) (i64 0)) (capability-call service::app::objects std::ObjectStorage::put-new (call chunkmath::key (local id) (local index)) (field (local request) (name body)) (static-text "application/octet-stream")))))))
+
+  (function create mime (visibility public)
+    (parameter create media (type Media))
+    (returns Text) (effect (task (requirement service::app::objects)))
+    (body (let (binding head (call chunkio::read (local media) (i64 0) (call codec::min (field (local media) (name size)) (i64 4096)))) (binding detected (call codec::mime (local head))) (in (if (call std::text-equal (local detected) (text "")) (if (if (call std::less-equal (i64 5) (field (local media) (name size))) (if (call codec::at (local head) (i64 0) (call std::bytes-from-list (list I64 (i64 255) (i64 216) (i64 255)))) (if (call std::text-equal (call std::bytes-to-hex (call chunkio::read (local media) (call std::subtract (field (local media) (name size)) (i64 2)) (i64 2))) (text "ffd9")) (bool true) (bool false)) (bool false)) (bool false)) (text "image/jpeg") (text "application/octet-stream")) (local detected))))))
+
+  (test create binary-concat (visibility private) (actual (call std::bytes-to-hex (call chunkio::concat (call std::bytes-from-list (list I64 (i64 0) (i64 255))) (call std::bytes-from-list (list I64 (i64 128)))))) (expected (text "00ff80")))
+
+)

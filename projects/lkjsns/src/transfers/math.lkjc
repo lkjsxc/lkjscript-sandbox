@@ -1,0 +1,32 @@
+(module create chunkmath
+  (function create count (visibility public)
+    (parameter create size (type I64))
+    (returns I64) (effect pure)
+    (body (call std::divide (call std::add (local size) (i64 4194303)) (i64 4194304))))
+
+  (function create length (visibility public)
+    (parameter create size (type I64))
+    (parameter create index (type I64))
+    (returns I64) (effect pure)
+    (body (call codec::min (i64 4194304) (call std::subtract (local size) (call std::multiply (local index) (i64 4194304))))))
+
+  (function create key (visibility public)
+    (parameter create id (type Text))
+    (parameter create index (type I64))
+    (returns Text) (effect pure)
+    (body (call std::text-join (list Text (text "parts/") (local id) (text "/") (call std::i64-to-text (local index))) (text ""))))
+
+  (function create valid-size (visibility public)
+    (parameter create size (type I64))
+    (returns Bool) (effect pure)
+    (body (if (call std::less (i64 0) (local size)) (if (call std::less-equal (local size) (i64 268435456)) (bool true) (bool false)) (bool false))))
+
+  (test create limit-accepted (visibility private) (actual (call chunkmath::valid-size (i64 268435456))) (expected (bool true)))
+
+  (test create over-limit-rejected (visibility private) (actual (call chunkmath::valid-size (i64 268435457))) (expected  (bool false)))
+
+  (test create max-count (visibility private) (actual (call chunkmath::count (i64 268435456))) (expected (i64 64)))
+
+  (test create last-short-part (visibility private) (actual (call chunkmath::length (i64 4194305) (i64 1))) (expected  (i64 1)))
+
+)

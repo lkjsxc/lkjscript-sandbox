@@ -13,7 +13,7 @@
   (function create label (visibility public)
     (parameter create kind (type Text))
     (returns Text) (effect pure)
-    (body (if (call std::text-equal (local kind) (text "follow")) (text "followed you") (if (call std::text-equal (local kind) (text "reply")) (text "replied to your post") (text "liked your post")))))
+    (body (if (call std::text-equal (local kind) (text "follow")) (text "followed you") (if (call std::text-equal (local kind) (text "reply")) (text "replied to your post") (text "paid attention to your post")))))
 
   (function create base (visibility public)
     (parameter create filter (type Text))
@@ -23,7 +23,7 @@
   (function create tabs (visibility public)
     (parameter create filter (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (text "<div class=\"feed\"><nav class=\"tabs activity-tabs\" aria-label=\"Activity filter\">") (call page::link (text "/notifications") (text "All") (text "") (call std::text-equal (local filter) (text ""))) (call page::link (text "/notifications?kind=replies") (text "Replies") (text "") (call std::text-equal (local filter) (text "replies"))) (call page::link (text "/notifications?kind=likes") (text "Likes") (text "") (call std::text-equal (local filter) (text "likes"))) (call page::link (text "/notifications?kind=follows") (text "Follows") (text "") (call std::text-equal (local filter) (text "follows"))) (text "</nav></div>")) (text ""))))
+    (body (call std::text-join (list Text (text "<div class=\"feed\"><nav class=\"tabs activity-tabs\" aria-label=\"Activity filter\">") (call page::link (text "/notifications") (text "All") (text "") (call std::text-equal (local filter) (text ""))) (call page::link (text "/notifications?kind=replies") (text "Replies") (text "") (call std::text-equal (local filter) (text "replies"))) (call page::link (text "/notifications?kind=likes") (text "Attention") (text "") (call std::text-equal (local filter) (text "likes"))) (call page::link (text "/notifications?kind=follows") (text "Follows") (text "") (call std::text-equal (local filter) (text "follows"))) (text "</nav></div>")) (text ""))))
 
   (function create row (visibility public)
     (parameter create ctx (type Context))
@@ -57,13 +57,13 @@
     (parameter create cursor (type Text))
     (parameter create remaining (type I64))
     (returns Text) (effect (task (requirement service::app::store)))
-    (body (let (binding listing (call db::listing (call std::text-join (list Text (text "notice/") (field (local ctx) (name user))) (text "")) (local cursor) (i64 30))) (binding rows (call activity::rows (local ctx) (local viewer) (field (local listing) (name ids)) (i64 0) (local filter) (text ""))) (in (if (call activity::scan-next (local rows) (field (local listing) (name next)) (local remaining)) (call activity::collection (local ctx) (local viewer) (local filter) (call std::i64-to-text (field (local listing) (name next))) (call std::subtract (local remaining) (i64 1))) (call std::text-join (list Text (text "<section class=\"feed activity-list\" aria-label=\"Activity\">") (if (call std::text-equal (local rows) (text "")) (if (call std::less-equal (i64 0) (field (local listing) (name next))) (text "<div class=\"empty\"><h2>No matching activity on this page</h2><p>Older activity may match this filter. Continue to the next page.</p></div>") (call page::empty (text "No activity to show") (text "Replies, likes, and follows appear here. Hidden or unavailable posts are not shown.") (text "/") (text "Back to Home"))) (local rows)) (text "</section>") (call page::pager (field (local listing) (name next)) (call activity::base (local filter)))) (text "")))))))
+    (body (let (binding listing (call db::listing (call std::text-join (list Text (text "notice/") (field (local ctx) (name user))) (text "")) (local cursor) (i64 30))) (binding rows (call activity::rows (local ctx) (local viewer) (field (local listing) (name ids)) (i64 0) (local filter) (text ""))) (in (if (call activity::scan-next (local rows) (field (local listing) (name next)) (local remaining)) (call activity::collection (local ctx) (local viewer) (local filter) (call std::i64-to-text (field (local listing) (name next))) (call std::subtract (local remaining) (i64 1))) (call std::text-join (list Text (text "<section class=\"feed activity-list\" aria-label=\"Activity\">") (if (call std::text-equal (local rows) (text "")) (if (call std::less-equal (i64 0) (field (local listing) (name next))) (text "<div class=\"empty\"><h2>No matching activity on this page</h2><p>Older activity may match this filter. Continue to the next page.</p></div>") (call page::empty (text "No activity to show") (text "Replies, attention, and follows appear here.") (text "/") (text "Back to Home"))) (local rows)) (text "</section>") (call page::pager (field (local listing) (name next)) (call activity::base (local filter)))) (text "")))))))
 
   (function create view (visibility public)
     (parameter create ctx (type Context))
     (parameter create request (type Request))
     (returns Response) (effect (task (requirement service::app::store)))
-    (body (let (binding filter (call util::query (local request) (text "kind"))) (in (if (call activity::valid-filter (local filter)) (let (binding viewer (call db::user (field (local ctx) (name user)))) (in (call page::ok (local ctx) (text "Notifications") (call std::text-join (list Text (call activity::tabs (local filter)) (text "<p class=\"context-hint\">Replies, likes, and follows. Newest first, without interruptions.</p>") (call activity::collection (local ctx) (local viewer) (local filter) (call util::query (local request) (text "cursor")) (i64 4))) (text ""))))) (call page::error (i64 400) (text "Choose All, Replies, Likes, or Follows.")))))))
+    (body (let (binding filter (call util::query (local request) (text "kind"))) (in (if (call activity::valid-filter (local filter)) (let (binding viewer (call db::user (field (local ctx) (name user)))) (in (call page::ok (local ctx) (text "Notifications") (call std::text-join (list Text (call activity::tabs (local filter)) (text "") (call activity::collection (local ctx) (local viewer) (local filter) (call util::query (local request) (text "cursor")) (i64 4))) (text ""))))) (call page::error (i64 400) (text "Choose All, Replies, Attention, or Follows.")))))))
 
   (test create filter-8 (visibility private)
     (actual (call activity::matches (text "") (text "reply"))) (expected (bool true)))
