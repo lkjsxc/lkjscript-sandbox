@@ -11,30 +11,48 @@ Coder authentication; community accounts require an application invitation.
 [The release record](docs/RELEASE.md) identifies the exact deployed bundle and
 separates local acceptance from public-service verification.
 
-## Reading, writing, and settings
+## Reading, writing, and navigation
 
-Home, Search, Notifications, Bookmarks, Drive, and Settings are the primary destinations.
-Clicking the account identity opens its profile. Drafts and Members remain reachable from Settings. Drive also keeps its
-Settings shortcut. Profile, profile image, and password changes have their
-own settings pages. Admin has an overview and an Invitations child page.
+The composer has **Attach file** and **Post**. File selection, uploading, removal,
+and file options retain the text, audience, content warning, and reply identity
+without publishing. There is no visible draft collection, Save draft control, or
+preview step. Existing owned working copies remain private and editable.
+Published posts have **Save changes** and a separate confirmed deletion action.
 
-The composer is focused on entry and has a visible text boundary. Save draft,
-Save & preview, Save & choose files, and Post share one action group. The selected
-audience persists for the next post. Preview shows the actual post before its
-audience summary. Uploading from the picker saves the file, attaches it to the
-saved draft, and returns to writing without publishing.
+Home, Search, Notifications, Bookmarks, Drive, Settings, and More are the desktop
+destinations. The mobile dock has only **Home, Post, Notifications, More**.
+More links to search, bookmarks, files, members, your profile, settings, authorized
+administration, and service information. Settings contains profile/security
+settings and sign-out rather than a second site map. About is no longer pinned
+to the sidebar footer. Every product-owned label remains English.
 
-Posts support replies, following, muting, Attention, private bookmarks, and
-notifications. Clicking a post's body opens its permalink without taking over
-links, media controls, or text selection. Deletion asks for confirmation after
-the delete action; cancelling the browser dialog retains unsubmitted writing.
-Stale-version conflicts preserve submitted text or tags rather than overwriting
-another tab's work.
+Bookmarks put the most recently bookmarked item first. Next spans its feed's
+width, and a top Prev restores the exact preceding page and filter. The bounded
+native cursor trail also survives reactions and attachment selection; it works
+without JavaScript. Direct cursor URLs without a preceding trail offer First.
 
-Search has a single query field. It finds readable published posts and, for signed-in
-viewers, people by handle or display name. It supports literal substring matching,
-ASCII case folding, and Unicode text. Drafts, deleted posts, and muted authors are
-not exposed. Work per request is bounded; older results remain paginated.
+Posts support replies, following, muting, Attention, bookmarks, and notifications.
+Reply counts follow current readability, mute, and deletion checks, not a count
+of hidden records. Up to 256 indexed replies are inspected per card; an incomplete
+positive count carries a plus sign rather than pretending to be exact.
+
+HTTP(S) links in posts and profile text open separately, with opener/referrer
+protection and a small external-link indicator. Native rendering escapes content,
+handles punctuation and Unicode, and does not fetch remote previews. Clicking
+other post content still opens its permalink without intercepting controls or
+text selection. Conflicting versions retain the attempted input for comparison.
+
+Search finds readable published posts and, for signed-in viewers, people by
+handle or display name. Literal substring matching, ASCII case folding, Unicode,
+and bounded pagination are supported. Private working copies, deleted posts,
+and muted authors are not exposed in search.
+
+About, Privacy policy, Terms of service, Community guidelines, and Contact are
+publicly readable from More. Registration links to the terms and privacy copy.
+The operator contact uses the public address on lkjsxc's GitHub profile. The
+service documents describe the implementation, not unimplemented encryption,
+automated account deletion, or a promise of immediate backup erasure. See
+[operator responsibilities](docs/OPERATOR-RESPONSIBILITIES.md).
 
 ## Drive and profile images
 
@@ -52,9 +70,11 @@ Their selected representation is public; that does not make the original's priva
 Drive URL public. Files currently used by a profile or post cannot be deleted
 until those references are removed.
 
-Normal pages do not repeat their name in a visible top banner. Draft previews are
-whole-card links. Attachment and profile-image pickers use the preview itself as
-the selection control, without separate Attach or Use as profile image buttons.
+Normal pages do not repeat their name in a visible top banner. Attachment and
+profile-image pickers use the preview itself as the selection control, without
+separate Attach or Use as profile image buttons. Upload sits beside the storage
+meter. File tiles have inset text padding, and Used in renders normal post cards
+with native actions that return to the same file page.
 
 Posts and files use `/<id>` addresses, with `/<id>/edit` for published editing and
 `/<id>/raw` for originals. Existing query-style resource links redirect to these
@@ -73,7 +93,7 @@ are acknowledged durably; the browser can resume an interrupted transfer while
 the upload page and selected file remain available. Downloads use validated byte
 ranges. The portable browser save path can temporarily buffer a large file.
 
-Core forms, writing, preview, confirmation pages, and the multipart upload fallback
+Core forms, writing, attachment selection, confirmation pages, and the multipart upload fallback
 work with JavaScript disabled. Files larger than 32 MiB require JavaScript for
 uploading and full-file downloading. Media HEAD is deliberately unsupported: an
 authorized request returns 405 with Allow: GET, not incorrect zero-length metadata.
@@ -120,8 +140,7 @@ production acceptance. Normal repository CI remains lightweight.
 
 ## Boundaries
 
-Post saving is explicit, not automatic. Navigating away can lose unsubmitted text;
-cancelling a delete dialog does not. A Members post is readable by all registered
+A Members post is readable by all registered
 members, not followers only. Public posts and their attachments are readable
 without signing in. Removing a reference revokes future access, not copies that
 someone already downloaded.
@@ -132,7 +151,8 @@ interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [the profile-derived favicon](docs/PERSONAL-FAVICON.md),
+See [quiet workflows](docs/QUIET-WORKFLOWS.md),
+[the profile-derived favicon](docs/PERSONAL-FAVICON.md),
 [reply rendering and favicon](docs/REPLIES-FAVICON.md),
 [direct interactions and resource paths](docs/DIRECT-INTERACTIONS.md),
 [community UX and transfer architecture](docs/COMMUNITY-UX.md),

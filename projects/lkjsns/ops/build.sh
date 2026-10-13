@@ -48,6 +48,7 @@ apply_fragment() {
   printf '  ))\n'
 } > "$work/capabilities.lkjc"
 apply_fragment capabilities "$work/capabilities.lkjc" "$ROOT/src/health.lkjc"
+apply_fragment text-input "$ROOT/src/textinput.lkjc"
 for name in util paths invitations; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
@@ -61,6 +62,8 @@ done
 for name in controls navigation; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
+apply_fragment paging "$ROOT/src/reading/paging.lkjc"
+apply_fragment sequence "$ROOT/src/reading/sequence.lkjc"
 for name in math store io; do
   apply_fragment "transfer-$name" "$ROOT/src/transfers/$name.lkjc"
 done
@@ -68,12 +71,14 @@ apply_fragment delivery "$ROOT/src/delivery.lkjc"
 apply_fragment library-path "$ROOT/src/reading/librarypath.lkjc"
 apply_fragment tags "$ROOT/src/tags.lkjc"
 apply_fragment search-text "$ROOT/src/searchtext.lkjc"
+apply_fragment links "$ROOT/src/reading/links.lkjc"
 for name in admission mediaui; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
 for name in conversation activity; do
   apply_fragment "$name" "$ROOT/src/reading/$name.lkjc"
 done
+apply_fragment reply-metrics "$ROOT/src/reading/replymetrics.lkjc"
 for name in intents workspace; do
   apply_fragment "writing-$name" "$ROOT/src/writing/$name.lkjc"
 done
@@ -85,6 +90,7 @@ apply_fragment journal-submit "$ROOT/src/writing/submit.lkjc"
 for name in attachments relations adminview accounts fileactions; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
+apply_fragment information "$ROOT/src/ui/information.lkjc"
 apply_fragment identity "$ROOT/src/identity.lkjc"
 for name in driveview mediaflow recovery; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"

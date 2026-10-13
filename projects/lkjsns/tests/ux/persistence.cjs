@@ -1,5 +1,5 @@
 const {iconPaths,iconRevision}=require('./icon-paths.cjs');
-const {resourceId,isResource,isEditor,chromium,base,assert,goto,pass,session,load}=require('./support.cjs');
+const {resourceId,isResource,isEditor,chromium,base,assert,click,goto,pass,session,load}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -8,7 +8,16 @@ const {resourceId,isResource,isEditor,chromium,base,assert,goto,pass,session,loa
   await goto(p,'/settings/profile');assert.equal(await p.locator('[name=display]').inputValue(),'Alex Morgan');
   const media=load('media');await goto(p,'/file?id='+media.textId);assert.equal(await p.locator('[name=tags]').inputValue(),'travel, work, 日本語');
   const avatar=await clean.request.get(base+'/avatar?user=testowner');assert.equal(avatar.status(),200);assert(avatar.headers()['content-type'].startsWith('image/'));
-  await goto(p,'/search?q='+encodeURIComponent('日本語の検索'));assert.equal(await p.locator('article.note').count(),1);
+  await goto(p,'/search?q='+encodeURIComponent('日本語の検索'));
+  // Later suites add more than one bounded search window. Follow the real Next
+  // links rather than assuming this early specimen remains on the first page.
+  const target=p.locator('#post-'+load('search').japanese);let pages=0;
+  while(await target.count()===0 && await p.getByRole('link',{name:'Next',exact:true}).count()) {
+   assert(++pages<=8,'Search must find the retained specimen within this bounded fixture');
+   await click(p,p.getByRole('link',{name:'Next',exact:true}));
+  }
+  assert.equal(await target.count(),1);assert((await target.innerText()).includes('日本語の検索'));
+
   await goto(p,'/compose');assert.equal(await p.locator('[name=audience]').inputValue(),load('expected-audience').value);
   pass('Native restart preserves profile, private tags, avatar, search and signed-in access');
   const large=load('large');const r=await clean.request.get(base+'/media?id='+large.id,{headers:{Range:'bytes=0-13'}});assert.equal(r.status(),206);assert((await r.body()).toString().startsWith('lkjsns-part-0-'));

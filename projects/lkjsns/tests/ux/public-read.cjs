@@ -13,7 +13,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
   const context=await browser.newContext({locale:'en-US'});const p=await context.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));
   for(const scheme of ['light','dark'])for(const width of [390,1280]) {
    await p.emulateMedia({colorScheme:scheme,reducedMotion:'reduce'});await p.setViewportSize({width,height:900});
-   for(const route of ['/','/login','/join','/about','/search']) {
+   for(const route of ['/','/login','/join','/about','/search','/more','/privacy','/terms','/guidelines','/contact']) {
     const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');
     assert.equal(await p.locator('.page-header').count(),0,route);assert((await p.locator('main h1').getAttribute('class')).includes('sr-only'),route);
     assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),iconPaths.svg);

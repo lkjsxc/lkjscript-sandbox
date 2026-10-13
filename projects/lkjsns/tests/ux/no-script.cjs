@@ -5,17 +5,16 @@ const {resourceId,isResource,isEditor,chromium,base,fixture,fs,path,assert,form,
  try {
   const context=await session(browser,'owner',{javaScriptEnabled:false,viewport:{width:390,height:844}});const p=await context.newPage();
   await goto(p,'/compose');await p.locator('[name=body]').fill('Native HTML writing without application scripts.');
-  await p.locator('select[name=audience]').selectOption('members');await click(p,p.getByRole('button',{name:'Save & preview',exact:true}));
-  assert.equal(new URL(p.url()).searchParams.get('preview'),'1');const draft=resourceId(p.url());
-  await click(p,p.getByRole('link',{name:'Back to writing',exact:true}));
-  await click(p,p.getByRole('button',{name:'Save & choose files',exact:true}));
+  await p.locator('select[name=audience]').selectOption('members');
+  await click(p,p.getByRole('button',{name:'Attach file',exact:true}));
+  const draft=new URL(p.url()).searchParams.get('draft');assert(draft);
   await click(p,p.getByRole('link',{name:'Upload',exact:true}));
   const f=path.join(fixture,'no-script.txt');fs.writeFileSync(f,'Native multipart fallback.');
   await p.locator('input[type=file]').setInputFiles(f);await click(p,p.getByRole('button',{name:'Upload',exact:true}));
   assert(isEditor(p.url())||new URL(p.url()).pathname==='/compose');assert.equal(resourceId(p.url()),draft);
   assert.equal(await p.locator('[name=body]').inputValue(),'Native HTML writing without application scripts.');
   const href=await p.locator('.composer-attachments .download-card').getAttribute('href');const media=resourceId(href,base);
-  pass('Without JavaScript, native writing, preview, picker and multipart attachment all work');
+  pass('Without JavaScript, native writing, picker and multipart attachment preserve input without save or preview buttons');
   await click(p,p.getByRole('link',{name:'Delete post',exact:true}));assert.equal(new URL(p.url()).pathname,'/delete');
   await click(p,p.getByRole('link',{name:'Cancel',exact:true}));assert.equal(await p.locator('[name=body]').inputValue(),'Native HTML writing without application scripts.');
   await click(p,p.getByRole('link',{name:'Delete post',exact:true}));await click(p,p.getByRole('button',{name:'Delete post',exact:true}));

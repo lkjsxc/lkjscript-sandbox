@@ -1,0 +1,12 @@
+(module create sequenceview
+
+  (function create walk (visibility public) (parameter create items (type (list Text))) (parameter create index (type I64)) (parameter create remaining (type I64)) (parameter create out (type (list Text))) (returns Listing) (effect pure) (body (if (if (call std::less-equal (i64 0) (local index)) (if (call std::less (local index) (call std::list-length (types Text) (local items))) (if (call std::less (i64 0) (local remaining)) (bool true) (bool false)) (bool false)) (bool false)) (call sequenceview::walk (local items) (call std::subtract (local index) (i64 1)) (call std::subtract (local remaining) (i64 1)) (call std::list-append (types Text) (local out) (call std::list-get (types Text) (local items) (local index)))) (record structural (field ids (local out)) (field next (if (if (call std::less-equal (i64 0) (local index)) (if (call std::less (local index) (call std::list-length (types Text) (local items))) (bool true) (bool false)) (bool false)) (local index) (i64 -1)))))))
+
+  (function create window (visibility public) (parameter create items (type (list Text))) (parameter create cursor (type Text)) (parameter create limit (type I64)) (returns Listing) (effect pure) (body (let (binding last (call std::subtract (call std::list-length (types Text) (local items)) (i64 1))) (binding parsed (call util::number (local cursor) (local last))) (in (call sequenceview::walk (local items) (if (call std::less (local parsed) (i64 0)) (local last) (local parsed)) (local limit) (list Text))))))
+
+  (test create recent-items-first (visibility private) (actual (field (call sequenceview::window (list Text (text "old") (text "middle") (text "recent")) (text "") (i64 2)) (name ids))) (expected (list Text (text "recent") (text "middle"))))
+
+  (test create next-reverse-window (visibility private) (actual (field (call sequenceview::window (list Text (text "old") (text "middle") (text "recent")) (text "0") (i64 2)) (name ids))) (expected (list Text (text "old"))))
+
+  (test create empty-window (visibility private) (actual (field (call sequenceview::window (list Text) (text "") (i64 30)) (name next))) (expected (i64 -1)))
+)

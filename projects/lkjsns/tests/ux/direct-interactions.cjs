@@ -10,18 +10,16 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
    assert(await p.locator('main h1').evaluate(e=>e.classList.contains('sr-only')&&e.getBoundingClientRect().width<=1),route);
    assert((await p.title()).includes('lkjsns'),route);
   }
-  await goto(p,'/drive');for(const selector of ['.nav','.mobile-nav'])assert.equal(await p.locator(selector+' a[href="/drive"]').count(),1);
+  await goto(p,'/drive');assert.equal(await p.locator('.nav a[href="/drive"]').count(),1);assert.equal(await p.locator('.mobile-nav a[href="/drive"]').count(),0);assert.deepEqual(await p.locator('.mobile-nav a').allTextContents(),['Home','Post','Notifications','More']);
   assert.equal(await p.locator('.nav a[href="/drive"]').getAttribute('aria-current'),'page');
-  pass('Every normal page omits its title banner; Drive is primary on desktop and mobile');
-  await goto(p,'/drafts');const draft=p.locator('a.draft-card[href="/'+posts.protectedDraft+'"]');assert.equal(await draft.count(),1);
-  assert.equal(await draft.locator('a,button,input,select,textarea').count(),0);
-  assert(!(await p.locator('main').innerText()).includes('Continue writing'));
-  await click(p,draft.locator('.draft-body'));assert.equal(new URL(p.url()).pathname,'/'+posts.protectedDraft);
-  assert.equal(await p.locator('[name=body]').inputValue(),'Newest private draft nebula.');
+  pass('Every normal page omits its title banner; Drive stays on desktop and mobile uses the four-item dock');
+  await goto(p,'/drafts');assert.equal(new URL(p.url()).pathname,'/compose');
+  assert.equal(await p.locator('a[href="/drafts"]').count(),0);
+  await goto(p,'/'+posts.protectedDraft);assert.equal(await p.locator('[name=body]').inputValue(),'Newest private draft nebula.');
   const noScripts=await session(browser,'owner',{javaScriptEnabled:false});const np=await noScripts.newPage();
-  await goto(np,'/drafts');await np.locator('a.draft-card[href="/'+posts.protectedDraft+'"] ' .trim()).focus();await Promise.all([np.waitForNavigation(),np.keyboard.press('Enter')]);
-  assert.equal(await np.locator('[name=body]').inputValue(),'Newest private draft nebula.');await noScripts.close();
-  pass('A whole draft card opens writing by mouse or keyboard without a Continue writing button or JavaScript');
+  await goto(np,'/'+posts.protectedDraft+'/preview');assert.equal(await np.locator('[name=body]').inputValue(),'Newest private draft nebula.');
+  assert.equal(await np.locator('.preview-card,.preview-summary').count(),0);await noScripts.close();
+  pass('No draft list is exposed; existing private working copies and old preview URLs remain safely editable without scripts');
   for(const [legacy,canonical] of [['/note?id='+posts.publicId,'/'+posts.publicId],['/file?id='+media.textId,'/'+media.textId],['/compose?id='+posts.protectedDraft,'/'+posts.protectedDraft+'/edit'],['/media?id='+media.textId,'/'+media.textId+'/raw']]) {
    const r=await owner.request.get(base+legacy,{maxRedirects:0});assert.equal(r.status(),303);assert.equal(r.headers().location,canonical);
   }
@@ -43,7 +41,7 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
   const reply=resourceId(response.headers().location);await goto(p,'/'+reply);assert.equal(await p.locator('.parent-card').getAttribute('href'),'/'+posts.publicId);
   assert.equal(await p.getByText(/View original post|Open original post|View the original post/).count(),0);
   pass('Reply context is directly linked without a separate original-post button');
-  await goto(p,'/compose');await p.locator('[name=body]').fill('Tap previews to select reusable files.');await click(p,p.getByRole('button',{name:'Save & choose files',exact:true}));
+  await goto(p,'/compose');await p.locator('[name=body]').fill('Tap previews to select reusable files.');await click(p,p.getByRole('button',{name:'Attach file',exact:true}));
   const selectedDraft=new URL(p.url()).searchParams.get('draft');const candidates=[media.avatarId,media.textId,...media.unsafeIds.slice(0,3)];
   for(let i=0;i<4;i++){
    const tile=p.locator('#file-'+candidates[i]+' .media-choice');assert.equal(await tile.getAttribute('aria-pressed'),'false');assert.equal(await tile.locator('a,button,input').count(),0);

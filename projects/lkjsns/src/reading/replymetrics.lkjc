@@ -1,0 +1,16 @@
+(module create replymetrics
+
+  (function create scan (visibility public) (parameter create ctx (type Context)) (parameter create viewer (type User)) (parameter create parent (type Text)) (parameter create ids (type (list Text))) (parameter create index (type I64)) (parameter create total (type I64)) (returns I64) (effect (task (requirement service::app::store))) (body (if (call std::less (local index) (call std::list-length (types Text) (local ids))) (let (binding note (call db::note (call std::list-get (types Text) (local ids) (local index)))) (in (call replymetrics::scan (local ctx) (local viewer) (local parent) (local ids) (call std::add (local index) (i64 1)) (call std::add (local total) (if (if (field (local note) (name published)) (if (call std::text-equal (field (local note) (name reply)) (local parent)) (if (call conversation::readable (local ctx) (local note) (local viewer) (call db::user (field (local note) (name author)))) (bool true) (bool false)) (bool false)) (bool false)) (i64 1) (i64 0)))))) (local total))))
+
+  (function create format (visibility public) (parameter create total (type I64)) (parameter create complete (type Bool)) (returns Text) (effect pure) (body (if (local complete) (call std::i64-to-text (local total)) (if (call std::less (i64 0) (local total)) (call std::text-join (list Text (call std::i64-to-text (local total)) (text "+")) (text "")) (text "")))))
+
+  (function create label (visibility public) (parameter create ctx (type Context)) (parameter create viewer (type User)) (parameter create parent (type Text)) (returns Text) (effect (task (requirement service::app::store))) (body (let (binding listing (call db::listing (call std::text-join (list Text (text "replies/") (local parent)) (text "")) (text "") (i64 256))) (in (call replymetrics::format (call replymetrics::scan (local ctx) (local viewer) (local parent) (field (local listing) (name ids)) (i64 0) (i64 0)) (call std::less (field (local listing) (name next)) (i64 0)))))))
+
+  (test create zero-is-exact (visibility private) (actual (call replymetrics::format (i64 0) (bool true))) (expected (text "0")))
+
+  (test create count-exact (visibility private) (actual (call replymetrics::format (i64 8) (bool true))) (expected (text "8")))
+
+  (test create bounded-count-is-marked (visibility private) (actual (call replymetrics::format (i64 256) (bool false))) (expected (text "256+")))
+
+  (test create never-invent-a-zero (visibility private) (actual (call replymetrics::format (i64 0) (bool false))) (expected (text "")))
+)

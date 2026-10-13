@@ -48,7 +48,7 @@ async function upload(page,file,draft='') {
   await goto(p,'/file?id='+avatarId);assert((await p.locator('body').innerText()).includes('public profile image'));assert(!(await p.locator('body').innerText()).includes('Only you can access this file.'));
   pass('Public profile image does not grant access to the private original; in-use deletion is blocked');
   await goto(p,'/compose');await p.locator('[name=body]').fill('Attachment journey through one writing workspace.');
-  await click(p,p.getByRole('button',{name:'Save & choose files',exact:true}));const draft=new URL(p.url()).searchParams.get('draft');assert(draft);
+  await click(p,p.getByRole('button',{name:'Attach file',exact:true}));const draft=new URL(p.url()).searchParams.get('draft');assert(draft);
   await click(p,p.getByRole('link',{name:/Upload/,exact:false}).first());
   await p.locator('input[type=file]').setInputFiles(path.join(files,'sample-1.png'));
   await click(p,p.getByRole('button',{name:'Upload',exact:true}));

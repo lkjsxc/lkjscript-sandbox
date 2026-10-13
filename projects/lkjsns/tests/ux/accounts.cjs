@@ -4,7 +4,7 @@ const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,asser
  try {
   const owner=await browser.newContext({locale:'en-US',viewport:{width:1280,height:1000}});
   const p=await owner.newPage(); p.setDefaultTimeout(20000);
-  for(const route of ['/','/login','/join','/about','/search']) {
+  for(const route of ['/','/login','/join','/about','/search','/more','/privacy','/terms','/guidelines','/contact']) {
    await goto(p,route); assert.equal(await p.locator('html').getAttribute('lang'),'en');
   }
   pass('English guest pages and query-only Search');
@@ -14,13 +14,16 @@ const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,asser
    invite:fs.readFileSync(path.join(fixture,'bootstrap.secret'),'utf8').trim()})) await p.locator(`[name=${name}]`).fill(value);
   await click(p,form(p,'join').locator('button')); assert.equal(new URL(p.url()).pathname,'/');
   pass('Real browser bootstrap registration');
-  assert.deepEqual(await p.locator('.nav a').allTextContents(),['Home','Search','Notifications','Bookmarks','Drive','Settings']);
+  assert.deepEqual(await p.locator('.nav a').allTextContents(),['Home','Search','Notifications','Bookmarks','Drive','Settings','More']);
   assert.equal(await p.locator('.account-identity').getAttribute('href'),'/profile?user=testowner');
   assert((await p.locator('h1').getAttribute('class')).includes('sr-only')); assert.equal(await p.getByRole('link',{name:'Refresh',exact:true}).count(),0);
   pass('Primary navigation and account identity destinations');
   await goto(p,'/settings'); assert.equal(await p.locator('h1').innerText(),'Settings');
   assert.equal(await p.locator('input[name=password]').count(),0);
-  for(const route of ['/settings/profile','/settings/security','/drive','/drafts','/people','/admin']) assert(await p.locator(`.settings-row[href="${route}"]`).count());
+  assert.deepEqual(await p.locator('.settings-row').evaluateAll(es=>es.map(e=>e.getAttribute('href'))),['/settings/profile','/settings/security']);
+  await goto(p,'/more');for(const route of ['/search','/saved','/drive','/people','/settings','/admin','/about','/privacy','/terms','/guidelines','/contact']) assert.equal(await p.locator(`main .settings-row[href="${route}"]`).count(),1,route);
+  assert.equal(await p.locator('a[href="/drafts"]').count(),0);
+  pass('More contains navigation and service information; Settings contains only settings');
   await goto(p,'/settings/profile'); await p.locator('[name=display]').fill('Alex Morgan'); await p.locator('[name=bio]').fill('A quiet place to share things.');
   await click(p,form(p,'profile').locator('button')); assert.equal(new URL(p.url()).pathname,'/settings/profile');
   assert.equal(await p.locator('[name=display]').inputValue(),'Alex Morgan');

@@ -32,17 +32,17 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
  await click(p,p.locator('.reply-list #post-'+child+' .note-body'));assert.equal(new URL(p.url()).pathname,'/'+child);
  await click(p,p.locator('.note-detail .parent-card'));assert.equal(new URL(p.url()).pathname,'/'+parent);
  await goto(p,'/'+nested);assert.equal(await p.locator('.note-detail .parent-card').getAttribute('href'),'/'+child);
- await click(p,p.locator('.note-detail .note-actions').getByRole('link',{name:'Reply',exact:true}));assert.equal(new URL(p.url()).searchParams.get('reply'),nested);
+ await click(p,p.locator('.note-detail .note-actions').getByRole('link',{name:/^Reply(?:\s+\d+\+?)?$/}));assert.equal(new URL(p.url()).searchParams.get('reply'),nested);
  assert.equal(await p.locator('.composer .parent-card').getAttribute('target'),'_blank');
  pass('Nested replies point to their immediate parent; post clicks and Reply target the correct resource and preserve composition links');
- // Saving, previewing and editing must not lose reply identity or duplicate the index.
- const draft=await reply(m,parent,'Draft reply that will be published from preview.',{mode:'draft'});
+ // Attachment selection and editing must not lose reply identity or duplicate the index.
+ const draft=await reply(m,parent,'Reply preserved through attachment selection.',{mode:'draft'});
  await goto(p,'/'+parent);assert.equal(await p.locator('.reply-list #post-'+draft).count(),0);
- await goto(m,'/'+draft+'/edit');await click(m,m.getByRole('button',{name:'Save & preview',exact:true}));await click(m,m.getByRole('button',{name:'Post',exact:true}));
+ await goto(m,'/'+draft+'/edit');await click(m,m.getByRole('button',{name:'Attach file',exact:true}));await click(m,m.getByRole('link',{name:'Back to writing',exact:true}));await click(m,m.getByRole('button',{name:'Post',exact:true}));
  await goto(p,'/'+parent);assert.equal(await p.locator('.reply-list #post-'+draft).count(),1);
  await goto(m,'/'+draft+'/edit');const updated=await submit(m,'note',{body:'Edited reply stays in the same conversation.',mode:'publish'});await goto(m,updated.headers().location);
  await goto(p,'/'+parent);assert.equal(await p.locator('.reply-list #post-'+draft).count(),1);assert.equal(await p.locator('#post-'+draft+' .note-body').innerText(),'Edited reply stays in the same conversation.');
- pass('Saved and previewed replies publish into their parent once; edits retain the same reply identity');
+ pass('Retained replies publish into their parent once; edits retain the same reply identity');
  // Content warnings must not leak the parent's underlying body through an excerpt.
  await goto(p,'/compose');const warningBody='Hidden parent content 8fb905';const created=await submit(p,'note',{body:warningBody,cw:'Spoilers',audience:'public',mode:'publish'});const warningParent=resourceId(created.headers().location);
  const warningChild=await reply(m,warningParent,'A safe reply to a warning.');await goto(g,'/'+warningChild);
@@ -60,7 +60,7 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
  assert.equal(await g.locator('.parent-card').count(),0);assert(!(await g.content()).includes('Unique parent body cb7f56'));assert((await g.locator('.note-body').innerText()).includes('Own reply'));
  pass('Muted or deleted parents become a compact unavailable context without leaking text or showing editor instructions');
  // A real uploaded attachment is authorized through the child, not its parent.
- await goto(m,'/compose?reply='+parent);await m.locator('[name=body]').fill('An image attached to this reply.');await click(m,m.getByRole('button',{name:'Save & choose files',exact:true}));await click(m,m.getByRole('link',{name:'Upload',exact:true}));
+ await goto(m,'/compose?reply='+parent);await m.locator('[name=body]').fill('An image attached to this reply.');await click(m,m.getByRole('button',{name:'Attach file',exact:true}));await click(m,m.getByRole('link',{name:'Upload',exact:true}));
  await m.locator('input[type=file]').setInputFiles(path.join(output,'media','landscape-2.png'));await Promise.all([m.waitForURL(u=>/^\/[a-f0-9]{64}\/edit$/.test(u.pathname)),m.getByRole('button',{name:'Upload',exact:true}).click()]);
  const imageReply=resourceId(m.url());await click(m,m.getByRole('button',{name:'Post',exact:true}));await goto(g,'/'+imageReply);
  const image=g.locator('.note-detail .media-original img');await image.waitFor();await image.evaluate(el=>el.decode());assert(await image.evaluate(el=>el.naturalWidth>0));

@@ -44,15 +44,9 @@
     (returns Bool) (effect pure)
     (body (if (call std::less-equal (i64 3) (call util::size (local value))) (if (call std::less-equal (call util::size (local value)) (i64 24)) (if (call util::ascii (call std::bytes-from-text (local value)) (i64 0) (bool false)) (bool true) (bool false)) (bool false)) (bool false))))
 
-  (function create clean
-    (visibility public) (parameter create value (type Text)) (parameter create minimum (type I64)) (parameter create maximum (type I64))
-    (returns Bool) (effect pure)
-    (body (if (field (call editor::clean-text (local value)) (name valid)) (if (call std::less-equal (local minimum) (call util::size (local value))) (if (call std::less-equal (call util::size (local value)) (local maximum)) (bool true) (bool false)) (bool false)) (bool false))))
+  (function create clean (visibility public) (parameter create value (type Text)) (parameter create minimum (type I64)) (parameter create maximum (type I64)) (returns Bool) (effect pure) (body (if (call std::less-equal (local minimum) (call util::size (local value))) (if (call std::less-equal (call util::size (local value)) (local maximum)) (if (call textinput::valid (call std::bytes-from-text (local value))) (bool true) (bool false)) (bool false)) (bool false))))
 
-  (function create normal
-    (visibility public) (parameter create value (type Text))
-    (returns Text) (effect pure)
-    (body (field (call editor::clean-text (local value)) (name value))))
+  (function create normal (visibility public) (parameter create value (type Text)) (returns Text) (effect pure) (body (call textinput::normalize (local value))))
 
   (function create number
     (visibility public) (parameter create value (type Text)) (parameter create maximum (type I64))

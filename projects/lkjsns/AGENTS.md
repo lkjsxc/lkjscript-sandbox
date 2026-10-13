@@ -50,3 +50,24 @@ avatar exception, bounded search, 4 MiB transfers, and no-script boundaries.
 Use tests/ux/run.sh via the normal browser command for current acceptance; the
 older tests/browser flow suites retain historical UI assumptions and are not the
 current release gate. Do not claim every historical suite was rerun.
+
+## Quiet workflow contract
+
+Read docs/QUIET-WORKFLOWS.md for the current writing and navigation model. Keep
+Attach file and Post as the new-post actions, with no exposed draft collection,
+saving notice, preview step, or routine warning about lost unsaved input. Owned
+working copies remain an internal part of attachment and conflict recovery.
+More contains secondary destinations and service information; Settings contains
+actual settings. The mobile dock is Home, Post, Notifications, More.
+
+Keep cursor trails bounded and destination-free. Preserve the exact reading place
+(e.g. bookmarks, not the saved URL name) through reaction forms. File options must
+return directly to the owned editor. HTTP(S) links remain natively escaped and
+new-tab safe, and reply metrics must not count unreadable/deleted/muted records.
+The SNS textinput module owns its 16,000-byte normalization boundary; do not
+reintroduce the web-editor sample's unrelated 4 KiB admission cap.
+
+Service-information pages must match implemented behavior. Do not invent legal
+identity details, retention periods, automatic account deletion/export, or a
+claim of legal compliance. Read docs/OPERATOR-RESPONSIBILITIES.md for operator
+requirements that cannot be established by software or policy prose alone.

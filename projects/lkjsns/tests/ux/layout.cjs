@@ -3,7 +3,7 @@ const {resourceId,isResource,isEditor,chromium,base,root,output,fs,path,assert,g
  const browser=await chromium.launch({headless:true});
  try {
   const context=await session(browser),p=await context.newPage();const media=load('media');const errors=[];p.on('pageerror',e=>errors.push(e.message));
-  const routes=['/','/compose','/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/file?id='+media.textId,'/notifications','/search','/admin','/admin/invitations'];
+  const routes=['/','/compose','/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/file?id='+media.textId,'/notifications','/search','/admin','/admin/invitations','/more','/privacy','/terms','/guidelines','/contact'];
   for(const scheme of ['light','dark'])for(const width of [320,390,768,1280]) {
    await p.emulateMedia({colorScheme:scheme,reducedMotion:'reduce'});await p.setViewportSize({width,height:900});
    for(const route of routes) {
@@ -17,7 +17,7 @@ const {resourceId,isResource,isEditor,chromium,base,root,output,fs,path,assert,g
    await goto(p,'/notifications');
    const boxes=await p.locator('.activity-tabs a').evaluateAll(es=>es.map(e=>({label:e.textContent,w:e.getBoundingClientRect().width,h:e.getBoundingClientRect().height})));
    for(const b of boxes){assert(b.w>=44&&b.h>=44,JSON.stringify({width,...b}));}
-   pass(`${scheme} layout: twelve routes at ${width}px, no horizontal overflow, usable activity tabs`);
+   pass(`${scheme} layout: seventeen routes at ${width}px, no horizontal overflow, usable activity tabs`);
   }
   await p.emulateMedia({colorScheme:'light'});await p.setViewportSize({width:1280,height:950});
   for(const [name,route] of [['home','/'],['drive','/drive'],['settings','/settings'],['admin','/admin'],['compose','/compose']]) {
@@ -35,14 +35,14 @@ const {resourceId,isResource,isEditor,chromium,base,root,output,fs,path,assert,g
    assert(fs.existsSync(axePath),'The requested axe script does not exist.');
    const script=fs.readFileSync(axePath,'utf8');const reports=[];
    await p.emulateMedia({colorScheme:'light'});await p.setViewportSize({width:1280,height:950});
-   for(const route of ['/','/compose','/settings','/settings/profile','/drive','/notifications','/search','/settings/avatar']) {
+   for(const route of ['/','/compose','/settings','/settings/profile','/drive','/notifications','/search','/settings/avatar','/more','/privacy','/terms','/guidelines','/contact']) {
     await goto(p,route);await p.evaluate(script);
     const report=await p.evaluate(async()=>axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}));
     reports.push({route,violations:report.violations.map(v=>({id:v.id,impact:v.impact,help:v.help,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))});
    }
    fs.writeFileSync(path.join(output,'accessibility.json'),JSON.stringify(reports,null,2));
    const serious=reports.flatMap(r=>r.violations.filter(v=>['critical','serious'].includes(v.impact)).map(v=>({route:r.route,...v})));
-   assert.deepEqual(serious,[],JSON.stringify(serious,null,2));pass('Automated accessibility checks: no serious or critical findings on eight primary routes');
+   assert.deepEqual(serious,[],JSON.stringify(serious,null,2));pass('Automated accessibility checks: no serious or critical findings on thirteen primary and service routes');
   } else {console.log('SKIP optional accessibility audit: set LKJSNS_AXE to an installed axe.min.js.');}
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

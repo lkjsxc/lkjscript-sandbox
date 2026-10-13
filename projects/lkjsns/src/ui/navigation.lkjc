@@ -31,15 +31,7 @@
 
   (test create unreserved-query (visibility private)
     (actual (call navigation::encode (text "hello-_.~123"))) (expected (text "hello-_.~123")))
-  (function create reading-place (visibility public)
-    (parameter create place (type Text)) (returns Bool) (effect pure)
-    (body (if (call util::has (list Text (text "home") (text "following") (text "bookmarks")) (local place) (i64 0))
-      (bool true)
-      (if (call std::text-starts-with (local place) (text "profile:"))
-        (call util::handle (call util::slice (local place) (i64 8) (call util::size (local place))))
-        (if (call std::text-starts-with (local place) (text "thread:"))
-          (call util::token (call util::slice (local place) (i64 7) (call util::size (local place))))
-          (bool false))))))
+  (function create reading-place (visibility public) (parameter create place (type Text)) (returns Bool) (effect pure) (body (if (if (call std::text-starts-with (local place) (text "file:")) (if (call util::token (call util::slice (local place) (i64 5) (call util::size (local place)))) (bool true) (bool false)) (bool false)) (bool true) (if (if (call util::has (list Text (text "home") (text "following") (text "bookmarks")) (local place) (i64 0)) (bool true) (if (call std::text-starts-with (local place) (text "profile:")) (call util::handle (call util::slice (local place) (i64 8) (call util::size (local place)))) (if (call std::text-starts-with (local place) (text "thread:")) (call util::token (call util::slice (local place) (i64 7) (call util::size (local place)))) (bool false)))) (bool true) (bool false)))))
 
   (function create reading-cursor (visibility public)
     (parameter create cursor (type Text)) (returns Bool) (effect pure)
@@ -57,19 +49,7 @@
             (call paths::canonical (call std::text-join (list Text (text "/note?id=")
               (call util::slice (local place) (i64 7) (call util::size (local place)))) (text "")))))))))
 
-  (function create reading-return (visibility public)
-    (parameter create place (type Text)) (parameter create cursor (type Text))
-    (parameter create post (type Text)) (returns Text) (effect pure)
-    (body (if (if (call navigation::reading-place (local place))
-      (if (call navigation::reading-cursor (local cursor)) (call util::token (local post)) (bool false)) (bool false))
-      (let (binding base (call navigation::reading-base (local place)))
-        (in (call std::text-join (list Text (local base)
-          (if (call std::text-equal (local cursor) (text "")) (text "")
-            (call std::text-join (list Text
-              (if (call std::text-contains (local base) (text "?")) (text "&cursor=") (text "?cursor="))
-              (call std::i64-to-text (call util::number (local cursor) (i64 9999999999)))) (text "")))
-          (text "#post-") (local post)) (text ""))))
-      (text "/"))))
+  (function create reading-return (visibility public) (parameter create place (type Text)) (parameter create cursor (type Text)) (parameter create post (type Text)) (returns Text) (effect pure) (body (if (if (if (call std::text-starts-with (local place) (text "file:")) (if (call util::token (call util::slice (local place) (i64 5) (call util::size (local place)))) (bool true) (bool false)) (bool false)) (if (call navigation::reading-cursor (local cursor)) (if (call util::token (local post)) (bool true) (bool false)) (bool false)) (bool false)) (call std::text-join (list Text (text "/") (call util::slice (local place) (i64 5) (call util::size (local place))) (text "?cursor=") (call navigation::encode (local cursor)) (text "#post-") (local post)) (text "")) (if (if (call navigation::reading-place (local place)) (if (call navigation::reading-cursor (local cursor)) (call util::token (local post)) (bool false)) (bool false)) (let (binding base (call navigation::reading-base (local place))) (in (call std::text-join (list Text (local base) (if (call std::text-equal (local cursor) (text "")) (text "") (call std::text-join (list Text (if (call std::text-contains (local base) (text "?")) (text "&cursor=") (text "?cursor=")) (call std::i64-to-text (call util::number (local cursor) (i64 9999999999)))) (text ""))) (text "#post-") (local post)) (text "")))) (text "/")))))
 
   (test create reading-accepts-home (visibility private)
     (actual (call navigation::reading-place (text "home"))) (expected (bool true)))
@@ -108,4 +88,6 @@
     (expected (text "/")))
   (test create reading-invalid-anchor-fails-closed (visibility private)
     (actual (call navigation::reading-return (text "home") (text "") (text "oops#fragment"))) (expected (text "/")))
+
+  (test create bookmark-history-return (visibility private) (actual (call navigation::reading-return (text "bookmarks") (text "5") (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))) (expected (text "/saved?cursor=5#post-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")))
 )
