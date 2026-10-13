@@ -1,42 +1,54 @@
 # lkjsns checkpoint — October 13, 2026
 
-The profile-derived **lkjsns** favicon is live through
-[Coder public port 8793](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
-Promotion completed at **2026-10-13 07:04:03 JST** with existing data and the original lkjsxc
-profile image preserved.
+The quiet workflow release is live through the existing Coder public port 8793.
+Promotion completed at **2026-10-13 17:42:02 JST** with existing accounts, posts,
+metadata, files, and the original profile image preserved.
 
-Executable source: `72ff3cbbeb8483b06e5b9e66d32e3a80c6c8d234`
+Executable source: `19786dac85341cf15bd68f67eec425f15caa7dec`
 
-Application SHA-256: `beaf52afd7e20ce5d03c742b9ecd9202c128be2a8255357c68b33472946396d2`
+Application SHA-256:
+`04d56071771afe60c2e64747e7659590218d16c53d451d84c5f96adb305d867a`
 
-Runtime remains the unchanged checksum-pinned lkjscript 0.1.89 executable.
+Runtime remains checksum-pinned lkjscript **0.1.89**. The exact candidate passed
+**547 native tests**, **99 fresh synthetic browser groups**, **47 read-only public
+groups**, and **8 public routing/security groups**. See [RELEASE.md](RELEASE.md)
+for the exact source tree, graph, scope, preservation proof, and limitations.
 
-## Current favicon contract
+## Current product contract
 
-Use the four-panel/white-circle personal icon, slightly recolored with outlined
-**lkjsns** lettering. Do not revert to the generic lk/ mark. The current content
-revision is `b7cf1e2c2a49`; document heads use versioned icon filenames, and legacy
-icon paths remain compatible. All SVG/ICO/PNG variants are first-party native
-assets, not runtime font-dependent text or user avatar replacements.
+Keep the composer focused on Attach file and Post. Attachment transitions retain
+text, content warning, audience, reply identity, and file selection privately,
+without presenting a drafts feature, Save draft button, preview step, or normal
+saving notices. Existing working copies and conflict input remain recoverable.
 
-The reviewed SVG is the source artwork. The optional render-icons.cjs generator
-creates its small indexed PNG/ICO representations. Then embed-icons.cjs updates
-the split native icondata payloads, native links and versioned routes together.
-The ordinary build manifest and exact-byte browser tests bind these to a selected
-bundle. No original avatar image or font file is part of the public source export.
+Desktop navigation includes More. Mobile has only Home, Post, Notifications,
+More. Secondary destinations and service documents belong in More; actual
+profile/security settings belong in Settings. About is not a fixed footer link.
 
-The release passed 487 native tests, 86 synthetic browser groups and 27 read-only
-public groups. Data/object hashes and the original avatar bytes were preserved.
-See [RELEASE.md](RELEASE.md) and [PERSONAL-FAVICON.md](PERSONAL-FAVICON.md).
+Bookmarks are newest-bookmarked first. Next is feed-width and Prev restores an
+exact bounded native cursor history. Reaction and selection forms preserve their
+current list context. Used in reuses normal post cards with file-page returns.
+Upload sits beside storage capacity, and file-card text has consistent padding.
 
-## Retained application behavior
+Post links are native, escaped HTTP(S) anchors with new-tab opener/referrer
+protection. Counts reflect directly readable replies and mark bounded incomplete
+results honestly. Keep visibility, mute, suspension, deletion, and object access
+checks intact. The textinput module owns SNS text admission instead of inheriting
+the sample web editor's unrelated 4 KiB limit.
 
-Bounded readable reply previews, root resource IDs, Drive in primary navigation,
-no normal page-title banners, direct attachment/avatar selection, whole-draft
-links, uncapped/explicitly unlimited invitations, search, private tags and bounded
-256 MiB transfer remain unchanged. Keep object effects outside retried metadata
-transactions and preserve the existing Coder Host/Origin and port 8793.
+## Retained infrastructure and artwork
 
-Keep private fixtures, raw source-avatar captures, fonts, credentials and snapshots
-out of Git. Do not restart or enable stopped tunnel dependencies. Public smoke
-checks remain read-only and distinct from authenticated synthetic acceptance.
+Keep exact Coder Host/Origin checks, native session/CSRF, port 8793, private tags,
+4 MiB upload parts, 256 MiB file limit, and 2 GiB account allowance. Do not start
+either disabled dedicated tunnel or promote test fixtures. Keep object effects
+outside retried metadata transactions.
+
+The personal four-panel/white-circle **lkjsns** favicon remains unchanged, with
+content revision `b7cf1e2c2a49`. Original avatar bytes and all stored metadata and
+objects were checked across this application-only replacement.
+
+Read [quiet workflows](QUIET-WORKFLOWS.md),
+[operator responsibilities](OPERATOR-RESPONSIBILITIES.md),
+[the favicon contract](PERSONAL-FAVICON.md), and
+[Coder hosting](CODER-HOSTING.md). Do not publish private receipts, fixtures,
+credentials, internal snapshots, or user data.
