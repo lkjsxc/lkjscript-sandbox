@@ -114,11 +114,12 @@ export class TrafficMotion{
     // Sampling/viewport omission is not an arrival. Never invent a faster exit.
     else if(previous){const p=compilePath(previous,this.cells,paths),value=p.at(station(previous,p,this.cells));pose=()=>value}
     else {const p=compilePath(next,this.cells,paths),value=p.at(station(next,p,this.cells));pose=()=>value}
-    items.push({id,current,pose,born:!previous});
+    items.push({id,current,pose,born:!previous,previous,next,expires:Infinity});
    }
+   retireOmissions(items,this.cells,paths);
    this.prepared={lo,hi,revision:this.revision,items};this.preparations++;
   }
-  const poses=[];for(const item of this.prepared.items){if(!this.active?.has(item.id)&&time>=this.latest||item.born&&hi!==lo&&t<1)continue;poses.push({...item.current,...item.pose(t)})}
+  const poses=[];for(const item of this.prepared.items){if(t>=item.expires||!this.active?.has(item.id)&&time>=this.latest||item.born&&hi!==lo&&t<1)continue;poses.push({...item.current,...item.pose(t)})}
   return this.rendered=poses;
  }
  sampleRails(now,reduced=false){const time=this.clock(now,reduced),{lo,hi,t}=this.pair(this.railFrames,time),a=this.railFrames.get(lo)||new Map(),b=this.railFrames.get(hi)||a;return[...b.values()].map(current=>({current,previous:a.get(current.id),mix:t}))}
@@ -248,3 +249,29 @@ export function animationPreference(saved){
  return ['smooth','reduced','system'].includes(mode)?mode:saved?.motion===true?'reduced':'smooth';
 }
 export const trafficReduced=(mode,systemReduced)=>mode==='reduced'||(mode==='system'&&systemReduced);
+
+// Retire an already omitted stand-in before an observed follower reaches it.
+// Work is grouped by shared geometry and prepared per snapshot pair, not frame.
+// No observed actor is hidden, delayed, moved or assigned a new route.
+function retireOmissions(items,cells,paths){
+ const groups=new Map();
+ for(const item of items){
+  const a=item.previous;if(!a||a.from===a.to||layerOf(a.from)!==layerOf(a.to))continue;
+  const key=[a.from,a.to,a.dir,a.out??a.dir,a.mode===2?2:1,laneSide(a,cells.get(a.from)?.kind),laneSide(a,cells.get(a.to)?.kind)].join(':');
+  if(!groups.has(key))groups.set(key,[]);groups.get(key).push(item);
+ }
+ for(const group of groups.values())for(const omitted of group){
+  if(omitted.next)continue;const a=omitted.previous,p=compilePath(a,cells,paths),stop=station(a,p,cells);
+  omitted.expires=1;
+  for(const follower of group){
+   const b=follower.previous,c=follower.next;if(!c)continue;
+   const q=compilePath(b,cells,paths),start=station(b,q,cells);if(start>=stop-1e-9)continue;
+   const r=compilePath(c,cells,paths),end=station(c,r,cells);let travel=0;
+   if(b.from===c.from&&b.to===c.to&&b.out===c.out)travel=end-start;
+   else if(b.to===c.from&&b.mode===c.mode)travel=q.length-start+end;
+   if(travel<=0)continue;
+   const gap=a.mode===2?.18:.035;
+   omitted.expires=Math.min(omitted.expires,clamp((stop-gap-start)/travel,0,1));
+  }
+ }
+}
