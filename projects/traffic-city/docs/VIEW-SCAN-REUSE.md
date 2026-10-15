@@ -132,4 +132,33 @@ Chromium classic-release, Commuter Boroughs residents, demand-rendering, tunnel
 and gesture suites all passed. These cover real construction, save acknowledgement
 and exact reload, walkers/cars/trains reaching the canvas, retained idle sleeping,
 layer editing, and portrait/pinch/pan interaction. HTTP and native game selections
-were paired explicitly. The public cutover has not yet been completed.
+were paired explicitly.
+
+The native session change was published on **2026-10-15**. The existing session
+supervisor was stopped gracefully, and the existing store was verified and backed
+up offline. That native backup was restored and verified in a separate directory
+before switching only the session artifact. The original save root and browser
+recovery scheme were preserved. Previous artifacts, the old descriptor, the
+supervisor configuration and the verified native backup remain available privately
+for rollback. No competing writer was started.
+
+The independent Classic HTTP and both Metropolis listener process IDs and
+configuration hashes remained unchanged across cutover and public verification.
+Neither the proxy nor its routing was changed. All eleven public HTTPS assets
+matched the current source bytes. The root, direct `/classic` alias, legacy
+session-port query normalization and separate `/metropolis` page were verified.
+An initial verification-only attempt incorrectly expected `/classic` to redirect;
+the existing alias intentionally serves Classic directly. That assertion was
+corrected against the unchanged proxy configuration and the checks were rerun.
+No game fix or routing change was needed for that failed test assumption.
+
+A disposable public Chromium context passed actual park construction, native
+save acknowledgement, exact saved-city reload, moving walkers/cars/trains,
+64 pedestrian glyph pixel samples, and portrait zoom/pan. Browser errors, failed
+HTTP responses and WebSocket errors were all empty. Those checks used a new
+browser profile and its own city, never an existing player's recovery key.
+
+The live store was not reset or migrated. The code change is source commit
+`16ed0e16398a58d8745a9ed7fba16b1c41095671`; a subsequent documentation commit only
+records deployment verification. No Codex task, model API, or paid external
+inference service was launched for this work.

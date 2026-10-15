@@ -16,7 +16,7 @@ The browser reuses identical native scenes and paints only changed input, layout
 
 ## Lower native view cost
 
-Read-only resident scans reuse their fallback values instead of reconstructing them for every lookup. Browser assets, actor samples and saved cities are unchanged. See [exact-scene comparisons and actual 2,048-person session measurements](docs/VIEW-SCAN-REUSE.md).
+Read-only resident scans reuse their fallback values instead of reconstructing them for every lookup. Browser assets, actor samples and saved cities are unchanged. Published on 2026-10-15; see [exact-scene comparisons, actual 2,048-person session measurements, and public verification](docs/VIEW-SCAN-REUSE.md).
 
 ## Lower native simulation cost
 
