@@ -14,6 +14,13 @@ Classic remains the foundation: freely placed streets and facilities, single-cir
 
 The browser reuses identical native scenes and paints only changed input, layout or buffered movement. Paused scenes sleep; moving people and trains keep the existing interpolation cadence. Native sessions, ownership and saving continue independently. See [published scope, measured visual differences and release boundary](docs/DEMAND-RENDERING.md).
 
+## Traffic animation preference
+
+Menu → Preferences offers Smooth (default), Reduced and Follow system. Smooth
+keeps people, cars and trains animated independently of the OS setting; interface
+transitions still respect reduced motion. Explicit legacy reduced-motion choices
+are preserved. See [verification and release scope](docs/SMOOTH-PLAYBACK.md).
+
 ## Lower native view cost
 
 Read-only resident scans reuse their fallback values instead of reconstructing them for every lookup. Browser assets, actor samples and saved cities are unchanged. Published on 2026-10-15; see [exact-scene comparisons, actual 2,048-person session measurements, and public verification](docs/VIEW-SCAN-REUSE.md).

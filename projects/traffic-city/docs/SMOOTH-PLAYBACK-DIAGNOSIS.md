@@ -1,8 +1,11 @@
 # Smooth playback diagnosis (2026-10-15)
 
-Status: diagnosis only. No production game, browser asset, preference, listener,
+Historical checkpoint: diagnosis only. No production game, browser asset, preference, listener,
 proxy, save, or default runtime was changed. The proposed preference repair is
 not implemented or deployed by this checkpoint.
+
+The subsequent implementation and verification are recorded in
+[Explicit traffic animation](SMOOTH-PLAYBACK.md).
 
 ## Reproduced cause
 

@@ -3,7 +3,7 @@ import {connections,entranceLinks,roadHeatSegments,riverPoints,waterAt,drawRiver
 import {createCityLab} from './lab.js';
 import {CommandQueue,mapEdit,cityMutation} from './commands.js';
 import {createLineManager,lineState,lineEditable,railColors} from './lines.js';
-import {DemandPainter,SnapshotGate,TrafficMotion,actorPose,pedestrianSize,streetCaption,TileIndex,railPath,railGeometry,railProgress,railPose,railPresentation} from './motion.js';
+import {animationPreference,trafficReduced,DemandPainter,SnapshotGate,TrafficMotion,actorPose,pedestrianSize,streetCaption,TileIndex,railPath,railGeometry,railProgress,railPose,railPresentation} from './motion.js';
 const trafficMotion=new TrafficMotion(),tileIndex=new TileIndex();
 const sceneGate=new SnapshotGate();let pendingPaint='';
 let painter=null;function repaint(){painter?.invalidate()}
@@ -26,7 +26,8 @@ let width=1,height=1,dpr=1,initialized=false,tool=-2,selected=null,hover=null,dr
 const camera={x:64,y:64,scale:25,angle:0,min:12,max:120,fit:25};
 const pointers=new Map();let gesture=null,gestureSerial=0;
 const history=[],sentCommands=[],frameTimes=[];
-let preferences={grid:false,motion:false};try{preferences={...preferences,...JSON.parse(localStorage.getItem('traffic-city-preferences')||'{}')}}catch{}
+let preferences={grid:false};try{preferences=JSON.parse(localStorage.getItem('traffic-city-preferences'))||{}}catch{}
+preferences={grid:preferences.grid===true,animation:animationPreference(preferences)};
 let palette='',menuPage='home',menuWasRunning=false,menuHistory=false,firstCityFrame=true,lastFrame=null,review=null,removalBounds=null,removeRequest=0,removeWasRunning=false,reviewCamera=null,mutationPending=null,confirmKind='';
 const cityLab=createCityLab({send,cancelGesture,setTool,toast,focusHome(id){setLayer(0);cancelGesture();camera.x=id%128+.5;camera.y=gridY(id)+.5;cameraChanged();inspect(id,true);$('inspect-title').focus({preventScroll:true})},leaveMenu(){menuWasRunning=false;closeMenu()}});
 const commandQueue=new CommandQueue(item=>{const{id,...action}=item;ws.send(JSON.stringify({id,action,token:action.op==='resume'?cityToken:'',owner:action.op==='resume'?ownerToken:''}))},{changed:updateDelivery});
@@ -34,7 +35,7 @@ const lineManager=createLineManager({getLines:()=>rails,getStations:()=>[...cell
 $('lines-open').onclick=()=>lineManager.show();
 function beginAddStop(id){setTool(11);addStopLine=id;toast('Choose an existing station. Only this stopped, empty line changes.');}
 function updateDelivery(){const key=commandQueue.items.filter(c=>mapEdit(c.op)).map(c=>c.id).join(',');if(key!==pendingPaint){pendingPaint=key;repaint()}const n=commandQueue.items.filter(c=>cityMutation(c.op)).length;const status=$('edit-delivery');status.hidden=!n;status.textContent=n?`${n} ${n===1?'change':'changes'} awaiting the city server…`:'';}
-const motionReduced=()=>reducedMotion.matches||preferences.motion;
+const motionReduced=()=>trafficReduced(preferences.animation,reducedMotion.matches);
 
 function mapArea(){if(frameArea)return frameArea;const top=height<500?104:width<=680?180:150;const bottom=Math.max(top+90,Math.min(height-25,document.querySelector('.bottom-ui').getBoundingClientRect().top-18));return{top,bottom,height:Math.max(90,bottom-top)}}
 function origin(){const a=mapArea();return{x:width/2,y:(a.top+a.bottom)/2}}
@@ -109,7 +110,7 @@ $('new-city').onclick=()=>reviewCity('reset');$('restore-city').onclick=()=>revi
 $('city-confirm').onclick=()=>{if(!lastFrame||!confirmKind||mutationPending)return;const id=send(confirmKind.startsWith('scenario-')?'load-scenario':confirmKind==='reset'?'reset-city':'restore-city',{x:lastFrame.confirmation,kind:confirmKind.startsWith('scenario-')?Number(confirmKind.slice(9)):0});if(id){mutationPending={id,type:confirmKind};$('city-confirm').disabled=true;$('city-cancel').disabled=true;$('confirm-back').disabled=true;$('confirm-status').textContent='Saving city change…'}};
 $('menu').addEventListener('cancel',e=>{e.preventDefault();if(mutationPending)return;if(menuPage==='confirm')cancelCityReview();else if(menuPage!=='home'){showMenuPage('home');$('continue').focus()}else closeMenu()});
 window.addEventListener('popstate',()=>{if(menuHistory){menuHistory=false;closeMenu(true)}});
-$('grid-setting').checked=preferences.grid;$('motion-setting').checked=preferences.motion;for(const [id,key]of [['grid-setting','grid'],['motion-setting','motion']])$(id).onchange=()=>{preferences[key]=$(id).checked;try{localStorage.setItem('traffic-city-preferences',JSON.stringify(preferences))}catch{toast('This preference cannot be saved on this device.')}};
+$('grid-setting').checked=preferences.grid;$('animation-setting').value=preferences.animation;for(const [id,key]of [['grid-setting','grid'],['animation-setting','animation']])$(id).onchange=()=>{preferences[key]=key==='grid'?$(id).checked:$(id).value;try{localStorage.setItem('traffic-city-preferences',JSON.stringify(preferences))}catch{toast('This preference cannot be saved on this device.')}};
 function cancelRemoval(){if(mutationPending)return;if(reviewCamera){Object.assign(camera,reviewCamera);reviewCamera=null;cameraChanged()}clearReview();if($('removal').open)$('removal').close();if(removeWasRunning&&stats.paused&&sessionStatus===1)send('set-running',{kind:1});removeWasRunning=false;canvas.focus()}
 $('remove-cancel').onclick=cancelRemoval;$('removal').addEventListener('cancel',e=>{e.preventDefault();cancelRemoval()});
 $('remove-confirm').onclick=()=>{if(!review?.valid||mutationPending)return;const id=send('apply-remove',{x:review.id});if(id){mutationPending={id,type:'remove'};$('remove-confirm').disabled=true;$('remove-cancel').disabled=true}};

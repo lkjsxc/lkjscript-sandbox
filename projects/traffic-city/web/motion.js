@@ -240,3 +240,10 @@ export class SnapshotGate {
   if(key===this.key)return false;this.key=key;return true;
  }
 }
+
+// Explicit traffic choices are independent of nonessential UI motion.
+export function animationPreference(saved){
+ const mode=saved?.animation;
+ return ['smooth','reduced','system'].includes(mode)?mode:saved?.motion===true?'reduced':'smooth';
+}
+export const trafficReduced=(mode,systemReduced)=>mode==='reduced'||(mode==='system'&&systemReduced);

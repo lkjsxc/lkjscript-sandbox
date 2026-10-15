@@ -28,7 +28,8 @@ try{
   return {browserFrames:90,draws:g.renderMetrics.draws-start,moved,bufferTicks:g.motionMetrics.bufferTicks};
  });assert(movement.moved);assert(movement.draws>30);samples.movement=movement;
  checks.push('Normal native playback keeps repainting and changes actual interpolated resident positions');
- await page.emulateMedia({reducedMotion:'reduce'});await page.waitForTimeout(700);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.locator('#menu-open').click();await page.locator('#preferences-open').click();await page.locator('#animation-setting').selectOption('system');await page.locator('#menu-preferences [data-menu-back]').click();await page.locator('#continue').click();await page.waitForTimeout(700);
  const reducedStart=await state();await page.waitForTimeout(2000);const reducedEnd=await state();
  assert(reducedEnd.tick>reducedStart.tick);assert.equal(reducedEnd.motionTime,reducedEnd.tick);
  const reducedDraws=reducedEnd.draws-reducedStart.draws,received=reducedEnd.sequence-reducedStart.sequence;

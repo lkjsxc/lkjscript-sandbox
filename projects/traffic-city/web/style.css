@@ -49,3 +49,5 @@
 #line-toggle,#line-map-stop,#line-add-existing,#line-create,#line-stop-select{display:block;width:100%;margin-top:8px}#line-toggle{background:#23483d!important;color:#fffcec!important}#line-details label{display:block;margin-top:14px;font-size:12px}#line-create{margin-top:18px}
 @media(max-width:680px){#lines-panel{top:174px;bottom:192px;right:10px;width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:14px;box-sizing:border-box}#edit-delivery{top:148px;font-size:11px}}
 @media(max-height:540px){#lines-panel{top:90px;bottom:70px}#edit-delivery{top:82px}}
+
+.preference select{min-height:44px;max-width:48%;flex-shrink:0;padding:8px;border:1px solid #c3d2ba;border-radius:10px;background:#f1f5e6;color:var(--green);font:inherit;font-size:13px}
