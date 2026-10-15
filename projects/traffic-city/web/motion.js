@@ -111,7 +111,8 @@ export class TrafficMotion{
    for(const id of new Set([...a.keys(),...b.keys()])){
     const previous=a.get(id),next=b.get(id),current=next||previous;let pose;
     if(previous&&next)pose=compileTransition(previous,next,this.cells,paths);
-    else if(previous){const p=compilePath(previous,this.cells,paths),s=station(previous,p,this.cells);pose=t=>p.at(s+(p.length-s)*t)}
+    // Sampling/viewport omission is not an arrival. Never invent a faster exit.
+    else if(previous){const p=compilePath(previous,this.cells,paths),value=p.at(station(previous,p,this.cells));pose=()=>value}
     else {const p=compilePath(next,this.cells,paths),value=p.at(station(next,p,this.cells));pose=()=>value}
     items.push({id,current,pose,born:!previous});
    }

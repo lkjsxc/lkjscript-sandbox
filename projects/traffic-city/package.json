@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/author.mjs",
     "start": "./play.sh",
-    "test": "node tests/animation-preferences.mjs && node tests/demand-painter.mjs && node tests/render-projection.mjs && node tests/command-queue.mjs && node tests/line-status.mjs && node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/motion-timing.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
+    "test": "node tests/animation-preferences.mjs && node tests/demand-painter.mjs && node tests/render-projection.mjs && node tests/command-queue.mjs && node tests/line-status.mjs && node tests/waterfront-geometry.mjs && node tests/atlas-presentation.mjs && node tests/rail-accounting-check.mjs && node tests/motion-geometry.mjs && node tests/motion-timing.mjs && node tests/motion-sampling.mjs && node tests/layered-geometry.mjs && node tests/routing.mjs && node tests/correctness.mjs && node tests/socket.mjs",
     "test:browser": "node tests/with-preview.mjs tests/browser.mjs",
     "test:scale": "node tests/scaling.mjs",
     "test:backpressure": "node tests/backpressure.mjs",
@@ -107,7 +107,9 @@
     "test:presentation-selection": "node tests/presentation-selection.mjs",
     "build:view-scans": "node scripts/author-view-scans.mjs",
     "test:view-scan-equivalence": "node tests/view-scan-equivalence.mjs",
-    "test:view-scan-live": "node tests/view-scan-live.mjs"
+    "test:view-scan-live": "node tests/view-scan-live.mjs",
+    "test:motion-sampling": "node tests/motion-sampling.mjs",
+    "test:motion-sampling-replay": "node tests/motion-sampling-replay.mjs"
   },
   "engines": {
     "node": ">=22"
