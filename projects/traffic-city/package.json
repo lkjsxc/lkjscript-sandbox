@@ -104,7 +104,10 @@
     "test:metropolis-soak": "node tests/metropolis-soak.mjs",
     "test:metropolis-host": "node tests/metropolis-host.mjs",
     "test:demand-render-ui": "node tests/with-preview.mjs tests/demand-render-ui.mjs",
-    "test:presentation-selection": "node tests/presentation-selection.mjs"
+    "test:presentation-selection": "node tests/presentation-selection.mjs",
+    "build:view-scans": "node scripts/author-view-scans.mjs",
+    "test:view-scan-equivalence": "node tests/view-scan-equivalence.mjs",
+    "test:view-scan-live": "node tests/view-scan-live.mjs"
   },
   "engines": {
     "node": ">=22"
