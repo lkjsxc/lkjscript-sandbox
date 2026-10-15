@@ -8,7 +8,7 @@ source_manifest() (
     echo 'Source symlinks are not accepted.' >&2; exit 2;
   }
   find src -type f -name '*.lkjc' -print0 | sort -z | xargs -0 sha256sum
-  sha256sum web/style.css web/ui.js web/transfer.js web/favicon.svg web/favicon.ico web/favicon-32.png web/apple-touch-icon.png ops/*.sh ops/development.json project.sh
+  sha256sum web/style.css web/ui.js web/transfer.js web/favicon.svg web/favicon.ico web/favicon-32.png web/apple-touch-icon.png web/app-icon-192.png web/app-icon-512.png web/manifest.webmanifest ops/*.sh ops/development.json project.sh
 )
 verify_selection() {
   local recorded_path expected actual base recorded_revision current_revision

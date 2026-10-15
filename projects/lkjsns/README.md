@@ -104,6 +104,10 @@ parents retain their access boundaries. The site includes native SVG/ICO favicon
 and a touch icon based on lkjsxc's personal four-panel/white-circle artwork,
 with slightly adjusted colors and outlined lkjsns lettering. Content-versioned
 icon URLs replace the preceding cached mark while old asset URLs still work.
+The desktop sidebar, mobile header, and standalone error pages share this same
+image rather than a separate `lk/` glyph. A browser manifest supplies 192px and
+512px application/home-screen icons from the same source. See
+[shared application identity](docs/SHARED-BRAND.md).
 
 ## Development
 

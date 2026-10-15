@@ -32,7 +32,7 @@ start(){
 }
 start
 node tests/browser/media-fixtures.cjs
-for suite in ${LKJSNS_UX_SUITES:-accounts writing media search security direct-interactions transfer-recovery layout large replies quiet quiet-paging quiet-files quiet-content favicons no-script};do
+for suite in ${LKJSNS_UX_SUITES:-accounts writing media search security direct-interactions transfer-recovery layout large replies quiet quiet-paging quiet-files quiet-content favicons brand no-script};do
  echo "--- $suite";node "tests/ux/$suite.cjs" 2>&1 | tee "$output/$suite.log"
 done
 "$LKJ" data verify --root "$fixture/data" > "$output/data-verify.log"

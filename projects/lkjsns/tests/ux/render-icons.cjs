@@ -25,13 +25,13 @@ function palettePNG(rgba,size){
 }
 (async()=>{const root=path.resolve(__dirname,'../../web');const svg=fs.readFileSync(path.join(root,'favicon.svg'),'utf8');
  const browser=await chromium.launch({headless:true});try{const p=await browser.newPage();const images=[];
- for(const size of [16,32,180]){
+ for(const size of [16,32,180,192,512]){
   const pixels=await p.evaluate(async({svg,size})=>{const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);await img.decode();const c=document.createElement('canvas');c.width=c.height=size;c.getContext('2d').drawImage(img,0,0,size,size);return Array.from(c.getContext('2d').getImageData(0,0,size,size).data);},{svg,size});
-  const data=palettePNG(pixels,size);if(size===32)fs.writeFileSync(path.join(root,'favicon-32.png'),data);if(size===180)fs.writeFileSync(path.join(root,'apple-touch-icon.png'),data);if(size<=32)images.push({size,data});
+  const data=palettePNG(pixels,size);if(size===32)fs.writeFileSync(path.join(root,'favicon-32.png'),data);if(size===180)fs.writeFileSync(path.join(root,'apple-touch-icon.png'),data);if(size===192||size===512)fs.writeFileSync(path.join(root,`app-icon-${size}.png`),data);if(size<=32)images.push({size,data});
  }
  const directory=Buffer.alloc(6+16*images.length);directory.writeUInt16LE(1,2);directory.writeUInt16LE(images.length,4);let offset=directory.length;
  images.forEach(({size,data},i)=>{const at=6+16*i;directory[at]=directory[at+1]=size;directory.writeUInt16LE(1,at+4);directory.writeUInt16LE(32,at+6);directory.writeUInt32LE(data.length,at+8);directory.writeUInt32LE(offset,at+12);offset+=data.length;});
  fs.writeFileSync(path.join(root,'favicon.ico'),Buffer.concat([directory,...images.map(i=>i.data)]));
- console.log('Rendered 16/32px ICO, 32px PNG and 180px touch icon from the profile-derived lkjsns mark.');
+ console.log('Rendered 16/32px ICO, 32px PNG, 180px touch and 192/512px application icons from the profile-derived lkjsns mark.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

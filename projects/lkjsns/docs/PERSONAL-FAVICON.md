@@ -1,5 +1,9 @@
 # Profile-derived lkjsns favicon
 
+The approved artwork now also supplies all in-page brand marks and 192/512px
+application icons. See [shared application identity](SHARED-BRAND.md) for the
+complete current catalog and browser manifest; the original artwork below is unchanged.
+
 The favicon is based on the current public `lkjsxc` profile artwork, not the
 previous generic `lk/` mark. Both the live community profile image and the public
 GitHub avatar were inspected on October 13, 2026 (JST). They use the same four
@@ -29,11 +33,11 @@ six-letter text at that size.
 ## Delivery and browser caching
 
 The reviewed SVG is rasterized to the existing 16/32px ICO, 32px PNG and 180px
-touch representations. The raster palette now preserves all four panels, white,
+touch representations, plus 192/512px application icons. The raster palette preserves all four panels, white,
 dark ink and antialiasing shades; it no longer uses the old one-blue palette.
 
 Document heads link to content-versioned filenames derived from the bytes of
-all four assets. A changed design gets new browser icon URLs. The original
+all six image assets. A changed design gets new browser icon URLs. The original
 `/favicon.svg`, `/favicon.ico`, `/favicon-32.png`, and `/apple-touch-icon.png` paths
 remain compatible aliases, serving the same new bytes without sign-in. No
 arbitrary query-string exemption or changed Host policy is introduced.
@@ -53,8 +57,8 @@ node tests/ux/embed-icons.cjs
 
 The checked-in SVG already contains its outlines; these commands do not need the
 original font or avatar. Native payloads and routes must be regenerated together.
-The standard source manifest binds all native fragments and all four authored
-asset files to the selected detached application bundle.
+The standard source manifest binds all native fragments and all six authored
+image files and the browser manifest to the selected detached application bundle.
 
 ## Verification
 

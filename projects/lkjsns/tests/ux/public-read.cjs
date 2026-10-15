@@ -1,4 +1,5 @@
 const {iconPaths,iconRevision}=require('./icon-paths.cjs');
+const {checkPageBrand,checkPublicAssets}=require('./brand-contract.cjs');
 // Read-only public verification. Never creates an account, draft, or upload.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {chromium}=require(process.env.LKJSNS_PLAYWRIGHT||'playwright');
@@ -17,6 +18,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
     const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');
     assert.equal(await p.locator('.page-header').count(),0,route);assert((await p.locator('main h1').getAttribute('class')).includes('sr-only'),route);
     assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),iconPaths.svg);
+    await checkPageBrand(p);
     const geometry=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert(geometry.scroll<=geometry.width+1,route);
     assert(response.headers()['content-security-policy'].includes("script-src 'self'"));checks.push(`${scheme} ${width}px ${route}`);
    }
@@ -29,12 +31,14 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
   }checks.push('Public CSS and both scripts exactly match the selected source');
   for(const route of ['/unavailable-page','/settings/unavailable-page']) {
    const response=await p.goto(origin+route);assert.equal(response.status(),404);assert.equal(await p.locator('main h1').innerText(),'This page is unavailable');
-   assert.equal(await p.getByRole('link',{name:'Sign in',exact:true}).count(),0);
+   assert.equal(await p.getByRole('link',{name:'Sign in',exact:true}).count(),0);await checkPageBrand(p);
   }checks.push('Unknown public paths render the branded unavailable page');
   const absent='f'.repeat(64);const legacy=await context.request.get(origin+'/note?id='+absent,{maxRedirects:0});assert.equal(legacy.status(),303);assert.equal(legacy.headers().location,'/'+absent);
   const duplicate=await context.request.get(origin+'/'+absent+'?id='+absent);assert.equal(duplicate.status(),400);checks.push('Root-ID redirects and path-authoritative query validation');
   for(const [route,file] of [['/favicon.svg','favicon.svg'],['/favicon.ico','favicon.ico'],['/favicon-32.png','favicon-32.png'],['/apple-touch-icon.png','apple-touch-icon.png']]) {const r=await context.request.get(origin+route);assert.equal(r.status(),200);assert.deepEqual(await r.body(),fs.readFileSync(path.join(root,'web',file)));}checks.push('Public favicon/touch assets exactly match the selected source');
   for(const [key,file]of [['svg','favicon.svg'],['ico','favicon.ico'],['png','favicon-32.png'],['touch','apple-touch-icon.png']]){const r=await context.request.get(origin+iconPaths[key]);assert.equal(r.status(),200);assert.deepEqual(await r.body(),fs.readFileSync(path.join(root,'web',file)));}checks.push('Content-versioned personal favicon aliases match the outlined lkjsns artwork');
+  await checkPublicAssets(context.request,origin,fs,path,root);checks.push('All six shared brand assets, previous URLs, Apple fallback and application manifest match reviewed source bytes');
+  const unknown=await p.goto(origin+'/'+'f'.repeat(64));assert.equal(unknown.status(),404);await checkPageBrand(p);checks.push('Standalone error shell uses the same new brand image');
   assert.equal((await context.request.get(origin+'/healthz')).status(),200);assert.deepEqual(errors,[]);checks.push('Public health and browser scripts');
   const report={at:new Date().toISOString(),origin,checks,passed:checks.length,authenticatedWrites:false};
   fs.writeFileSync(path.join(output,'public-read.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

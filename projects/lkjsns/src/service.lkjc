@@ -92,13 +92,39 @@
 
 
 
-  (route create icon-current-svg (method GET) (path "/favicon-b7cf1e2c2a49.svg") (port service::app::view))
-  (route create icon-current-ico (method GET) (path "/favicon-b7cf1e2c2a49.ico") (port service::app::view))
-  (route create icon-current-png (method GET) (path "/favicon-b7cf1e2c2a49-32.png") (port service::app::view))
-  (route create icon-current-touch (method GET) (path "/apple-touch-icon-b7cf1e2c2a49.png") (port service::app::view))
   (route create info-more (method GET) (path "/more") (port service::app::view))
   (route create info-privacy (method GET) (path "/privacy") (port service::app::view))
   (route create info-terms (method GET) (path "/terms") (port service::app::view))
   (route create info-guidelines (method GET) (path "/guidelines") (port service::app::view))
   (route create info-contact (method GET) (path "/contact") (port service::app::view))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  (route create identity-0 (method GET) (path "/favicon-9ef7b4ce01bf.svg") (port service::app::view))
+  (route create identity-1 (method GET) (path "/favicon-b7cf1e2c2a49.svg") (port service::app::view))
+  (route create identity-2 (method GET) (path "/favicon-9ef7b4ce01bf.ico") (port service::app::view))
+  (route create identity-3 (method GET) (path "/favicon-b7cf1e2c2a49.ico") (port service::app::view))
+  (route create identity-4 (method GET) (path "/favicon-9ef7b4ce01bf-32.png") (port service::app::view))
+  (route create identity-5 (method GET) (path "/favicon-b7cf1e2c2a49-32.png") (port service::app::view))
+  (route create identity-6 (method GET) (path "/apple-touch-icon-9ef7b4ce01bf.png") (port service::app::view))
+  (route create identity-7 (method GET) (path "/apple-touch-icon-b7cf1e2c2a49.png") (port service::app::view))
+  (route create identity-8 (method GET) (path "/app-icon-192.png") (port service::app::view))
+  (route create identity-9 (method GET) (path "/app-icon-9ef7b4ce01bf-192.png") (port service::app::view))
+  (route create identity-10 (method GET) (path "/app-icon-512.png") (port service::app::view))
+  (route create identity-11 (method GET) (path "/app-icon-9ef7b4ce01bf-512.png") (port service::app::view))
+  (route create identity-12 (method GET) (path "/manifest.webmanifest") (port service::app::view))
+  (route create identity-13 (method GET) (path "/site.webmanifest") (port service::app::view))
+  (route create identity-14 (method GET) (path "/apple-touch-icon-precomposed.png") (port service::app::view))
 )

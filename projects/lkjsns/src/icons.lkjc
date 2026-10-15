@@ -23,28 +23,52 @@
 
   (test create touch-has-payload (visibility private) (actual (call std::less (i64 0) (call std::bytes-length (call icons::touch)))) (expected (bool true)))
 
+  (function create app192 (visibility public)
+    (returns Bytes) (effect pure)
+    (body (call iconapp192::read)))
+
+  (test create app192-has-payload (visibility private) (actual (call std::less (i64 0) (call std::bytes-length (call icons::app192)))) (expected (bool true)))
+
+  (function create app512 (visibility public)
+    (returns Bytes) (effect pure)
+    (body (call iconapp512::read)))
+
+  (test create app512-has-payload (visibility private) (actual (call std::less (i64 0) (call std::bytes-length (call icons::app512)))) (expected (bool true)))
+
+  (function create manifest (visibility public)
+    (returns Bytes) (effect pure)
+    (body (call std::bytes-from-text (text "{\n  \"id\": \"/\",\n  \"name\": \"lkjsns\",\n  \"short_name\": \"lkjsns\",\n  \"start_url\": \"/\",\n  \"scope\": \"/\",\n  \"display\": \"standalone\",\n  \"lang\": \"en\",\n  \"icons\": [\n    {\n      \"src\": \"/app-icon-9ef7b4ce01bf-192.png\",\n      \"sizes\": \"192x192\",\n      \"type\": \"image/png\",\n      \"purpose\": \"any\"\n    },\n    {\n      \"src\": \"/app-icon-9ef7b4ce01bf-512.png\",\n      \"sizes\": \"512x512\",\n      \"type\": \"image/png\",\n      \"purpose\": \"any\"\n    },\n    {\n      \"src\": \"/favicon-9ef7b4ce01bf.svg\",\n      \"sizes\": \"any\",\n      \"type\": \"image/svg+xml\",\n      \"purpose\": \"any\"\n    }\n  ]\n}\n"))))
+
   (function create links (visibility public)
     (returns Text) (effect pure)
-    (body (text "<link rel=\"icon\" href=\"/favicon-b7cf1e2c2a49.ico\" sizes=\"16x16 32x32\"><link rel=\"icon\" href=\"/favicon-b7cf1e2c2a49-32.png\" type=\"image/png\" sizes=\"32x32\"><link rel=\"icon\" href=\"/favicon-b7cf1e2c2a49.svg\" type=\"image/svg+xml\" sizes=\"any\"><link rel=\"apple-touch-icon\" href=\"/apple-touch-icon-b7cf1e2c2a49.png\" sizes=\"180x180\">")))
+    (body (text "<link rel=\"icon\" href=\"/favicon-9ef7b4ce01bf.ico\" sizes=\"16x16 32x32\"><link rel=\"icon\" href=\"/favicon-9ef7b4ce01bf-32.png\" type=\"image/png\" sizes=\"32x32\"><link rel=\"icon\" href=\"/favicon-9ef7b4ce01bf.svg\" type=\"image/svg+xml\" sizes=\"any\"><link rel=\"apple-touch-icon\" href=\"/apple-touch-icon-9ef7b4ce01bf.png\" sizes=\"180x180\"><link rel=\"manifest\" href=\"/manifest.webmanifest\"><meta name=\"application-name\" content=\"lkjsns\"><meta name=\"apple-mobile-web-app-title\" content=\"lkjsns\">")))
 
   (function create revision (visibility public)
     (returns Text) (effect pure)
-    (body (text "b7cf1e2c2a49")))
+    (body (text "9ef7b4ce01bf")))
+
+  (function create mark (visibility public)
+    (returns Text) (effect pure)
+    (body (text "<img class=\"brand-mark\" src=\"/favicon-9ef7b4ce01bf.svg\" width=\"32\" height=\"32\" alt=\"\" aria-hidden=\"true\" decoding=\"async\">")))
+
+  (function create brand (visibility public)
+    (returns Text) (effect pure)
+    (body (text "<a href=\"/\" class=\"brand\" aria-label=\"lkjsns home\"><img class=\"brand-mark\" src=\"/favicon-9ef7b4ce01bf.svg\" width=\"32\" height=\"32\" alt=\"\" aria-hidden=\"true\" decoding=\"async\"><span>lkjsns</span></a>")))
 
   (function create known (visibility public)
     (parameter create path (type Text))
     (returns Bool) (effect pure)
-    (body (call util::has (list Text (text "/favicon.svg") (text "/favicon-b7cf1e2c2a49.svg") (text "/favicon.ico") (text "/favicon-b7cf1e2c2a49.ico") (text "/favicon-32.png") (text "/favicon-b7cf1e2c2a49-32.png") (text "/apple-touch-icon.png") (text "/apple-touch-icon-b7cf1e2c2a49.png")) (local path) (i64 0))))
+    (body (call util::has (list Text (text "/favicon.svg") (text "/favicon-9ef7b4ce01bf.svg") (text "/favicon-b7cf1e2c2a49.svg") (text "/favicon.ico") (text "/favicon-9ef7b4ce01bf.ico") (text "/favicon-b7cf1e2c2a49.ico") (text "/favicon-32.png") (text "/favicon-9ef7b4ce01bf-32.png") (text "/favicon-b7cf1e2c2a49-32.png") (text "/apple-touch-icon.png") (text "/apple-touch-icon-9ef7b4ce01bf.png") (text "/apple-touch-icon-b7cf1e2c2a49.png") (text "/app-icon-192.png") (text "/app-icon-9ef7b4ce01bf-192.png") (text "/app-icon-512.png") (text "/app-icon-9ef7b4ce01bf-512.png") (text "/manifest.webmanifest") (text "/site.webmanifest") (text "/apple-touch-icon-precomposed.png")) (local path) (i64 0))))
 
   (function create data (visibility public)
     (parameter create path (type Text))
     (returns Bytes) (effect pure)
-    (body (if (call util::has (list Text (text "/favicon.svg") (text "/favicon-b7cf1e2c2a49.svg")) (local path) (i64 0)) (call icons::svg) (if (call util::has (list Text (text "/favicon.ico") (text "/favicon-b7cf1e2c2a49.ico")) (local path) (i64 0)) (call icons::ico) (if (call util::has (list Text (text "/favicon-32.png") (text "/favicon-b7cf1e2c2a49-32.png")) (local path) (i64 0)) (call icons::png) (call icons::touch))))))
+    (body (if (call util::has (list Text (text "/manifest.webmanifest") (text "/site.webmanifest")) (local path) (i64 0)) (call icons::manifest) (if (call util::has (list Text (text "/apple-touch-icon-precomposed.png")) (local path) (i64 0)) (call icons::touch) (if (call util::has (list Text (text "/favicon.svg") (text "/favicon-9ef7b4ce01bf.svg") (text "/favicon-b7cf1e2c2a49.svg")) (local path) (i64 0)) (call icons::svg) (if (call util::has (list Text (text "/favicon.ico") (text "/favicon-9ef7b4ce01bf.ico") (text "/favicon-b7cf1e2c2a49.ico")) (local path) (i64 0)) (call icons::ico) (if (call util::has (list Text (text "/favicon-32.png") (text "/favicon-9ef7b4ce01bf-32.png") (text "/favicon-b7cf1e2c2a49-32.png")) (local path) (i64 0)) (call icons::png) (if (call util::has (list Text (text "/apple-touch-icon.png") (text "/apple-touch-icon-9ef7b4ce01bf.png") (text "/apple-touch-icon-b7cf1e2c2a49.png")) (local path) (i64 0)) (call icons::touch) (if (call util::has (list Text (text "/app-icon-192.png") (text "/app-icon-9ef7b4ce01bf-192.png")) (local path) (i64 0)) (call icons::app192) (if (call util::has (list Text (text "/app-icon-512.png") (text "/app-icon-9ef7b4ce01bf-512.png")) (local path) (i64 0)) (call icons::app512) (call std::bytes-from-text (text ""))))))))))))
 
   (function create mime (visibility public)
     (parameter create path (type Text))
     (returns Text) (effect pure)
-    (body (if (call util::has (list Text (text "/favicon.svg") (text "/favicon-b7cf1e2c2a49.svg")) (local path) (i64 0)) (text "image/svg+xml") (if (call util::has (list Text (text "/favicon.ico") (text "/favicon-b7cf1e2c2a49.ico")) (local path) (i64 0)) (text "image/x-icon") (if (call util::has (list Text (text "/favicon-32.png") (text "/favicon-b7cf1e2c2a49-32.png")) (local path) (i64 0)) (text "image/png") (text "image/png"))))))
+    (body (if (call util::has (list Text (text "/manifest.webmanifest") (text "/site.webmanifest")) (local path) (i64 0)) (text "application/manifest+json; charset=utf-8") (if (call util::has (list Text (text "/apple-touch-icon-precomposed.png")) (local path) (i64 0)) (text "image/png") (if (call util::has (list Text (text "/favicon.svg") (text "/favicon-9ef7b4ce01bf.svg") (text "/favicon-b7cf1e2c2a49.svg")) (local path) (i64 0)) (text "image/svg+xml") (if (call util::has (list Text (text "/favicon.ico") (text "/favicon-9ef7b4ce01bf.ico") (text "/favicon-b7cf1e2c2a49.ico")) (local path) (i64 0)) (text "image/x-icon") (if (call util::has (list Text (text "/favicon-32.png") (text "/favicon-9ef7b4ce01bf-32.png") (text "/favicon-b7cf1e2c2a49-32.png")) (local path) (i64 0)) (text "image/png") (if (call util::has (list Text (text "/apple-touch-icon.png") (text "/apple-touch-icon-9ef7b4ce01bf.png") (text "/apple-touch-icon-b7cf1e2c2a49.png")) (local path) (i64 0)) (text "image/png") (if (call util::has (list Text (text "/app-icon-192.png") (text "/app-icon-9ef7b4ce01bf-192.png")) (local path) (i64 0)) (text "image/png") (if (call util::has (list Text (text "/app-icon-512.png") (text "/app-icon-9ef7b4ce01bf-512.png")) (local path) (i64 0)) (text "image/png") (text "application/octet-stream")))))))))))
 
   (test create ico-header (visibility private) (actual (call std::bytes-to-hex (call std::bytes-slice (call icons::ico) (i64 0) (i64 6)))) (expected (text "000001000200")))
 
@@ -54,12 +78,44 @@
 
   (test create svg-is-font-independent (visibility private) (actual (call std::text-contains (call std::bytes-to-text (call icons::svg)) (text "<text"))) (expected (bool false)))
 
-  (test create svg-versioned-alias (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-b7cf1e2c2a49.svg")) (call icons::data (text "/favicon.svg")))) (expected (bool true)))
+  (test create svg-alias-0 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon.svg")) (call icons::svg))) (expected (bool true)))
 
-  (test create ico-versioned-alias (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-b7cf1e2c2a49.ico")) (call icons::data (text "/favicon.ico")))) (expected (bool true)))
+  (test create svg-alias-1 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-9ef7b4ce01bf.svg")) (call icons::svg))) (expected (bool true)))
 
-  (test create png-versioned-alias (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-b7cf1e2c2a49-32.png")) (call icons::data (text "/favicon-32.png")))) (expected (bool true)))
+  (test create svg-alias-2 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-b7cf1e2c2a49.svg")) (call icons::svg))) (expected (bool true)))
 
-  (test create touch-versioned-alias (visibility private) (actual (call std::bytes-equal (call icons::data (text "/apple-touch-icon-b7cf1e2c2a49.png")) (call icons::data (text "/apple-touch-icon.png")))) (expected (bool true)))
+  (test create ico-alias-0 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon.ico")) (call icons::ico))) (expected (bool true)))
+
+  (test create ico-alias-1 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-9ef7b4ce01bf.ico")) (call icons::ico))) (expected (bool true)))
+
+  (test create ico-alias-2 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-b7cf1e2c2a49.ico")) (call icons::ico))) (expected (bool true)))
+
+  (test create png-alias-0 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-32.png")) (call icons::png))) (expected (bool true)))
+
+  (test create png-alias-1 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-9ef7b4ce01bf-32.png")) (call icons::png))) (expected (bool true)))
+
+  (test create png-alias-2 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/favicon-b7cf1e2c2a49-32.png")) (call icons::png))) (expected (bool true)))
+
+  (test create touch-alias-0 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/apple-touch-icon.png")) (call icons::touch))) (expected (bool true)))
+
+  (test create touch-alias-1 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/apple-touch-icon-9ef7b4ce01bf.png")) (call icons::touch))) (expected (bool true)))
+
+  (test create touch-alias-2 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/apple-touch-icon-b7cf1e2c2a49.png")) (call icons::touch))) (expected (bool true)))
+
+  (test create app192-alias-0 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/app-icon-192.png")) (call icons::app192))) (expected (bool true)))
+
+  (test create app192-alias-1 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/app-icon-9ef7b4ce01bf-192.png")) (call icons::app192))) (expected (bool true)))
+
+  (test create app512-alias-0 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/app-icon-512.png")) (call icons::app512))) (expected (bool true)))
+
+  (test create app512-alias-1 (visibility private) (actual (call std::bytes-equal (call icons::data (text "/app-icon-9ef7b4ce01bf-512.png")) (call icons::app512))) (expected (bool true)))
+
+  (test create brand-uses-current-mark (visibility private) (actual (call std::text-contains (call icons::brand) (call icons::mark))) (expected (bool true)))
+
+  (test create brand-has-no-old-glyph (visibility private) (actual (call std::text-contains (call icons::brand) (text "lk/"))) (expected (bool false)))
+
+  (test create manifest-media-type (visibility private) (actual (call icons::mime (text "/manifest.webmanifest"))) (expected (text "application/manifest+json; charset=utf-8")))
+
+  (test create unknown-path-is-not-an-icon (visibility private) (actual (call icons::known (text "/icon/anything"))) (expected (bool false)))
 
 )

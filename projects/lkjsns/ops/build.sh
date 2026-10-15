@@ -52,7 +52,8 @@ apply_fragment text-input "$ROOT/src/textinput.lkjc"
 for name in util paths invitations; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
-for name in ico png touch; do
+apply_fragment icon-bytes "$ROOT/src/icondata/bytes.lkjc"
+for name in ico png touch app192 app512; do
   apply_fragment "icon-$name" "$ROOT/src/icondata/$name.lkjc"
 done
 apply_fragment icons "$ROOT/src/icons.lkjc"

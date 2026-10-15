@@ -71,3 +71,13 @@ Service-information pages must match implemented behavior. Do not invent legal
 identity details, retention periods, automatic account deletion/export, or a
 claim of legal compliance. Read docs/OPERATOR-RESPONSIBILITIES.md for operator
 requirements that cannot be established by software or policy prose alone.
+
+## Shared brand contract
+
+Use icons::brand for all desktop/mobile/error brand links and icons::links for
+their document heads. Never reintroduce a separate lk/ text glyph or text-only
+error-page logo. The six-asset catalog and native manifest use one content
+revision; read docs/SHARED-BRAND.md. Preserve the approved source SVG and actual
+user profile images. Icon data uses compact hexadecimal constants and a bounded native decoder,
+not higher runtime/review limits. The brand suite and public read-only contract
+check the same image references and actual browser decoding.
