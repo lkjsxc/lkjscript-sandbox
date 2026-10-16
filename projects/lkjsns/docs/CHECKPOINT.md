@@ -1,23 +1,23 @@
 # lkjsns checkpoint — October 17, 2026
 
-Attention relationships and the genuinely circular shared icon are live on
-Coder workspace **devmain**, agent **main**, public port **8793**. Promotion
-completed at **2026-10-17 02:52:20 JST**. Existing accounts, sessions, posts,
-media and the original lkjsxc profile image were preserved.
+The redundant **You** badge is removed from the viewer's own profile. The fix is
+live in Coder workspace **devmain**, agent **main**, public port **8793**, since
+**2026-10-17 04:06:06 JST**. Other profile badges and list identity are unchanged.
 
-Executable source: `8e0b2e9f19faebacb7c474cf3d00fb25c7f0cb72`
+Executable source: `864d16814ef77b8f22a5da0bc453bd14e0a42255`
 
 Application SHA-256:
-`e1f55a8b462f9b4e3da6ad3bdffecc64d489a136d886864f70ff89bc5b6b4b16`
+`611d0fa2e469066a4749f510df08f829f8e8eb65de1cdec76e95844e3b892205`
 
 Native graph:
-`rev_00e650f80cf974ef6cef0fc3485f9a8343f5209ede76278b39ebe0202ee0bcc2`
+`rev_4439c2926d26f4afa97ce4ba2ef6a73442bf9e9c1160bcd08e511f365dc6088c`
 
-Runtime remains checksum-pinned **lkjscript 0.1.89**. The final exact candidate
-passed **607 native tests**, **120 synthetic browser groups**, a separate
-**56-edge legacy-store upgrade**, **49 public read-only browser groups**, and
-**8 public routing/security groups**. See [RELEASE.md](RELEASE.md) for exact
-identities, verification boundaries, public cutover and state preservation.
+Runtime remains checksum-pinned **lkjscript 0.1.89**. The exact candidate passed
+**613 native tests**, **29 focused synthetic browser groups**, including **48
+own-profile combinations**, and **49 public read-only browser groups**. Stored
+data, objects and configuration remained unchanged through cutover. No migration
+was required. See [RELEASE.md](RELEASE.md) for verification boundaries; earlier
+media/upgrade suites are historical, not newly rerun for this small correction.
 
 ## Attention contract
 
@@ -29,6 +29,7 @@ Profiles expose Attention to / Attention from as native links. Lists are
 member-only, bounded and indexed in both directions. Row identities are profile
 links; their sibling desired-state buttons retain the viewed subject, direction,
 cursor and trail. Mutual-state badges describe the relationship to the viewer.
+The own profile must not display a redundant You badge.
 Mutes remain independent and your own outgoing muted relations stay manageable.
 
 The canonical account field is attention. Legacy serialization and notice names
