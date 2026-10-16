@@ -63,4 +63,47 @@
       (record structural (field user (text "alice")) (field csrf (text "fixture")) (field session (text "")) (field now (i64 0)))
       (text "bravo") (bool true) (text "bravo") (text "profile") (text "") (text ""))
       (text "aria-label=\"Attention to @bravo\" aria-pressed=\"true\""))) (expected (bool true)))
+
+  (function create profile-badge (visibility public)
+    (parameter create viewer (type User)) (parameter create target (type User))
+    (returns Text) (effect pure)
+    (body (if (call std::text-equal (field (local viewer) (name handle)) (field (local target) (name handle)))
+      (text "") (call attentionui::badge (local viewer) (local target)))))
+
+  (function create badge-fixture (visibility private)
+    (parameter create handle (type Text)) (parameter create attention (type (list Text)))
+    (returns User) (effect pure)
+    (body (record structural (field handle (local handle)) (field password (text ""))
+      (field display (local handle)) (field bio (text "")) (field admin (bool false))
+      (field suspended (bool false)) (field created (i64 0)) (field failures (i64 0))
+      (field locked (i64 0)) (field sessions (list Text)) (field attention (local attention))
+      (field muted (list Text)) (field saved (list Text)) (field used (i64 0)) (field version (i64 0)))))
+
+  (test create self-profile-has-no-badge (visibility private)
+    (actual (call attentionui::profile-badge
+      (call attentionui::badge-fixture (text "alice") (list Text))
+      (call attentionui::badge-fixture (text "alice") (list Text)))) (expected (text "")))
+  (test create other-profile-mutual-state-remains (visibility private)
+    (actual (call attentionui::profile-badge
+      (call attentionui::badge-fixture (text "alice") (list Text (text "bravo")))
+      (call attentionui::badge-fixture (text "bravo") (list Text (text "alice")))))
+    (expected (text "<span class=\"relation-badge\">Mutual attention</span>")))
+  (test create other-profile-incoming-state-remains (visibility private)
+    (actual (call attentionui::profile-badge
+      (call attentionui::badge-fixture (text "alice") (list Text))
+      (call attentionui::badge-fixture (text "bravo") (list Text (text "alice")))))
+    (expected (text "<span class=\"relation-badge\">Attention to you</span>")))
+  (test create unrelated-profile-has-no-badge (visibility private)
+    (actual (call attentionui::profile-badge
+      (call attentionui::badge-fixture (text "alice") (list Text))
+      (call attentionui::badge-fixture (text "bravo") (list Text)))) (expected (text "")))
+  (test create guest-profile-has-no-badge (visibility private)
+    (actual (call attentionui::profile-badge
+      (call attentionui::badge-fixture (text "") (list Text))
+      (call attentionui::badge-fixture (text "alice") (list Text)))) (expected (text "")))
+  (test create list-self-identity-remains-scoped (visibility private)
+    (actual (call attentionui::badge
+      (call attentionui::badge-fixture (text "alice") (list Text))
+      (call attentionui::badge-fixture (text "alice") (list Text))))
+    (expected (text "<span class=\"relation-badge\">You</span>")))
 )

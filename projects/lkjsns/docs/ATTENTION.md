@@ -23,8 +23,10 @@ Its visible and accessible labels stay stable while `aria-pressed`, the check
 mark and native desired state change. The same control works on a profile and
 inside a list without JavaScript. Self-attention is not offered.
 
-**Mutual attention**, **Attention to you**, and **You** describe the relevant
-relationship to the viewer, not an unrelated person's reciprocal state. List
+**Mutual attention** and **Attention to you** describe the relationship to the
+viewer, not an unrelated person's reciprocal state. Your own profile does not
+repeat a **You** badge. Relationship-list rows retain **You** when needed to
+identify the viewer among other people. List
 changes return to the viewed person's original direction, cursor and bounded
 history trail. They do not navigate to the person just acted on. Profile changes
 return to that profile. Return locations are assembled from validated handles,
