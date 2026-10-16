@@ -77,7 +77,18 @@ requirements that cannot be established by software or policy prose alone.
 Use icons::brand for all desktop/mobile/error brand links and icons::links for
 their document heads. Never reintroduce a separate lk/ text glyph or text-only
 error-page logo. The six-asset catalog and native manifest use one content
-revision; read docs/SHARED-BRAND.md. Preserve the approved source SVG and actual
-user profile images. Icon data uses compact hexadecimal constants and a bounded native decoder,
+revision; read docs/SHARED-BRAND.md. Preserve the approved source composition and actual
+user profile images. The October 17 owner-requested outer circular crop and
+RGBA rasterization are documented in docs/CIRCULAR-IDENTITY.md. Icon data uses compact hexadecimal constants and a bounded native decoder,
 not higher runtime/review limits. The brand suite and public read-only contract
 check the same image references and actual browser decoding.
+
+## Attention contract
+
+Read docs/ATTENTION.md. Both post reactions and user relationships use Attention;
+notification tabs distinguish Post attention and People attention. Never restore
+Follow/Following/Follower labels or rename post buttons to Like or React.
+Lists are member-only, indexed in both directions, and retain validated navigation
+context through native desired-state forms. Legacy account/notice names belong
+only in accountcodec. Run the offline native index on a preserved-store snapshot
+before public cutover. Do not reset accounts or expose a migration HTTP endpoint.

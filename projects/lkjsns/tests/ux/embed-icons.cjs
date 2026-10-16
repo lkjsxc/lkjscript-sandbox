@@ -1,7 +1,7 @@
 // Optional development-only embedding. Product markup and assets stay native.
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
-const {specs,iconPaths,iconRevision,previousPaths,manifest}=require('./icon-catalog.cjs');
+const {specs,iconPaths,iconRevision,previousPaths,legacyPaths,manifest}=require('./icon-catalog.cjs');
 const root=path.resolve(__dirname,'../..');
 const sources=specs.map(([name,file,mime])=>({name,file,mime,versioned:iconPaths[name],bytes:fs.readFileSync(path.join(root,'web',file))}));
 const text=value=>`(text ${JSON.stringify(value)})`;
@@ -9,15 +9,18 @@ const call=(name,...args)=>`(call ${name}${args.length?' '+args.join(' '):''})`;
 const iff=(condition,a,b)=>`(if ${condition} ${a} ${b})`;
 const fn=(name,parameters,type,body)=>`  (function create ${name} (visibility public)\n${parameters.map(([name,type])=>`    (parameter create ${name} (type ${type}))\n`).join('')}    (returns ${type}) (effect pure)\n    (body ${body}))\n`;
 const test=(name,actual,expected)=>`  (test create ${name} (visibility private) (actual ${actual}) (expected ${expected}))\n`;
-const aliases=item=>['/'+item.file,item.versioned,...(previousPaths[item.name]?[previousPaths[item.name]]:[])];
+const aliases=item=>['/'+item.file,item.versioned,...(previousPaths[item.name]?[previousPaths[item.name]]:[]),...(legacyPaths[item.name]?[legacyPaths[item.name]]:[])];
 const matching=paths=>call('util::has',`(list Text ${paths.map(text).join(' ')})`,'(local path)','(i64 0)');
 const declarations=[];
 for(const item of sources){
  if(item.name==='svg')declarations.push(fn('svg',[],'Bytes',call('std::bytes-from-text',text(item.bytes.toString('utf8')))));
  else{
+  if(item.bytes.length>32768)throw new Error('Icon exceeds the bounded 32 KiB representation limit: '+item.file);
   // Compact literals avoid a canonical graph node for every image byte.
   // The decoder is bounded native lkjscript; no host-language runtime is used.
-  const payload=fn('read',[],'Bytes',call('iconbytes::decode',text(item.bytes.toString('hex'))));
+  const decode=bytes=>call('iconbytes::decode',text(bytes.toString('hex')));
+  const body=item.bytes.length<=16384?decode(item.bytes):call('iconbytes::pair',decode(item.bytes.subarray(0,16384)),decode(item.bytes.subarray(16384)));
+  const payload=fn('read',[],'Bytes',body);
   fs.writeFileSync(path.join(root,'src/icondata',item.name+'.lkjc'),`(module create icon${item.name}\n${payload}\n)\n`);
   declarations.push(fn(item.name,[],'Bytes',call('icon'+item.name+'::read')));
  }
@@ -52,7 +55,8 @@ declarations.push(test('unknown-path-is-not-an-icon',call('icons::known',text('/
 fs.writeFileSync(path.join(root,'src/icons.lkjc'),'(module create icons\n'+declarations.join('\n')+'\n)\n');
 const servicePath=path.join(root,'src/service.lkjc');let service=fs.readFileSync(servicePath,'utf8');
 service=service.replace(/^\s*\(route create (?:icon-current-|identity-)[^\n]+\n/gm,'\n');
-const end=service.lastIndexOf(')');if(end<0||!service.includes('(target create lkjsns'))throw new Error('Expected native service target.');
+const maintenance=service.indexOf('\n(target create attention-index');
+const end=service.lastIndexOf(')',maintenance<0?service.length:maintenance);if(end<0||!service.includes('(target create lkjsns'))throw new Error('Expected native service target.');
 const paths=[...new Set([...sources.flatMap(aliases),...extraPaths])].filter(url=>!service.includes(`(path ${JSON.stringify(url)})`));
 const routes=paths.map((url,i)=>`  (route create identity-${i} (method GET) (path ${JSON.stringify(url)}) (port service::app::view))`).join('\n');
 service=service.slice(0,end)+routes+'\n'+service.slice(end);fs.writeFileSync(servicePath,service);

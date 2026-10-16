@@ -4,7 +4,7 @@
     (returns Text) (effect pure)
     (body (if (call std::text-equal (local value) (text "public"))
       (text "Anyone, including people who are not signed in, will be able to read this post and its attachments.")
-      (text "Everyone registered here will be able to read this post and its attachments. This is not limited to your followers."))))
+      (text "Everyone registered here will be able to read this post and its attachments. This is independent of attention relationships."))))
 
   (function create content (visibility public) (parameter create ctx (type Context)) (parameter create note (type Note)) (returns Text) (effect (task (requirement service::app::store))) (body (call std::text-join (list Text (text "<div class=\"note-body\">") (call links::render (field (local note) (name body))) (text "</div>") (if (call std::less (i64 0) (call std::list-length (types Text) (field (local note) (name media)))) (call std::text-join (list Text (text "<div class=\"media-grid\">") (call mediaui::attachments (local ctx) (local note) (i64 0) (text "")) (text "</div>")) (text "")) (text ""))) (text ""))))
 
@@ -100,8 +100,8 @@
   (test create public-audience-is-explicit (visibility private)
     (actual (call std::text-contains (call writingview::audience (text "public")) (text "not signed in")))
     (expected (bool true)))
-  (test create members-is-not-followers (visibility private)
-    (actual (call std::text-contains (call writingview::audience (text "members")) (text "not limited to your followers")))
+  (test create members-audience-is-independent (visibility private)
+    (actual (call std::text-contains (call writingview::audience (text "members")) (text "independent of attention relationships")))
     (expected (bool true)))
   (test create empty-preview-cannot-post (visibility private)
     (actual (call std::text-contains (call writingview::publish-form (call auth::guest (i64 0)) (call db::empty-note))

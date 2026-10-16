@@ -24,7 +24,7 @@
 
   (function create with-trail (visibility public) (parameter create url (type Text)) (parameter create trail (type Text)) (returns Text) (effect pure) (body (if (if (call std::bool-not (call std::text-equal (local trail) (text ""))) (if (call paging::valid-trail (local trail)) (bool true) (bool false)) (bool false)) (let (binding hash (call paging::index-of (call std::bytes-from-text (local url)) (i64 35) (i64 0))) (binding front (call util::slice (local url) (i64 0) (local hash))) (in (call std::text-join (list Text (local front) (if (call std::text-contains (local front) (text "?")) (text "&trail=") (text "?trail=")) (local trail) (call util::slice (local url) (local hash) (call util::size (local url)))) (text "")))) (local url))))
 
-  (test create trail-first (visibility private) (actual (call paging::previous-url (text "_") (text "/?feed=following&"))) (expected (text "/?feed=following")))
+  (test create trail-first (visibility private) (actual (call paging::previous-url (text "_") (text "/?feed=attention&"))) (expected (text "/?feed=attention")))
 
   (test create trail-restores-page (visibility private) (actual (call paging::previous-url (text "_.90.60") (text "/drive?tag=travel&"))) (expected (text "/drive?tag=travel&cursor=60&trail=_.90")))
 

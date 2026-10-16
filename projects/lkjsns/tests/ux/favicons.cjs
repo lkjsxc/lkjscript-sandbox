@@ -27,10 +27,10 @@ const {chromium,base,root,output,fs,path,assert,goto,pass,session}=require('./su
  const artwork=fs.readFileSync(path.join(root,'web/favicon.svg'),'utf8');
  assert(artwork.includes('<title id="title">lkjsns</title>'));assert(artwork.includes('id="wordmark-lkjsns"'));assert(!/<text\b|<script\b|@font-face|<image\b/.test(artwork));
  for(const color of ['#2589ca','#51aad7','#526fd5','#8388e0','#0b1020'])assert(artwork.includes(color));
- assert(artwork.includes('<circle cx="128" cy="128" r="100" fill="#fff"/>'));
+ assert(artwork.includes('<circle cx="128" cy="128" r="100" fill="#fff"/>'));assert(artwork.includes('clip-path="url(#icon-circle)"'));
  pass('The favicon retains the personal icon’s four panels and white disk, with outlined lkjsns lettering and no font dependency');
  const samples=await p.evaluate(async urls=>{const out=[];for(const src of urls){const im=new Image();im.src=src;await im.decode();const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');g.drawImage(im,0,0,180,180);const pixel=(x,y)=>Array.from(g.getImageData(x,y,1,1).data);out.push({src,corners:[pixel(4,4),pixel(175,4),pixel(4,175),pixel(175,175)],circle:pixel(90,35),ink:Array.from(g.getImageData(22,65,136,50).data).filter((v,i,a)=>i%4===0&&v<40&&a[i+1]<50&&a[i+2]<70).length});}return out;},[iconPaths.svg,iconPaths.png,iconPaths.touch]);
- for(const sample of samples){assert.deepEqual(sample.corners,[[37,137,202,255],[81,170,215,255],[82,111,213,255],[131,136,224,255]]);assert.deepEqual(sample.circle,[255,255,255,255]);if(sample.src!==iconPaths.png)assert(sample.ink>500,JSON.stringify(sample));}
+ for(const sample of samples){assert.deepEqual(sample.corners,Array.from({length:4},()=>[0,0,0,0]));assert.deepEqual(sample.circle,[255,255,255,255]);if(sample.src!==iconPaths.png)assert(sample.ink>500,JSON.stringify(sample));}
 
  // Compare the tiny PNG at its native resolution. Enlarging 32px to 180px
  // changes antialias coverage and is not a valid dark-pixel-area contract.
@@ -39,18 +39,17 @@ const {chromium,base,root,output,fs,path,assert,goto,pass,session}=require('./su
   const canvas=document.createElement('canvas');canvas.width=canvas.height=32;const g=canvas.getContext('2d');
   g.drawImage(svg,0,0,32,32);const expected=g.getImageData(0,0,32,32).data;
   g.clearRect(0,0,32,32);g.drawImage(png,0,0);const actual=g.getImageData(0,0,32,32).data;
-  const palette=[];for(const base of [[11,16,32],[37,137,202],[81,170,215],[82,111,213],[131,136,224]])for(let i=0;i<16;i++)palette.push(base.map(v=>Math.round(v+(255-v)*i/15)));
-  let mismatches=0;
+  let mismatches=0,maxAlphaError=0,maxPremultipliedError=0,totalError=0;
   for(let at=0;at<expected.length;at+=4){
-   let best=palette[0],distance=Infinity;
-   for(const color of palette){const d=color.reduce((n,v,k)=>n+(expected[at+k]-v)**2,0);if(d<distance){distance=d;best=color;}}
-   if(best.some((v,k)=>actual[at+k]!==v)||actual[at+3]!==255)mismatches++;
+   maxAlphaError=Math.max(maxAlphaError,Math.abs(expected[at+3]-actual[at+3]));
+   for(let k=0;k<3;k++){const d=Math.abs(expected[at+k]*expected[at+3]/255-actual[at+k]*actual[at+3]/255);maxPremultipliedError=Math.max(maxPremultipliedError,d);totalError+=d;}
   }
-  return {pixels:1024,mismatches};
+  if(maxAlphaError>4||maxPremultipliedError>12||totalError/(1024*3)>3)mismatches++;
+  return {pixels:1024,mismatches,maxAlphaError,maxPremultipliedError,meanPremultipliedError:totalError/(1024*3)};
  },iconPaths);
  assert.equal(smallRaster.mismatches,0,JSON.stringify(smallRaster));
  fs.writeFileSync(path.join(output,'personal-icon-native-raster.json'),JSON.stringify(smallRaster,null,2));
  fs.writeFileSync(path.join(output,'personal-icon-samples.json'),JSON.stringify(samples,null,2));
- pass('SVG, PNG and touch variants preserve all four exact colors, the white center and dark full-word lettering');
+ pass('SVG, PNG and touch variants preserve transparent corners, the white center, full-word lettering and bounded alpha coverage without opaque corners');
 
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

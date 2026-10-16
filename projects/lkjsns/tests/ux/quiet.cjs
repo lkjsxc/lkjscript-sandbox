@@ -34,7 +34,7 @@ const {chromium,base,output,fs,path,assert,form,fields,click,goto,pass,session,s
  assert.equal((await guest.request.get(base+'/'+retained)).status(),404);
  await goto(p,'/'+retained+'/preview');assert.equal(await p.locator('.preview-card,.preview-summary').count(),0);assert.equal(await p.locator('[name=body]').inputValue(),'Input retained without any visible draft feature.');
  pass('Attachment selection retains text, content warning, audience, reply identity and file selection without publishing or exposing drafts');
- // Native rendering escapes hostile text; following a URL cannot navigate the
+ // Native rendering escapes hostile text; opening a URL cannot navigate the
  // signed-in page or pass its opener/referrer to the destination.
  const linkBody='Read (https://links.example.test/a_(b)?x=1&y=2).\n案内 https://links.example.test/道。\n<script>alert(1)</script> javascript:alert(1)';
  const linked=await createPost(p,linkBody,'public');const original=p.url();

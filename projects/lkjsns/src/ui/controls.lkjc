@@ -63,7 +63,7 @@
     (actual (call controls::area (text "body") (text "Body") (text "</textarea><script>"))) (expected (text "<label>Body<textarea name=\"body\" rows=\"5\">&lt;/textarea&gt;&lt;script&gt;</textarea></label>")))
 
   (test create audience-explains-members (visibility private)
-    (actual (call std::text-contains (call controls::audience (text "members")) (text "not just your followers"))) (expected (bool false)))
+    (actual (call std::text-contains (call controls::audience (text "members")) (text "not limited by attention relationships"))) (expected (bool false)))
 
   (test create public-choice-is-explicit (visibility private)
     (actual (call std::text-contains (call controls::audience (text "public")) (text "value=\"public\" selected>Public — anyone"))) (expected (bool true)))

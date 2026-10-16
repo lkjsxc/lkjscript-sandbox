@@ -28,11 +28,11 @@ const {iconPaths,manifest}=require('./icon-catalog.cjs');
  const decoded=await a.evaluate(async paths=>{const out=[];for(const [name,src,size]of [['app192',paths.app192,192],['app512',paths.app512,512]]){
   const img=new Image();img.src=src;await img.decode();const c=document.createElement('canvas');c.width=c.height=size;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
   const pixel=(x,y)=>Array.from(ctx.getImageData(x,y,1,1).data);
-  out.push({name,size,width:img.naturalWidth,height:img.naturalHeight,corners:[pixel(1,1),pixel(size-2,1),pixel(1,size-2),pixel(size-2,size-2)],white:pixel(size/2,Math.floor(size*.2))});
+  out.push({name,size,width:img.naturalWidth,height:img.naturalHeight,corners:[pixel(1,1),pixel(size-2,1),pixel(1,size-2),pixel(size-2,size-2)],white:pixel(size/2,Math.floor(size*.2)),panels:[pixel(Math.floor(size*.25),Math.floor(size*.125)),pixel(Math.floor(size*.75),Math.floor(size*.125)),pixel(Math.floor(size*.25),Math.floor(size*.875)),pixel(Math.floor(size*.75),Math.floor(size*.875))]});
  }return out;},iconPaths);
- for(const im of decoded){assert.equal(im.width,im.size);assert.equal(im.height,im.size);assert.deepEqual(im.corners,[[37,137,202,255],[81,170,215,255],[82,111,213,255],[131,136,224,255]]);assert.deepEqual(im.white,[255,255,255,255]);}
+ for(const im of decoded){assert.equal(im.width,im.size);assert.equal(im.height,im.size);assert.deepEqual(im.corners,Array.from({length:4},()=>[0,0,0,0]));assert.deepEqual(im.white,[255,255,255,255]);assert.deepEqual(im.panels,[[37,137,202,255],[81,170,215,255],[82,111,213,255],[131,136,224,255]]);}
  const finalAvatar=await owner.request.get(base+'/avatar?user=testowner');assert.deepEqual(await finalAvatar.body(),originalAvatar);
- pass('192/512px application icons retain the four-panel artwork; the user profile image is independent and unchanged');
+ pass('192/512px application icons retain the four-panel artwork with transparent circular edges; the user profile image is independent and unchanged');
  for(const route of ['/manifest.webmanifest?x=1','/site.webmanifest?x=1',iconPaths.app512+'?id=x'])assert.equal((await guest.request.get(base+route)).status(),400,route);
  for(const route of ['/manifest.webmanifest',iconPaths.app192])assert.equal((await guest.request.get(base+route,{headers:{Host:'invalid.example'}})).status(),400,route);
  const cold=await session(browser,'owner',{javaScriptEnabled:false,viewport:{width:390,height:844}});const n=await cold.newPage();await goto(n,'/more');await checkPageBrand(n);await cold.close();

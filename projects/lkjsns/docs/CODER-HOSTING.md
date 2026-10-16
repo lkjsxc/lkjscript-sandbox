@@ -1,3 +1,18 @@
+# Current Coder entrypoint — October 17, 2026
+
+The workspace is now **devmain**, agent **main**, public port **8793**.
+The canonical origin is
+<https://8793--main--devmain--lkjsxc.apps.coder.lkjsxc.com>.
+The app already used this exact origin when the October 17 work began. The
+custom-domain redirect still pointed at tomato-ocelot-73 and was corrected to
+devmain, preserving its GET/HEAD-only match, HTTP 302 and path/query handling.
+No tunnel was re-enabled and no application Host/Origin validation was relaxed.
+
+The earlier record below describes the original hosting repair; its old workspace
+name is historical. Consult [RELEASE.md](RELEASE.md) for the current application.
+
+---
+
 # Coder workspace hosting — October 12, 2026
 
 > The community UX application was subsequently promoted on October 13, 2026

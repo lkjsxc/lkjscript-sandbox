@@ -19,15 +19,13 @@
     (returns Bool) (effect (task (requirement service::app::store)))
     (body (capability-call service::app::store std::DataStore::put (static-text "lkjsns-v1") (call db::key (local kind) (local id)) (local value) (call db::expected (call db::read (local kind) (local id))))))
 
-  (function create empty-user
-    (visibility public)
-    (returns User) (effect pure)
-    (body (record structural (field handle (text "")) (field password (text "")) (field display (text "")) (field bio (text "")) (field admin (bool false)) (field suspended (bool false)) (field created (i64 0)) (field failures (i64 0)) (field locked (i64 0)) (field sessions (list Text)) (field following (list Text)) (field muted (list Text)) (field saved (list Text)) (field used (i64 0)) (field version (i64 -1)))))
+  (function create empty-user (visibility public) (returns User) (effect pure)
+    (body (call accountcodec::empty)))
 
   (function create user
     (visibility public) (parameter create id (type Text))
     (returns User) (effect (task (requirement service::app::store)))
-    (body (let (binding entries (call db::read (text "user") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-user) (call std::data-decode-or (types User) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-user)))))))
+    (body (let (binding entries (call db::read (text "user") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-user) (call accountcodec::read (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value)))))))
 
   (function create save-user
     (visibility public) (parameter create value (type User))
@@ -112,7 +110,7 @@
   (function create notice
     (visibility public) (parameter create id (type Text))
     (returns Notice) (effect (task (requirement service::app::store)))
-    (body (let (binding entries (call db::read (text "notice") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-notice) (call std::data-decode-or (types Notice) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-notice)))))))
+    (body (let (binding entries (call db::read (text "notice") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-notice) (call accountcodec::notice (call std::data-decode-or (types Notice) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-notice))))))))
 
   (function create count
     (visibility public) (parameter create name (type Text))

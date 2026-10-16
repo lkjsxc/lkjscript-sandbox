@@ -4,8 +4,8 @@ An invitation-only community built with native lkjscript inside lkjscript-sandbo
 The interface is English, with chronological posts, explicit audiences, reusable
 files, private tags, and a focused writing workspace.
 
-Open [lkjsns on Coder](https://8793--main--tomato-ocelot-73--lkjsxc.apps.coder.lkjsxc.com).
-The native app runs in workspace `tomato-ocelot-73` on public port **8793**.
+Open [lkjsns on Coder](https://8793--main--devmain--lkjsxc.apps.coder.lkjsxc.com).
+The native app runs in workspace `devmain` on public port **8793**.
 The custom domain redirects to this Coder entrypoint. Guest pages do not require
 Coder authentication; community accounts require an application invitation.
 [The release record](docs/RELEASE.md) identifies the exact deployed bundle and
@@ -31,7 +31,10 @@ width, and a top Prev restores the exact preceding page and filter. The bounded
 native cursor trail also survives reactions and attachment selection; it works
 without JavaScript. Direct cursor URLs without a preceding trail offer First.
 
-Posts support replies, following, muting, Attention, bookmarks, and notifications.
+Posts support replies, muting, Attention, bookmarks, and notifications.
+User relationships also use Attention: profiles link to Attention to and
+Attention from, with native in-list controls and mutual-state labels.
+Notifications distinguish Post attention from People attention.
 Reply counts follow current readability, mute, and deletion checks, not a count
 of hidden records. Up to 256 indexed replies are inspected per card; an incomplete
 positive count carries a plus sign rather than pretending to be exact.
@@ -102,7 +105,8 @@ Reply cards show their immediate parent as a bounded, readable preview. Long
 parents do not push the reply body out of view, and warnings/private/deleted
 parents retain their access boundaries. The site includes native SVG/ICO favicons
 and a touch icon based on lkjsxc's personal four-panel/white-circle artwork,
-with slightly adjusted colors and outlined lkjsns lettering. Content-versioned
+with slightly adjusted colors and outlined lkjsns lettering, clipped to a circle
+with transparent corners in every SVG/ICO/PNG representation. Content-versioned
 icon URLs replace the preceding cached mark while old asset URLs still work.
 The desktop sidebar, mobile header, and standalone error pages share this same
 image rather than a separate `lk/` glyph. A browser manifest supplies 192px and
@@ -145,7 +149,7 @@ production acceptance. Normal repository CI remains lightweight.
 ## Boundaries
 
 A Members post is readable by all registered
-members, not followers only. Public posts and their attachments are readable
+members, independently of attention relationships. Public posts and their attachments are readable
 without signing in. Removing a reference revokes future access, not copies that
 someone already downloaded.
 
@@ -155,7 +159,9 @@ interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [quiet workflows](docs/QUIET-WORKFLOWS.md),
+See [attention relationships](docs/ATTENTION.md),
+[circular identity](docs/CIRCULAR-IDENTITY.md),
+[quiet workflows](docs/QUIET-WORKFLOWS.md),
 [the profile-derived favicon](docs/PERSONAL-FAVICON.md),
 [reply rendering and favicon](docs/REPLIES-FAVICON.md),
 [direct interactions and resource paths](docs/DIRECT-INTERACTIONS.md),

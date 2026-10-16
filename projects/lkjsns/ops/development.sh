@@ -48,6 +48,7 @@ case "${1:-}" in
     export LKJSNS_BOOTSTRAP_SECRET
     printf 'Starting native local candidate %s on 127.0.0.1:19272\n' "$selected_sha"
     printf 'Authentication/media browser acceptance and public cutover remain separate.\n'
+    bash "$ROOT/ops/index-attention.sh" "$dev/service.json"
     exec "$LKJ" serve --deployment "$dev/service.json"
     ;;
   *) echo 'Expected prepare or run.' >&2; exit 2 ;;

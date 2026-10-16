@@ -15,7 +15,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
   for(const scheme of ['light','dark'])for(const width of [390,1280]) {
    await p.emulateMedia({colorScheme:scheme,reducedMotion:'reduce'});await p.setViewportSize({width,height:900});
    for(const route of ['/','/login','/join','/about','/search','/more','/privacy','/terms','/guidelines','/contact']) {
-    const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');
+    const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');if(route==='/privacy')assert.equal(await p.locator('.effective').innerText(),'Updated October 17, 2026');
     assert.equal(await p.locator('.page-header').count(),0,route);assert((await p.locator('main h1').getAttribute('class')).includes('sr-only'),route);
     assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),iconPaths.svg);
     await checkPageBrand(p);
@@ -23,9 +23,9 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
     assert(response.headers()['content-security-policy'].includes("script-src 'self'"));checks.push(`${scheme} ${width}px ${route}`);
    }
   }
-  for(const route of ['/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/drafts','/saved','/notifications','/admin','/admin/invitations','/compose']) {
+  for(const route of ['/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/drafts','/saved','/notifications','/admin','/admin/invitations','/compose','/attention?user=lkjsxc&direction=to','/attention?user=lkjsxc&direction=from']) {
    const r=await context.request.get(origin+route,{maxRedirects:0});assert.equal(r.status(),303,route);assert.equal(r.headers().location,'/login',route);
-  }checks.push('Eleven private routes require native sign-in');
+  }checks.push('Thirteen private routes, including both attention directions, require native sign-in');
   for(const [route,file] of [['/style.css','style.css'],['/ui.js','ui.js'],['/transfer.js','transfer.js']]) {
    const r=await context.request.get(origin+route);assert.equal(r.status(),200);assert.deepEqual(await r.body(),fs.readFileSync(path.join(root,'web',file)));
   }checks.push('Public CSS and both scripts exactly match the selected source');

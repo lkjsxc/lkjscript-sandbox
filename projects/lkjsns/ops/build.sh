@@ -57,13 +57,18 @@ for name in ico png touch app192 app512; do
   apply_fragment "icon-$name" "$ROOT/src/icondata/$name.lkjc"
 done
 apply_fragment icons "$ROOT/src/icons.lkjc"
+apply_fragment account-codec "$ROOT/src/attention/accountcodec.lkjc"
 for name in db preferences page assets auth access codec social compose notes drive; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
+apply_fragment attention-store "$ROOT/src/attention/store.lkjc"
+apply_fragment attention-migration "$ROOT/src/attention/migration.lkjc"
 for name in controls navigation; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
 apply_fragment paging "$ROOT/src/reading/paging.lkjc"
+apply_fragment attention-navigation "$ROOT/src/attention/navigation.lkjc"
+apply_fragment attention-ui "$ROOT/src/attention/ui.lkjc"
 apply_fragment sequence "$ROOT/src/reading/sequence.lkjc"
 for name in math store io; do
   apply_fragment "transfer-$name" "$ROOT/src/transfers/$name.lkjc"
@@ -91,6 +96,7 @@ apply_fragment journal-submit "$ROOT/src/writing/submit.lkjc"
 for name in attachments relations adminview accounts fileactions; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
+apply_fragment attention-view "$ROOT/src/attention/view.lkjc"
 apply_fragment information "$ROOT/src/ui/information.lkjc"
 apply_fragment identity "$ROOT/src/identity.lkjc"
 for name in driveview mediaflow recovery; do

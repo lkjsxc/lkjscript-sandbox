@@ -9,7 +9,7 @@ const {resourceId,isResource,isEditor,chromium,base,assert,click,goto,pass,sessi
   const media=load('media');await goto(p,'/file?id='+media.textId);assert.equal(await p.locator('[name=tags]').inputValue(),'travel, work, 日本語');
   const avatar=await clean.request.get(base+'/avatar?user=testowner');assert.equal(avatar.status(),200);assert(avatar.headers()['content-type'].startsWith('image/'));
   await goto(p,'/search?q='+encodeURIComponent('日本語の検索'));
-  // Later suites add more than one bounded search window. Follow the real Next
+  // Later suites add more than one bounded search window. Use the real Next
   // links rather than assuming this early specimen remains on the first page.
   const target=p.locator('#post-'+load('search').japanese);let pages=0;
   while(await target.count()===0 && await p.getByRole('link',{name:'Next',exact:true}).count()) {
@@ -33,6 +33,14 @@ const {resourceId,isResource,isEditor,chromium,base,assert,click,goto,pass,sessi
   pass('A pending upload resumes from its durable part acknowledgement after native restart');
   const replies=load('reply-regressions');await goto(p,'/'+replies.child);assert.equal(await p.locator('.note-detail .parent-card').getAttribute('href'),'/'+replies.parent);assert.equal(await p.locator('.reply-list #post-'+replies.nested).count(),1);assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),iconPaths.svg);
   assert.equal((await clean.request.get(base+'/favicon.ico')).status(),200);pass('Reply context, nested thread membership and favicon delivery survive a native restart');
+
+  const attention=load('attention');await goto(p,'/attention?user=testowner&direction=from');
+  const readPeople=()=>p.locator('.attention-person').evaluateAll(es=>es.map(e=>new URL(e.href).searchParams.get('user')));
+  const first=await readPeople();assert.deepEqual(first,attention.firstPage);
+  await click(p,p.getByRole('link',{name:'Next',exact:true}));const second=await readPeople();
+  assert.equal(new Set([...first,...second]).size,attention.expectedIncoming);
+  await goto(p,'/attention?user=testowner&direction=to');assert.deepEqual(await readPeople(),['testmember']);
+  pass('Both attention indexes, relation state and paginated member lists survive a native server restart');
 
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

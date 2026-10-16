@@ -1,3 +1,12 @@
+# Current artwork note — October 17, 2026
+
+The shared components and asset catalog described below remain in use. The owner
+subsequently requested a circular crop; [CIRCULAR-IDENTITY.md](CIRCULAR-IDENTITY.md)
+describes the new SVG clipping and RGBA raster bytes. Claims below about unchanged
+square artwork refer to the original October 15 integration only.
+
+---
+
 # Shared application identity
 
 The service identity is the approved four-panel blue/periwinkle artwork, with a

@@ -7,9 +7,10 @@ const hash=crypto.createHash('sha256');for(const [,file] of specs)hash.update(fs
 const iconRevision=hash.digest('hex').slice(0,12);
 const versioned=(name,tag)=>name==='touch'?`/apple-touch-icon-${tag}.png`:name==='png'?`/favicon-${tag}-32.png`:name.startsWith('app')?`/app-icon-${tag}-${name.slice(3)}.png`:`/favicon-${tag}.${name}`;
 const iconPaths=Object.fromEntries(specs.map(([name])=>[name,versioned(name,iconRevision)]));
-// Preserve the preceding exact artwork URLs for already-open tabs. Their bytes
-// did not change; this release expands the identity bundle, not the design.
-const previousRevision='b7cf1e2c2a49';
-const previousPaths=Object.fromEntries(specs.slice(0,4).map(([name])=>[name,versioned(name,previousRevision)]));
+// Older asset URLs remain aliases. They now serve the circular revision too;
+// current document links always use the new content hash.
+const previousRevision='9ef7b4ce01bf';
+const previousPaths=Object.fromEntries(specs.map(([name])=>[name,versioned(name,previousRevision)]));
+const legacyPaths=Object.fromEntries(specs.slice(0,4).map(([name])=>[name,versioned(name,'b7cf1e2c2a49')]));
 const manifest={id:'/',name:'lkjsns',short_name:'lkjsns',start_url:'/',scope:'/',display:'standalone',lang:'en',icons:[{src:iconPaths.app192,sizes:'192x192',type:'image/png',purpose:'any'},{src:iconPaths.app512,sizes:'512x512',type:'image/png',purpose:'any'},{src:iconPaths.svg,sizes:'any',type:'image/svg+xml',purpose:'any'}]};
-module.exports={specs,iconPaths,iconRevision,previousPaths,manifest};
+module.exports={specs,iconPaths,iconRevision,previousPaths,legacyPaths,manifest};
