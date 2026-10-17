@@ -56,7 +56,6 @@ other relationship states and mutes retain their existing meaning. The circular
 icon catalog is still 23eb76263041, with native/browser asset-byte equality and
 independent user-uploaded profile images.
 
-Keep the Coder origin, port, strict Host/Origin/session/CSRF checks and disabled
-legacy tunnels. No unrelated service, runtime budget or paid dependency was changed.
+Keep the 0.0.0.0:8793 listener, NetBird mesh overlay access (10.250.0.48), GitOps NGINX wildcard TLS routing, and canonical origin https://lkjsns.lkjsxc.com. Cloudflare tunnels and redirects are discontinued. No unrelated service, runtime budget or paid dependency was changed.
 See [ATTENTION.md](ATTENTION.md), [CIRCULAR-IDENTITY.md](CIRCULAR-IDENTITY.md),
 [CODER-HOSTING.md](CODER-HOSTING.md), and [OPERATOR-RESPONSIBILITIES.md](OPERATOR-RESPONSIBILITIES.md).

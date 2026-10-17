@@ -1,15 +1,16 @@
-# Current Coder entrypoint — October 17, 2026
+# Current NetBird & GitOps entrypoint — October 17, 2026
 
-The workspace is now **devmain**, agent **main**, public port **8793**.
-The canonical origin is
-<https://8793--main--devmain--lkjsxc.apps.coder.lkjsxc.com>.
-The app already used this exact origin when the October 17 work began. The
-custom-domain redirect still pointed at tomato-ocelot-73 and was corrected to
-devmain, preserving its GET/HEAD-only match, HTTP 302 and path/query handling.
-No tunnel was re-enabled and no application Host/Origin validation was relaxed.
+The workspace is **devmain** (`tomato-ocelot-73`), agent **main**, public port **8793**.
+The native listener binds to `0.0.0.0:8793`, listening across loopback, NetBird (`wt0`, `10.250.0.48`), and the internal container network.
 
-The earlier record below describes the original hosting repair; its old workspace
-name is historical. Consult [RELEASE.md](RELEASE.md) for the current application.
+Canonical origin: `<https://lkjsns.lkjsxc.com>`.
+
+Cloudflare tunnels and redirect rules are discontinued. Ingress is managed via:
+1. **NetBird Mesh Overlay**: Authenticated peer devices reach `10.250.0.48:8793` or `tomato-ocelot-73.nb.lkjsxc.com:8793` directly over WireGuard.
+2. **GitOps Ingress**: `services/public-apps/routes.json` routes `lkjsns.lkjsxc.com` through the `foundation/forgejo` NGINX reverse proxy with the active Let's Encrypt `*.lkjsxc.com` wildcard certificate.
+3. **LAN Resolution**: AdGuard Home maps `lkjsns.lkjsxc.com` to `192.168.1.2` (`services/adguardhome/lan-rewrites.json`).
+
+The earlier records below describe historical hosting iterations. Consult [RELEASE.md](RELEASE.md) and [CHECKPOINT.md](CHECKPOINT.md) for the active deployment.
 
 ---
 
