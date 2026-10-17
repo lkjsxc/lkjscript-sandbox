@@ -48,7 +48,7 @@ async function post(context,data,status=303){const r=await context.request.post(
  // Generate an actual second page so back must restore filter, trail and scroll.
  await goto(p,'/compose');const seed=await fields(p,'note');for(let i=0;i<36;i++)await post(owner,{...seed,id:newPostId(),version:'0',reply:'',body:'Reading navigation position '+i,cw:'',audience:'public',mode:'publish'});
  for(const route of ['/?feed=attention','/@testowner','/search?q=Reading%20navigation']){
-  await goto(p,route);await click(p,p.getByRole('link',{name:'Next',exact:true}).first());const from=rootPath(p);const card=p.locator('main article.note').nth(1);await card.locator('.note-body').scrollIntoViewIfNeeded();const y=await p.evaluate(()=>scrollY);
+  await goto(p,route);await click(p,p.getByRole('link',{name:/^(Older|Next)$/}).first());const from=rootPath(p);const card=p.locator('main article.note').nth(1);await card.locator('.note-body').scrollIntoViewIfNeeded();const y=await p.evaluate(()=>scrollY);
   await click(p,card.locator('.note-body'));assert(short.test(resourceId(p.url())));assert.equal(await p.locator('[data-post-back]').getAttribute('href'),from);
   await click(p,p.locator('[data-post-back]'));assert.equal(rootPath(p),from);await p.waitForTimeout(150);assert(Math.abs(await p.evaluate(()=>scrollY)-y)<70,`${route}: scroll position`);
  }

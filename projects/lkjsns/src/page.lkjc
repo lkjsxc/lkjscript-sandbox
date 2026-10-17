@@ -78,7 +78,7 @@
     (returns Text) (effect pure)
     (body (if (call std::less (local size) (i64 1024)) (call std::text-join (list Text (call std::i64-to-text (local size)) (text " B")) (text "")) (if (call std::less (local size) (i64 1048576)) (call std::text-join (list Text (call std::i64-to-text (call std::divide (local size) (i64 1024))) (text " KiB")) (text "")) (call std::text-join (list Text (call std::i64-to-text (call std::divide (local size) (i64 1048576))) (text " MiB")) (text ""))))))
 
-  (function create pager (visibility public) (parameter create next (type I64)) (parameter create base (type Text)) (returns Text) (effect pure) (body (if (call std::less-equal (i64 0) (local next)) (call std::text-join (list Text (text "<div class=\"pager\"><a class=\"button\" rel=\"next\" href=\"") (call std::html-escape-text (local base)) (text "cursor=") (call std::i64-to-text (local next)) (text "\">Next</a></div>")) (text "")) (text ""))))
+  (function create pager (visibility public) (parameter create next (type I64)) (parameter create base (type Text)) (returns Text) (effect pure) (body (if (call std::less-equal (i64 0) (local next)) (call std::text-join (list Text (text "<div class=\"pager\"><a class=\"button\" rel=\"next\" href=\"") (call std::html-escape-text (local base)) (text "cursor=") (call std::i64-to-text (local next)) (text "\">Older</a></div>")) (text "")) (text ""))))
 
   (function create append-headers
     (visibility public) (parameter create left (type (list Header))) (parameter create right (type (list Header))) (parameter create index (type I64))

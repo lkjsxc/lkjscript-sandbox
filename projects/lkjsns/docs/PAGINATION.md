@@ -6,11 +6,8 @@ content (sometimes above a profile, breadcrumb or filter) and Next below it.
 Every current renderer now emits one shared bottom row. DOM order, keyboard
 order and visual order agree; there is no CSS reordering or JavaScript relocation.
 
-The backward link sits on the left. Next takes the remaining width and retains
-its existing shape, height and arrow. On the first page, Next alone spans the
-full row as before. On the last page, Prev stays left-aligned rather than moving
-to the centre. Empty single-page lists render no empty navigation or spacer.
-Buttons have at least 54px height with separate hit targets, including on mobile.
+The backward link sits on the left labeled "Newer". "Older" takes the forward position on the right. When both buttons are present, they share the width equally (50/50) with generous, touch-friendly hit targets and directional arrows. On the first page, "Older" alone spans the row. On the last page, "Newer" alone is available. Empty single-page lists render no empty navigation or spacer.
+Buttons have at least 52px height with distinct, accessible hit targets across desktop and mobile.
 
 This applies to Home, the Attention feed, Bookmarks, profiles, members, both
 Attention directions, notification filters, Drive, attachment selection, profile

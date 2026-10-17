@@ -89,11 +89,11 @@ const post=async(context,body,status=303)=>{
   created.push(handle);await context.close();
  }
  await goto(p,list('testowner','from'));const firstPage=await people(p);assert.equal(firstPage.length,30);assert.equal(firstPage[0],created.at(-1));assert.equal(await p.evaluate(()=>window.attentionXSS),undefined);
- const next=await p.getByRole('link',{name:'Next',exact:true}).getAttribute('href');await goto(p,next);const beforeUrl=p.url(),secondPage=await people(p);assert.equal(secondPage.length,4);assert.equal(new Set([...firstPage,...secondPage]).size,34);
+ const next=await p.getByRole('link',{name:/^(Older|Next)$/}).getAttribute('href');await goto(p,next);const beforeUrl=p.url(),secondPage=await people(p);assert.equal(secondPage.length,4);assert.equal(new Set([...firstPage,...secondPage]).size,34);
  let row=p.locator('.attention-row').filter({has:p.locator('.attention-person[href="/@'+secondPage[0]+'"]')});
  await click(p,row.locator('button'));const after=new URL(p.url()),before=new URL(beforeUrl);assert.equal(after.search,before.search);assert.equal(after.hash,'#attention-'+secondPage[0]);
  row=p.locator('#attention-'+secondPage[0]);await click(p,row.locator('button'));assert.equal(new URL(p.url()).search,before.search);
- await click(p,p.getByRole('link',{name:'Prev',exact:true}));assert.deepEqual(await people(p),firstPage);
+ await click(p,p.getByRole('link',{name:/^(Newer|Prev)$/}));assert.deepEqual(await people(p),firstPage);
  pass('Newest attention first, 30-row native pagination, no duplicates, exact Prev and same-page actions across a 34-person incoming graph');
  const reports=[];const script=process.env.LKJSNS_AXE?fs.readFileSync(process.env.LKJSNS_AXE,'utf8'):null;
  for(const scheme of ['light','dark'])for(const width of [320,390,768,1280]){

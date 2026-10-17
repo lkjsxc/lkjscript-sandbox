@@ -11,11 +11,11 @@ const {newPostId,chromium,base,output,fs,path,assert,fields,click,goto,pass,sess
   await action({...seed,id,version:'2',reply:'',body,cw:'',audience:'members',mode:'publish'});posts.push(id);
  }
  await goto(p,'/'+media.textId);assert.deepEqual(await p.locator('.usage-posts > article.note').evaluateAll(es=>es.map(e=>e.id.slice(5))),posts.slice().reverse().slice(0,30));
- await click(p,p.getByRole('link',{name:'Next',exact:true}));const second=p.url();assert.equal(new URL(second).searchParams.get('trail'),'_');assert.equal(await p.getByRole('link',{name:'Prev',exact:true}).count(),1);
+ await click(p,p.getByRole('link',{name:/^(Older|Next)$/}));const second=p.url();assert.equal(new URL(second).searchParams.get('trail'),'_');assert.equal(await p.getByRole('link',{name:/^(Newer|Prev)$/}).count(),1);
  const card=p.locator('.usage-posts > article.note').first();const expected=await card.getAttribute('id');assert.equal(expected,'post-'+posts[2]);
  await click(p,card.locator('form').filter({has:p.locator('input[name=intent][value=bookmark]')}).locator('button'));
  assert.equal(new URL(p.url()).pathname,'/'+media.textId);assert.equal(new URL(p.url()).searchParams.get('cursor'),new URL(second).searchParams.get('cursor'));assert.equal(new URL(p.url()).searchParams.get('trail'),'_');
- await click(p,p.getByRole('link',{name:'Prev',exact:true}));assert.equal(await p.locator('.usage-posts > article.note').first().getAttribute('id'),'post-'+posts[32]);
+ await click(p,p.getByRole('link',{name:/^(Newer|Prev)$/}));assert.equal(await p.locator('.usage-posts > article.note').first().getAttribute('id'),'post-'+posts[32]);
  pass('More than thirty Used in posts paginate newest-first; native bookmark actions preserve the file page and exact Prev history');
  // File options must return to the same input, without a second save/preview step.
  const quiet=load('quiet');await goto(p,'/compose');await p.locator('[name=body]').fill('File options preserve this pending input.');await click(p,p.getByRole('button',{name:'Attach file',exact:true}));const working=new URL(p.url()).searchParams.get('draft');
