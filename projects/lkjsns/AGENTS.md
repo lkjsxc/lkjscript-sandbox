@@ -92,3 +92,24 @@ Lists are member-only, indexed in both directions, and retain validated navigati
 context through native desired-state forms. Legacy account/notice names belong
 only in accountcodec. Run the offline native index on a preserved-store snapshot
 before public cutover. Do not reset accounts or expose a migration HTTP endpoint.
+
+## Pagination layout
+
+Render one shared paging::controls (or named paging::render for Search) after
+each paginated collection. Prev belongs on the left of Next in the same bottom
+row, never above profile identity, filters, breadcrumbs or the list. Next alone
+retains full width. Direct cursors without history offer First; last pages retain
+the left-hand backward link. Do not implement positioning with CSS order or DOM
+reparenting. Read docs/PAGINATION.md for independent Search histories and tests.
+
+## Reading-flow contract
+
+Read docs/READING-FLOW.md and docs/PAGINATION.md. Prev/Next belong after their
+collection, not above profile identity or tabs. Post Back is a separate, safe
+reading-history action. Preserve its bounded, same-origin fallback and no-script
+behavior. Profiles use /@handle; post IDs are 16 characters, while authentication
+and media tokens retain their original full-strength validator. Do not truncate
+util::token globally. Legacy post aliases must be indexed offline on a retained
+snapshot before serving; collisions and incomplete indexes fail closed. Reply
+parents are neutral stacked siblings, not a nested colored In reply to box.
+Successful saves finish the editor task; validation/conflicts retain input.

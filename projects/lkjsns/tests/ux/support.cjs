@@ -27,7 +27,14 @@ async function createPost(page, body, audience='members', mode='publish') {
 }
 function save(name,value) {s.fs.writeFileSync(s.path.join(s.fixture,name+'.json'),JSON.stringify(value,null,2),{mode:0o600});}
 function load(name) {return JSON.parse(s.fs.readFileSync(s.path.join(s.fixture,name+'.json')));}
-function resourceId(value){const u=new URL(value,s.base);return u.pathname.match(/^\/([a-f0-9]{64})(?:\/|$)/)?.[1]||u.searchParams.get('id');}
-const isResource=value=>/^\/[a-f0-9]{64}$/.test(new URL(value,s.base).pathname);
-const isEditor=value=>/^\/[a-f0-9]{64}\/edit$/.test(new URL(value,s.base).pathname);
-module.exports={resourceId,isResource,isEditor,...s,crypto,pass,session,submit,createPost,save,load};
+function resourceId(value){const u=new URL(value,s.base);return u.pathname.match(/^\/([0-9abcdefghjkmnpqrstvwxyz]{16}|[a-f0-9]{64})(?:\/|$)/)?.[1]||u.searchParams.get('id');}
+const isResource=value=>/^\/(?:[0-9abcdefghjkmnpqrstvwxyz]{16}|[a-f0-9]{64})$/.test(new URL(value,s.base).pathname);
+const isEditor=value=>/^\/(?:[0-9abcdefghjkmnpqrstvwxyz]{16}|[a-f0-9]{64})\/edit$/.test(new URL(value,s.base).pathname);
+function shortPostId(id){
+ if(/^[0-9abcdefghjkmnpqrstvwxyz]{16}$/.test(id))return id;
+ s.assert(/^[a-f0-9]{64}$/.test(id));let number=BigInt('0x'+id.slice(0,20)),out='';
+ const alphabet='0123456789abcdefghjkmnpqrstvwxyz';for(let i=0;i<16;i++){out=alphabet[Number(number&31n)]+out;number>>=5n;}return out;
+}
+const newPostId=()=>shortPostId(crypto.randomBytes(32).toString('hex'));
+const profileHandle=value=>{const u=new URL(value,s.base);return u.pathname.match(/^\/@([a-z0-9_-]{3,24})(?:\/|$)/)?.[1]||u.searchParams.get('user');};
+module.exports={newPostId,shortPostId,profileHandle,resourceId,isResource,isEditor,...s,crypto,pass,session,submit,createPost,save,load};

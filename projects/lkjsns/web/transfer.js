@@ -61,7 +61,7 @@
     if(paused)throw new Error('Upload paused. Resume to continue.');
     status.textContent='Saving file…';pause.hidden=true;
     const done=await send('finish',null);const destination=new URL(done.url);
-    if(destination.origin!==location.origin||!(/^\/[a-f0-9]{64}(?:\/edit)?$/.test(destination.pathname)||destination.pathname==='/pick'))
+    if(destination.origin!==location.origin||!(/^\/(?:[0-9abcdefghjkmnpqrstvwxyz]{16}|[a-f0-9]{64})(?:\/edit)?$/.test(destination.pathname)||destination.pathname==='/pick'))
      throw new Error('Check Drive before repeating this upload.');
     active=false;location.assign(destination.href);
    }catch(error){status.textContent=error.message;button.textContent=started?'Resume upload':'Retry upload';}

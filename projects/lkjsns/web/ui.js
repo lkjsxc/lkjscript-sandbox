@@ -39,7 +39,7 @@ document.addEventListener('click', event => {
   const target = new URL(link.href);
   if (target.origin !== location.origin || target.pathname !== '/delete') return;
   const kind = target.searchParams.get('kind'), id = target.searchParams.get('id');
-  if (!['post','file'].includes(kind) || !/^[a-f0-9]{64}$/.test(id || '')) return;
+  if (!['post','file'].includes(kind) || !(kind === 'post' ? /^(?:[0-9abcdefghjkmnpqrstvwxyz]{16}|[a-f0-9]{64})$/ : /^[a-f0-9]{64}$/).test(id || '')) return;
   const source = document.querySelector(`form input[name="intent"][value="${kind === 'post' ? 'note' : 'file'}"]`)?.form;
   if (!source || source.elements.namedItem('id')?.value !== id) return;
   const csrf = source.elements.namedItem('csrf')?.value, version = source.elements.namedItem('version')?.value;
@@ -63,3 +63,87 @@ document.addEventListener('click', event => {
   dialog.addEventListener('close', () => {dialog.remove();link.focus();}, {once:true});
   actions.append(cancel,remove); form.append(actions); dialog.append(heading,description,form); document.body.append(dialog); dialog.showModal();
 });
+
+// Reading history is not pagination. Store only same-origin destinations and
+// scroll offsets, never post bodies, credentials, or unrestricted return URLs.
+(() => {
+  const key = 'lkjsns:reading:v1';
+  const shortId = /^[0-9abcdefghjkmnpqrstvwxyz]{16}$/;
+  const longId = /^[a-f0-9]{64}$/;
+  const compact = id => {
+    if (shortId.test(id)) return id;
+    if (!longId.test(id)) return id;
+    const alphabet = '0123456789abcdefghjkmnpqrstvwxyz';
+    let n = BigInt('0x' + id.slice(0,20)), text = '';
+    for (let i=0;i<16;i++) {text=alphabet[Number(n&31n)]+text;n>>=5n;}
+    return text;
+  };
+  const canonical = input => {
+    const url = new URL(input,location.href);
+    if (url.origin!==location.origin || url.username || url.password || url.href.length>4096) return null;
+    if (url.pathname==='/profile' && /^[a-z0-9_-]{3,24}$/.test(url.searchParams.get('user')||'')) {
+      url.pathname='/@'+url.searchParams.get('user');url.searchParams.delete('user');
+    }
+    if (url.pathname==='/note' && (shortId.test(url.searchParams.get('id')||'') || longId.test(url.searchParams.get('id')||''))) {
+      url.pathname='/'+compact(url.searchParams.get('id'));url.searchParams.delete('id');
+    }
+    return url;
+  };
+  const readable = url => url && (['/','/saved','/search','/notifications','/people','/drive','/attention','/more'].includes(url.pathname)
+    || /^\/@[a-z0-9_-]{3,24}(?:\/attention\/(?:to|from))?$/.test(url.pathname)
+    || shortId.test(url.pathname.slice(1)) || longId.test(url.pathname.slice(1)));
+  const relative = url => url.pathname+url.search+url.hash;
+  const current = canonical(location.href);
+  const load = () => {try {const value=JSON.parse(sessionStorage.getItem(key));return value&&typeof value==='object'?value:{};}catch{return {};}};
+  const store = value => {try {sessionStorage.setItem(key,JSON.stringify(value));}catch{}};
+  const safeEntry = entry => entry && Number.isFinite(entry.at) && Date.now()-entry.at>=0 && Date.now()-entry.at<1800000;
+  const rememberPosition = () => {
+    if (!readable(current)) return;
+    const state=load();const positions=Array.isArray(state.positions)?state.positions:[];
+    state.positions=[...positions.filter(x=>x.path!==relative(current)).slice(-23),{path:relative(current),y:scrollY,at:Date.now()}];store(state);
+  };
+  addEventListener('pagehide',rememberPosition);
+  document.addEventListener('click',event=>{
+    if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||!readable(current))return;
+    const link=event.target.closest('a[href]');
+    const card=!link&&!event.target.closest('button,input,textarea,select,summary,video,audio,label')&&!getSelection()?.toString()?event.target.closest('article.note[data-href]'):null;
+    if(!link&&!card || link?.hasAttribute('data-post-back') || link?.target==='_blank')return;
+    let target;try{target=canonical(link?.href||card.dataset.href);}catch{return;}
+    if(!readable(target)||relative(target)===relative(current))return;
+    rememberPosition();const state=load();state.departure={from:relative(current),to:relative(target),y:scrollY,length:history.length,at:Date.now()};store(state);
+  },true);
+  document.addEventListener('submit',event=>{
+    if(event.target.elements?.namedItem('intent')?.value==='logout'){try{sessionStorage.removeItem(key);}catch{}}
+  });
+  const back=document.querySelector('[data-post-back]');
+  let referrer=null;try{if(document.referrer)referrer=canonical(document.referrer);}catch{}
+  if(back){
+    const state=load(),departure=state.departure;const prior=Array.isArray(state.backs)?state.backs:[];
+    let selected=null;
+    if(safeEntry(departure)&&referrer&&canonical(departure.to)?.pathname===current.pathname&&readable(canonical(departure.from))&&relative(canonical(departure.from))!==relative(current)) {
+      selected={...departure,path:current.pathname,href:departure.from,expectedLength:departure.length+1};delete state.departure;
+    }else if(referrer && (referrer.pathname===current.pathname||referrer.pathname===current.pathname+'/edit'||referrer.pathname==='/action')){
+      selected=prior.find(x=>x.path===current.pathname&&safeEntry(x)&&readable(canonical(x.href)));
+    }
+    if(!selected){const href=canonical(back.getAttribute('href'));if(readable(href)){
+      const position=(Array.isArray(state.positions)?state.positions:[]).find(x=>x.path===relative(href)&&safeEntry(x));
+      selected={path:current.pathname,href:relative(href),y:position?.y||0,at:Date.now(),expectedLength:-1};
+    }}
+    if(selected){back.href=selected.href;state.backs=[...prior.filter(x=>x.path!==current.pathname).slice(-23),selected];store(state);
+      back.addEventListener('click',event=>{
+        if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.altKey||event.shiftKey)return;
+        const target=canonical(back.href);if(!readable(target)||target.pathname===current.pathname&&target.search===current.search)return;
+        event.preventDefault();const latest=load();delete latest.departure;
+        latest.restore={to:relative(target),y:Math.max(0,Number(selected.y)||0),at:Date.now()};store(latest);
+        if(referrer&&relative(referrer)===relative(target)&&history.length===selected.expectedLength&&history.length>1)history.back();
+        else location.assign(relative(target));
+      });
+    }
+  }
+  const state=load(),restore=state.restore;
+  if(readable(current)&&safeEntry(restore)&&restore.to===relative(current)){
+    delete state.restore;store(state);
+    const apply=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>scrollTo({top:Math.max(0,Number(restore.y)||0),behavior:'instant'})));
+    if(document.readyState==='complete')apply();else addEventListener('load',apply,{once:true});
+  }
+})();

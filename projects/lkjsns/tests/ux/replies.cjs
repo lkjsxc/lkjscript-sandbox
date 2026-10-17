@@ -7,20 +7,21 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
  async function remove(page,id){await goto(page,'/'+id+'/edit');await page.getByRole('link',{name:'Delete post',exact:true}).click();await page.getByRole('dialog').waitFor();await click(page,page.getByRole('dialog').getByRole('button',{name:'Delete post',exact:true}));}
  const body='A parent line with 日本語 and 🌍.\n'.repeat(30);const parent=await createPost(p,body,'public');
  const child=await reply(m,parent,'This is the first child reply.');const nested=await reply(p,child,'This is a reply to the child, not the root.');
- for(const route of ['/','/profile?user=testmember','/search?q='+encodeURIComponent('first child reply')]){
+ for(const route of ['/','/@testmember','/search?q='+encodeURIComponent('first child reply')]){
   await goto(p,route);const card=p.locator('#post-'+child);assert.equal(await card.count(),1);
-  assert.equal(await card.locator('.parent-card').getAttribute('href'),'/'+parent);
+  assert.equal(await card.locator('..').locator(':scope > .parent-card').getAttribute('href'),'/'+parent);
   assert.equal(await card.locator('.note-body').innerText(),'This is the first child reply.');
   assert.equal(await card.locator('.parent-card a,.parent-card button').count(),0);
-  assert.equal(await card.locator('.parent-card').getAttribute('target'),null);
+  assert.equal(await card.locator('..').locator(':scope > .parent-card').getAttribute('target'),null);
  }
- await goto(p,'/'+child);await click(p,p.locator('.note-detail form').filter({has:p.locator('input[name=intent][value=bookmark]')}).locator('button'));await goto(p,'/saved');assert.equal(await p.locator('#post-'+child+' .parent-card').getAttribute('href'),'/'+parent);
+ await goto(p,'/'+child);await click(p,p.locator('.note-detail form').filter({has:p.locator('input[name=intent][value=bookmark]')}).locator('button'));await goto(p,'/saved');assert.equal(await p.locator('.conversation-pair').filter({has:p.locator('#post-'+child)}).locator(':scope > .parent-card').getAttribute('href'),'/'+parent);
  pass('Reply cards retain a bounded clickable parent in Home, profiles, Search and Bookmarks without nested controls');
  const geometry=[];
  for(const scheme of ['light','dark'])for(const width of [320,390,768,1280]){
   await p.emulateMedia({colorScheme:scheme});await p.setViewportSize({width,height:844});await goto(p,'/'+child);
   const metrics=await p.locator('.note-detail').evaluate(el=>{const preview=el.querySelector('.parent-card'),summary=preview.querySelector('.context-copy'),body=el.querySelector('.note-body');return{parentHeight:preview.getBoundingClientRect().height,summaryHeight:summary.getBoundingClientRect().height,lineHeight:parseFloat(getComputedStyle(summary).lineHeight),replyTop:body.getBoundingClientRect().top,summaryBytes:new TextEncoder().encode(summary.textContent).length,overflow:document.documentElement.scrollWidth>innerWidth+1};});
-  assert(metrics.parentHeight<160,JSON.stringify(metrics));assert(metrics.summaryHeight<=metrics.lineHeight*3+1);assert(metrics.replyTop<460,JSON.stringify(metrics));assert(metrics.summaryBytes<=367);assert(!metrics.overflow);
+  // The stacked parent has a normal avatar/identity header, not the old small quote label.
+  assert(metrics.parentHeight<180,JSON.stringify(metrics));assert(metrics.summaryHeight<=metrics.lineHeight*3+1);assert(metrics.replyTop<460,JSON.stringify(metrics));assert(metrics.summaryBytes<=367);assert(!metrics.overflow);
   assert.equal(await p.locator('.note-detail .parent-card').count(),1);assert.equal(await p.locator('.reply-list #post-'+nested+' .parent-card').count(),0);geometry.push({scheme,width,...metrics});
  }
  fs.writeFileSync(path.join(output,'reply-geometry.json'),JSON.stringify(geometry,null,2));
@@ -46,22 +47,22 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
  // Content warnings must not leak the parent's underlying body through an excerpt.
  await goto(p,'/compose');const warningBody='Hidden parent content 8fb905';const created=await submit(p,'note',{body:warningBody,cw:'Spoilers',audience:'public',mode:'publish'});const warningParent=resourceId(created.headers().location);
  const warningChild=await reply(m,warningParent,'A safe reply to a warning.');await goto(g,'/'+warningChild);
- assert((await g.locator('.parent-card').innerText()).includes('Content warning: Spoilers'));assert(!(await g.content()).includes(warningBody));assert.equal(await g.locator('.parent-card img,.parent-card video,.parent-card audio').count(),0);
+ assert((await g.locator('.parent-card').innerText()).includes('Content warning: Spoilers'));assert(!(await g.content()).includes(warningBody));assert.equal(await g.locator('.parent-card img:not(.avatar img),.parent-card video,.parent-card audio').count(),0);
  const privateParent=await createPost(p,'Private parent d48649','members');const privateChild=await reply(m,privateParent,'Private child 90d091',{audience:'members'});
  const denied=await guest.request.get(base+'/'+privateChild);assert.equal(denied.status(),404);assert(!(await denied.text()).includes('Private parent'));assert(!(await denied.text()).includes('Private child'));
  pass('Warning text, private parents and private replies remain protected in previews and direct URLs');
  // Muting and deletion hide only the inaccessible parent context, not independent child content.
  const otherParent=await createPost(m,'Unique parent body cb7f56','public');const ownReply=await reply(p,otherParent,'Own reply that survives unavailable context.');
- await goto(p,'/profile?user=testmember');await click(p,form(p,'mute').locator('button'));await goto(p,'/'+ownReply);
+ await goto(p,'/@testmember');await click(p,form(p,'mute').locator('button'));await goto(p,'/'+ownReply);
  assert.equal(await p.locator('.note-detail .parent-card').count(),0);assert.equal(await p.locator('.note-detail .parent-unavailable').innerText(),'Original post unavailable.');assert(!(await p.content()).includes('Unique parent body cb7f56'));
  assert(!(await p.locator('main').innerText()).includes('save this reply as a draft'));assert((await p.locator('.note-detail .note-body').innerText()).includes('Own reply'));
  await goto(g,'/'+ownReply);assert.equal(await g.locator('.note-detail .parent-card').count(),1);
- await goto(p,'/profile?user=testmember');await click(p,form(p,'mute').locator('button'));await remove(m,otherParent);await goto(g,'/'+ownReply);
+ await goto(p,'/@testmember');await click(p,form(p,'mute').locator('button'));await remove(m,otherParent);await goto(g,'/'+ownReply);
  assert.equal(await g.locator('.parent-card').count(),0);assert(!(await g.content()).includes('Unique parent body cb7f56'));assert((await g.locator('.note-body').innerText()).includes('Own reply'));
  pass('Muted or deleted parents become a compact unavailable context without leaking text or showing editor instructions');
  // A real uploaded attachment is authorized through the child, not its parent.
  await goto(m,'/compose?reply='+parent);await m.locator('[name=body]').fill('An image attached to this reply.');await click(m,m.getByRole('button',{name:'Attach file',exact:true}));await click(m,m.getByRole('link',{name:'Upload',exact:true}));
- await m.locator('input[type=file]').setInputFiles(path.join(output,'media','landscape-2.png'));await Promise.all([m.waitForURL(u=>/^\/[a-f0-9]{64}\/edit$/.test(u.pathname)),m.getByRole('button',{name:'Upload',exact:true}).click()]);
+ await m.locator('input[type=file]').setInputFiles(path.join(output,'media','landscape-2.png'));await Promise.all([m.waitForURL(u=>/^\/(?:[0-9abcdefghjkmnpqrstvwxyz]{16}|[a-f0-9]{64})\/edit$/.test(u.pathname)),m.getByRole('button',{name:'Upload',exact:true}).click()]);
  const imageReply=resourceId(m.url());await click(m,m.getByRole('button',{name:'Post',exact:true}));await goto(g,'/'+imageReply);
  const image=g.locator('.note-detail .media-original img');await image.waitFor();await image.evaluate(el=>el.decode());assert(await image.evaluate(el=>el.naturalWidth>0));
  const imageURL=new URL(await image.getAttribute('src'),base);assert.equal(imageURL.searchParams.get('note'),imageReply);

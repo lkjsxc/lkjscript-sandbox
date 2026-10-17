@@ -17,7 +17,7 @@
     (returns Bool) (effect pure)
     (body (if (field (local form) (name valid)) (if (call util::unique (field (local form) (name items)) (i64 0)) (if (call controls::allowed (field (local form) (name items)) (local names) (i64 0)) (bool true) (bool false)) (bool false)) (bool false))))
 
-  (function create query (visibility public) (parameter create request (type Request)) (parameter create names (type (list Text))) (returns Bool) (effect pure) (body (if (call paging::valid-trail (call util::query (local request) (text "trail"))) (if (call admission::optional-fields (call util::parse (call std::bytes-from-text (field (local request) (name query)))) (local names)) (bool true) (bool false)) (bool false))))
+  (function create query (visibility public) (parameter create request (type Request)) (parameter create names (type (list Text))) (returns Bool) (effect pure) (body (if (if (call util::handle (call paths::member-id (field (local request) (name path)))) (call navigation::reading-cursor (call util::query (local request) (text "cursor"))) (bool true)) (if (call paging::valid-trail (call util::query (local request) (text "trail"))) (if (call admission::optional-fields (call util::parse (call std::bytes-from-text (field (local request) (name query)))) (local names)) (bool true) (bool false)) (bool false)) (bool false))))
 
   (test create login-complete (visibility private)
     (actual (call admission::valid (call util::parse (call std::bytes-from-text (text "intent=login&csrf=&handle=alice&password=long-password"))))) (expected (bool true)))

@@ -52,8 +52,8 @@ const {chromium,base,output,fs,path,assert,form,fields,click,goto,pass,session,s
  const nested=await createPost(p,'Independent non-reply must not count.','public');assert(nested);
  async function count(page,expected){await goto(page,'/'+parent);assert.equal(await page.locator('.note-detail .reply-count').innerText(),String(expected));assert.equal(await page.locator('.reply-list > article.note').count(),expected);}
  await count(p,2);await count(m,2);
- await goto(p,'/profile?user=testother');await click(p,form(p,'mute').locator('button'));await count(p,1);
- await goto(p,'/profile?user=testother');await click(p,form(p,'mute').locator('button'));await count(p,2);
+ await goto(p,'/@testother');await click(p,form(p,'mute').locator('button'));await count(p,1);
+ await goto(p,'/@testother');await click(p,form(p,'mute').locator('button'));await count(p,2);
  await goto(m,'/'+pub+'/edit');
  await m.getByRole('link',{name:'Delete post',exact:true}).click();await m.getByRole('dialog').waitFor();await click(m,m.getByRole('dialog').getByRole('button',{name:'Delete post',exact:true}));await count(p,1);
  await goto(g,'/'+parent);assert.equal(await g.locator('.reply-list > article.note').count(),0);assert(!(await g.locator('main').innerText()).includes('Counted members reply.'));

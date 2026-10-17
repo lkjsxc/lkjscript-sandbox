@@ -24,6 +24,7 @@ async function upload(page,file,draft='') {
   assert.equal(await p.getByLabel('File name',{exact:true}).count(),0);assert.equal(await p.getByLabel('Media description',{exact:true}).count(),0);
   pass('Text upload, unrestricted file chooser and safe original download');
   await p.locator('[name=tags]').fill('Travel, Work, travel, 日本語');await click(p,form(p,'file').locator('button'));
+  assert.equal(new URL(p.url()).pathname,'/drive');assert.equal(new URL(p.url()).hash,'#file-'+textId);await goto(p,'/'+textId);
   assert.equal(await p.locator('[name=tags]').inputValue(),'travel, work, 日本語');
   await goto(p,'/drive');assert.equal(await p.locator('input[type=search],select[name=kind],select[name=folder]').count(),0);
   assert.equal(await p.getByText('New folder',{exact:true}).count(),0);

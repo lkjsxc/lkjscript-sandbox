@@ -6,7 +6,7 @@ const {iconPaths,manifest}=require('./icon-catalog.cjs');
  const owner=await session(browser),member=await session(browser,'member'),guest=await browser.newContext({locale:'en-US'});
  const a=await owner.newPage(),m=await member.newPage(),g=await guest.newPage();
  const posts=load('posts'),media=load('media');const profileBefore=await owner.request.get(base+'/avatar?user=testowner');const originalAvatar=await profileBefore.body();
- const privateRoutes=['/','/compose','/saved','/notifications','/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/upload','/people','/profile?user=testowner','/search','/admin','/admin/invitations','/more','/about','/privacy','/terms','/guidelines','/contact','/'+posts.publicId,'/'+posts.protectedDraft+'/edit','/'+media.textId,'/pick?draft='+posts.protectedDraft];
+ const privateRoutes=['/','/compose','/saved','/notifications','/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/upload','/people','/@testowner','/search','/admin','/admin/invitations','/more','/about','/privacy','/terms','/guidelines','/contact','/'+posts.publicId,'/'+posts.protectedDraft+'/edit','/'+media.textId,'/pick?draft='+posts.protectedDraft];
  const guestRoutes=['/','/login','/join','/search','/more','/about','/privacy','/terms','/guidelines','/contact'];
  let rendered=0;
  for(const scheme of ['light','dark'])for(const width of [320,390,768,1280]){

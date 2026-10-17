@@ -28,12 +28,13 @@ first, rather than by the creation date of the underlying post. The existing
 append-ordered account list is traversed backwards; no data migration is needed.
 Removing and later adding a bookmark makes it the most recently bookmarked item.
 
-A Next control spans the same width as its feed. Traversing it adds a bounded
-history of exact native cursors, allowing Prev above the next list to restore the
-preceding page and its filters. Arithmetic guesses such as cursor plus 30 are
+Pagination sits below its collection in one native navigation landmark. Prev is
+on the left, with the larger Next control on the right; Next alone keeps the full
+width on the first page. Traversing it adds a bounded history of exact native
+cursors, allowing Prev to restore the preceding page and its filters. Arithmetic guesses such as cursor plus 30 are
 incorrect for sparse or filtered pages. A direct cursor URL with no preceding
-history offers First instead of inventing a previous destination. The mechanism
-works in native HTML without relying on JavaScript or browser history.
+history offers First instead of inventing a previous destination. Search maintains independent post and people cursor histories, and neither
+pager resets the other collection. The mechanism works in native HTML without relying on JavaScript or browser history.
 
 The cursor history contains only verified numeric positions and the initial-page
 sentinel, never a user-supplied destination URL. It is capped at 64 positions and

@@ -1,11 +1,11 @@
 // The same file and native cursor can be reused across many real posts. Loopback only.
-const {chromium,base,output,fs,path,assert,fields,click,goto,pass,session,load,save,resourceId,crypto}=require('./support.cjs');
+const {newPostId,chromium,base,output,fs,path,assert,fields,click,goto,pass,session,load,save,resourceId,crypto}=require('./support.cjs');
 (async()=>{const browser=await chromium.launch({headless:true});try{
  const owner=await session(browser),p=await owner.newPage();p.setDefaultTimeout(20000);const media=load('media');
  await goto(p,'/compose');const seed=await fields(p,'note');const posts=[];
  async function action(form){const r=await owner.request.post(base+'/action',{headers:{Origin:base},form,maxRedirects:0});assert.equal(r.status(),303,(await r.text()).slice(0,500));return r;}
  for(let i=0;i<33;i++){
-  const id=crypto.randomBytes(32).toString('hex'),body='Reusable file usage specimen '+String(i).padStart(2,'0');
+  const id=newPostId(),body='Reusable file usage specimen '+String(i).padStart(2,'0');
   await action({...seed,id,version:'0',reply:'',body,cw:'',audience:'members',mode:'picker'});
   await action({intent:'attach',csrf:seed.csrf,draft:id,id:media.textId,version:'1',enabled:'1',destination:'compose'});
   await action({...seed,id,version:'2',reply:'',body,cw:'',audience:'members',mode:'publish'});posts.push(id);

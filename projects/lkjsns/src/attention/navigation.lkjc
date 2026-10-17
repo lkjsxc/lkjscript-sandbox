@@ -8,8 +8,7 @@
     (body (if (call std::text-equal (local direction) (text "from")) (text "Attention from") (text "Attention to"))))
 
   (function create base (visibility public) (parameter create subject (type Text)) (parameter create direction (type Text))
-    (returns Text) (effect pure)
-    (body (call std::text-join (list Text (text "/attention?user=") (local subject) (text "&direction=") (local direction) (text "&")) (text ""))))
+    (returns Text) (effect pure) (body (call std::text-join (list Text (call paths::profile (local subject)) (text "/attention/") (local direction) (text "?")) (text ""))))
 
   (function create valid (visibility public) (parameter create subject (type Text)) (parameter create direction (type Text))
     (parameter create cursor (type Text)) (parameter create trail (type Text)) (parameter create target (type Text))
@@ -36,11 +35,11 @@
     (returns Text) (effect pure)
     (body (if (call attentionnav::valid (local subject) (local direction) (local cursor) (local trail) (local target))
       (if (call std::text-equal (local direction) (text "profile"))
-        (call std::text-join (list Text (text "/profile?user=") (local subject)) (text ""))
+        (call std::text-join (list Text (text "/@") (local subject)) (text ""))
         (call paging::with-trail (call std::text-join (list Text
           (call paging::root (call attentionnav::base (local subject) (local direction)))
           (if (call std::text-equal (local cursor) (text "")) (text "")
-            (call std::text-join (list Text (text "&cursor=") (local cursor)) (text "")))
+            (call std::text-join (list Text (text "?cursor=") (local cursor)) (text "")))
           (text "#attention-") (local target)) (text "")) (local trail)))
       (text "/"))))
 
@@ -52,10 +51,10 @@
 
   (test create preserve-direction-page-and-trail (visibility private)
     (actual (call attentionnav::return-to (text "alice") (text "from") (text "20") (text "_.50") (text "bravo")))
-    (expected (text "/attention?user=alice&direction=from&cursor=20&trail=_.50#attention-bravo")))
+    (expected (text "/@alice/attention/from?cursor=20&trail=_.50#attention-bravo")))
   (test create profile-return (visibility private)
     (actual (call attentionnav::return-to (text "bravo") (text "profile") (text "") (text "") (text "bravo")))
-    (expected (text "/profile?user=bravo")))
+    (expected (text "/@bravo")))
   (test create reject-external-subject (visibility private)
     (actual (call attentionnav::return-to (text "//evil.test") (text "from") (text "") (text "") (text "bravo"))) (expected (text "/")))
   (test create reject-direction-injection (visibility private)

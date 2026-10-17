@@ -26,8 +26,9 @@ administration, and service information. Settings contains profile/security
 settings and sign-out rather than a second site map. About is no longer pinned
 to the sidebar footer. Every product-owned label remains English.
 
-Bookmarks put the most recently bookmarked item first. Next spans its feed's
-width, and a top Prev restores the exact preceding page and filter. The bounded
+Bookmarks put the most recently bookmarked item first. One pagination row sits
+below each collection: Prev on the left and Next on the right. On the first page,
+Next retains the full available width. Prev restores the preceding page and filter. The bounded
 native cursor trail also survives reactions and attachment selection; it works
 without JavaScript. Direct cursor URLs without a preceding trail offer First.
 
@@ -57,6 +58,10 @@ service documents describe the implementation, not unimplemented encryption,
 automated account deletion, or a promise of immediate backup erasure. See
 [operator responsibilities](docs/OPERATOR-RESPONSIBILITIES.md).
 
+Successful profile saves return to the profile. Post saves return to the post;
+file settings return to Drive or to the same writing context when opened from
+the composer. Invalid or conflicting edits remain recoverable in the editor.
+
 ## Drive and profile images
 
 Drive accepts **any file type up to 256 MiB**. Multiple private tags replace the
@@ -79,10 +84,13 @@ separate Attach or Use as profile image buttons. Upload sits beside the storage
 meter. File tiles have inset text padding, and Used in renders normal post cards
 with native actions that return to the same file page.
 
-Posts and files use `/<id>` addresses, with `/<id>/edit` for published editing and
-`/<id>/raw` for originals. Existing query-style resource links redirect to these
-addresses. Invitation counts and durations no longer have the old 20-person/
-30-day caps; blank fields explicitly mean unlimited uses or no expiration.
+New posts and working copies use 16-character IDs at `/<post-id>` and
+`/<post-id>/edit`. Existing 64-character posts retain their stored identity and
+redirect through an indexed short alias. File/object IDs stay full-length, with
+`/<file-id>/raw` for originals. Profiles use `/@handle`; relationship lists use
+`/@handle/attention/to` and `/@handle/attention/from`. Old query-style resource and
+profile links remain compatible without letting query values override a path.
+Invitation counts and durations no longer have the old 20-person/30-day caps; blank fields explicitly mean unlimited uses or no expiration.
 
 ## Native server and bounded transfer
 
@@ -101,9 +109,12 @@ work with JavaScript disabled. Files larger than 32 MiB require JavaScript for
 uploading and full-file downloading. Media HEAD is deliberately unsupported: an
 authorized request returns 405 with Allow: GET, not incorrect zero-length metadata.
 
-Reply cards show their immediate parent as a bounded, readable preview. Long
-parents do not push the reply body out of view, and warnings/private/deleted
-parents retain their access boundaries. The site includes native SVG/ICO favicons
+Replies show their immediate parent above the reply as a separate, normally
+colored post preview, connected with a quiet line rather than a nested quote box.
+Long parents do not push the reply body out of view, and warnings/private/deleted
+parents retain their access boundaries. An individual post has Back at the top,
+separate from reply pagination, with native safe fallback and optional restoration
+of the original reading page and scroll position. The site includes native SVG/ICO favicons
 and a touch icon based on lkjsxc's personal four-panel/white-circle artwork,
 with slightly adjusted colors and outlined lkjsns lettering, clipped to a circle
 with transparent corners in every SVG/ICO/PNG representation. Content-versioned
@@ -159,7 +170,9 @@ interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [attention relationships](docs/ATTENTION.md),
+See [reading flow and resource addresses](docs/READING-FLOW.md),
+[collection-local pagination](docs/PAGINATION.md),
+[attention relationships](docs/ATTENTION.md),
 [circular identity](docs/CIRCULAR-IDENTITY.md),
 [quiet workflows](docs/QUIET-WORKFLOWS.md),
 [the profile-derived favicon](docs/PERSONAL-FAVICON.md),

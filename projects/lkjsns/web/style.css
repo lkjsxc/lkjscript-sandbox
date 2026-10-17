@@ -205,7 +205,7 @@ button,a.button{scroll-margin-block:100px}.note-actions .button,.note-actions bu
 @media(max-width:720px){.note>.parent-card{padding:10px 12px}.parent-card .context-copy{font-size:.82rem}.parent-card .eyebrow{font-size:.73rem}}
 
 /* Quiet writing, spacious paging, and a single storage action row. */
-.pager{display:block;padding:18px 0}.pager .button{display:flex;width:100%;min-height:54px;justify-content:center;border-radius:12px}.pager-prev{padding:0 0 18px}.pager-prev svg{transform:rotate(180deg)}
+.pager{display:flex;align-items:stretch;justify-content:flex-start;gap:12px;padding:18px 0}.pager .button{display:flex;min-height:54px;justify-content:center;border-radius:12px;min-width:0}.pager .pager-next{flex:1}.pager .pager-prev{flex:0 0 112px}.pager-prev svg{transform:rotate(180deg)}.pager:empty{display:none}
 .drive-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}.drive-header .quota{flex:1;min-width:0;margin:0}.drive-header>.button{flex:none;min-height:48px}.drive-header .quota progress{margin:10px 0 0}
 .composer .attachment-button{margin-right:auto}.composer .form-actions .primary{min-width:112px}.composer .form-actions .delete-link{margin-right:0}.composer-footer{display:flex;justify-content:flex-end;margin-top:18px}
 .usage-heading{display:flex;align-items:center;gap:14px;margin:24px 0 12px}.usage-heading h2{font-size:.94rem}.usage-posts{overflow:clip}.writing-use .note-body{margin-bottom:14px}.writing-use .meta{margin-top:12px}
@@ -236,3 +236,21 @@ button,a.button{scroll-margin-block:100px}.note-actions .button,.note-actions bu
 @media(max-width:360px){.attention-row{flex-wrap:wrap;gap:0}.attention-person{flex-basis:100%;padding-bottom:10px}.attention-row>form{margin:0 0 17px 52px}.attention-toggle{min-width:120px}}
 
 .activity-tabs a{white-space:normal;text-align:center;line-height:1.35}
+
+/* A conversation is two stacked posts, never a colored quote inside its reply. */
+.conversation-pair{position:relative;border-bottom:1px solid var(--line);min-width:0}
+.conversation-pair:last-child{border-bottom:0}.conversation-pair>.note{border-bottom:0}
+.parent-card.reply-preview{position:relative;margin:0;padding:24px 28px 16px;border:0;border-radius:0;background:transparent;color:var(--ink);outline:none}
+.parent-card.reply-preview:hover{background:transparent;color:var(--ink);outline:none}
+.parent-card .parent-identity{display:flex;align-items:center;gap:11px;margin:0 0 12px}
+.parent-person{display:flex;flex-direction:column;min-width:0;gap:2px}.parent-person>strong{font-size:.87rem;font-weight:600;line-height:1.5;color:var(--ink)}
+.parent-card .context-copy{margin-left:49px;font-size:.97rem;line-height:1.65;max-height:4.95em;color:var(--ink)}
+.conversation-pair>.parent-card::after{content:"";position:absolute;left:46px;top:68px;bottom:-24px;width:2px;background:var(--line);pointer-events:none}
+.conversation-pair>.note{padding-top:16px}.conversation-pair>.parent-unavailable{padding:20px 28px 0;margin:0;font-size:.82rem;color:var(--muted)}
+.composer .parent-card.reply-preview{padding:0 0 22px;margin:0 0 20px;border-bottom:1px solid var(--line)}
+.parent-card:focus-visible{outline:2px solid var(--accent)!important;outline-offset:-3px}
+.post-navigation{display:flex;align-items:center;margin:0 0 12px;min-height:44px}
+.back-link{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:8px 12px;border-radius:10px;font-size:.9rem;font-weight:500}
+.back-link svg{width:20px;height:20px;transform:rotate(180deg)}.back-link:hover{background:var(--surface)}
+@media(max-width:720px){.post-navigation{padding:5px 6px 0;margin:0 0 6px}.parent-card.reply-preview{padding:22px 18px 14px}.parent-card .context-copy{font-size:1rem;margin-left:49px}.conversation-pair>.parent-card::after{left:36px;top:65px;bottom:-23px}.conversation-pair>.parent-unavailable{padding:18px 18px 0}.conversation-pair>.note{padding-top:14px}}
+@media(forced-colors:active){.conversation-pair>.parent-card::after{background:CanvasText}.back-link:focus-visible{outline:2px solid Highlight}}

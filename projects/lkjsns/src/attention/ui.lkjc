@@ -40,7 +40,7 @@
     (parameter create request (type Request))
     (returns Text) (effect pure)
     (body (call std::text-join (list Text (text "<div class=\"attention-row\" id=\"attention-")
-      (call std::html-escape-text (field (local user) (name handle))) (text "\"><a class=\"attention-person\" href=\"/profile?user=")
+      (call std::html-escape-text (field (local user) (name handle))) (text "\"><a class=\"attention-person\" href=\"/@")
       (call std::html-escape-text (field (local user) (name handle))) (text "\">")
       (call page::avatar (field (local user) (name handle)))
       (text "<span class=\"attention-identity\"><strong>") (call std::html-escape-text (field (local user) (name display)))

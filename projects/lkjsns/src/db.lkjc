@@ -65,7 +65,7 @@
   (function create note
     (visibility public) (parameter create id (type Text))
     (returns Note) (effect (task (requirement service::app::store)))
-    (body (let (binding entries (call db::read (text "note") (local id))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-note) (call std::data-decode-or (types Note) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-note)))))))
+    (body (let (binding entries (call db::read (text "note") (call db::post-key (local id)))) (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local entries)) (i64 0)) (call db::empty-note) (call std::data-decode-or (types Note) (field (call std::list-get (types std::DataEntry) (local entries) (i64 0)) std::DataEntry::value) (call db::empty-note)))))))
 
   (function create save-note
     (visibility public) (parameter create value (type Note))
@@ -151,4 +151,14 @@
     (visibility public)
     (returns Unit) (effect (task (requirement service::app::store)))
     (body (sequence (call db::put (text "schema") (text "version") (call std::data-encode (types Text) (text "lkjsns-v1"))) (unit))))
+
+  (function create post-key (visibility public) (parameter create id (type Text))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (if (call util::short-valid (local id))
+      (let (binding rows (call db::read (text "post-alias") (local id)))
+        (in (if (call std::i64-equal (call std::list-length (types std::DataEntry) (local rows)) (i64 0)) (local id)
+          (let (binding original (call std::data-decode-or (types Text)
+            (field (call std::list-get (types std::DataEntry) (local rows) (i64 0)) std::DataEntry::value) (text "")))
+            (in (if (call util::token (local original)) (local original) (text ""))))))) (local id))))
+
 )

@@ -34,13 +34,17 @@ const {resourceId,isResource,isEditor,chromium,base,assert,click,goto,pass,sessi
   const replies=load('reply-regressions');await goto(p,'/'+replies.child);assert.equal(await p.locator('.note-detail .parent-card').getAttribute('href'),'/'+replies.parent);assert.equal(await p.locator('.reply-list #post-'+replies.nested).count(),1);assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),iconPaths.svg);
   assert.equal((await clean.request.get(base+'/favicon.ico')).status(),200);pass('Reply context, nested thread membership and favicon delivery survive a native restart');
 
-  const attention=load('attention');await goto(p,'/attention?user=testowner&direction=from');
-  const readPeople=()=>p.locator('.attention-person').evaluateAll(es=>es.map(e=>new URL(e.href).searchParams.get('user')));
+  const attention=load('attention');await goto(p,'/@testowner/attention/from');
+  const readPeople=()=>p.locator('.attention-person').evaluateAll(es=>es.map(e=>new URL(e.href).pathname.split('/')[1].slice(1)));
   const first=await readPeople();assert.deepEqual(first,attention.firstPage);
   await click(p,p.getByRole('link',{name:'Next',exact:true}));const second=await readPeople();
   assert.equal(new Set([...first,...second]).size,attention.expectedIncoming);
-  await goto(p,'/attention?user=testowner&direction=to');assert.deepEqual(await readPeople(),['testmember']);
+  await goto(p,'/@testowner/attention/to');assert.deepEqual(await readPeople(),['testmember']);
   pass('Both attention indexes, relation state and paginated member lists survive a native server restart');
+
+  const flow=load('reading-flow');await goto(p,'/'+flow.child);assert.equal(await p.locator('.note-detail .parent-card').getAttribute('href'),'/'+flow.parent);assert.equal(await p.locator('[data-post-back]').count(),1);
+  await goto(p,'/'+flow.draft+'/edit');assert.equal(await p.locator('[name=body]').inputValue(),'Keep this writing context through file settings.');
+  pass('Short post IDs, stacked reply identity, Back links and unpublished working copies survive native restart');
 
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

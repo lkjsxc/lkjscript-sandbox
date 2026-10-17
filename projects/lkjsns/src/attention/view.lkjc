@@ -44,7 +44,7 @@
       (in (if (call activity::scan-next (local rows) (field (local listing) (name next)) (local remaining))
         (call attentionview::collection (local ctx) (local viewer) (local subject) (local direction)
           (call std::i64-to-text (field (local listing) (name next))) (call std::subtract (local remaining) (i64 1)) (local request))
-        (call std::text-join (list Text (call paging::previous (local request) (local base))
+        (call std::text-join (list Text (text "")
           (text "<section class=\"panel attention-list\" aria-label=\"") (call attentionnav::label (local direction)) (text "\">")
           (if (call std::text-equal (local rows) (text ""))
             (if (call std::less-equal (i64 0) (field (local listing) (name next)))
@@ -53,7 +53,7 @@
                 (if (call std::text-equal (local direction) (text "from"))
                   (text "Attention from people will appear here.") (text "People given attention will appear here."))
                 (text "/people") (text "Find people"))) (local rows))
-          (text "</section>") (call paging::next (local request) (field (local listing) (name next)) (local base))) (text "")))))))
+          (text "</section>") (call paging::controls (local request) (field (local listing) (name next)) (local base))) (text "")))))))
 
   (function create view (visibility public) (parameter create ctx (type Context)) (parameter create request (type Request))
     (returns Response) (effect (task (requirement service::app::store)))

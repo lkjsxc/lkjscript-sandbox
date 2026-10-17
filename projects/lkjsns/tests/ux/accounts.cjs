@@ -15,7 +15,7 @@ const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,asser
   await click(p,form(p,'join').locator('button')); assert.equal(new URL(p.url()).pathname,'/');
   pass('Real browser bootstrap registration');
   assert.deepEqual(await p.locator('.nav a').allTextContents(),['Home','Search','Notifications','Bookmarks','Drive','Settings','More']);
-  assert.equal(await p.locator('.account-identity').getAttribute('href'),'/profile?user=testowner');
+  assert.equal(await p.locator('.account-identity').getAttribute('href'),'/@testowner');
   assert((await p.locator('h1').getAttribute('class')).includes('sr-only')); assert.equal(await p.getByRole('link',{name:'Refresh',exact:true}).count(),0);
   pass('Primary navigation and account identity destinations');
   await goto(p,'/settings'); assert.equal(await p.locator('h1').innerText(),'Settings');
@@ -25,9 +25,9 @@ const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,asser
   assert.equal(await p.locator('a[href="/drafts"]').count(),0);
   pass('More contains navigation and service information; Settings contains only settings');
   await goto(p,'/settings/profile'); await p.locator('[name=display]').fill('Alex Morgan'); await p.locator('[name=bio]').fill('A quiet place to share things.');
-  await click(p,form(p,'profile').locator('button')); assert.equal(new URL(p.url()).pathname,'/settings/profile');
-  assert.equal(await p.locator('[name=display]').inputValue(),'Alex Morgan');
-  await goto(p,'/profile?user=testowner'); assert((await p.locator('h1').getAttribute('class')).includes('sr-only'));
+  await click(p,form(p,'profile').locator('button')); assert.equal(new URL(p.url()).pathname,'/@testowner');
+  assert.equal(await p.locator('.profile>h2').innerText(),'Alex Morgan');assert.equal(await form(p,'profile').count(),0);
+  await goto(p,'/@testowner'); assert((await p.locator('h1').getAttribute('class')).includes('sr-only'));
   pass('Profile settings child and nonredundant public profile heading');
   await goto(p,'/settings/security'); assert.equal(await p.locator('[name=old]').count(),1);
   await goto(p,'/admin'); assert.equal(await p.locator('h1').innerText(),'Admin');

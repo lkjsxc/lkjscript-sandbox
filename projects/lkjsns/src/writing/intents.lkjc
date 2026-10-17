@@ -35,7 +35,7 @@
     (parameter create id (type Text)) (parameter create mode (type Text))
     (parameter create published (type Bool))
     (returns Text) (effect pure)
-    (body (if (call util::token (local id))
+    (body (if (call util::post-id (local id))
       (if (local published)
         (call paths::canonical (call std::text-join (list Text (text "/note?id=") (local id) (text "&saved=1")) (text "")))
         (if (call std::text-equal (local mode) (text "picker"))
@@ -81,7 +81,7 @@
   (test create preview-is-owner-editor-location (visibility private)
     (actual (call writingintents::location
       (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") (text "preview") (bool false)))
-    (expected (text "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/edit?preview=1")))
+    (expected (text "/nananananananana/edit?preview=1")))
   (test create upload-retains-draft (visibility private)
     (actual (call writingintents::location
       (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") (text "upload") (bool false)))
@@ -89,7 +89,7 @@
   (test create published-returns-to-post (visibility private)
     (actual (call writingintents::location
       (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") (text "preview") (bool true)))
-    (expected (text "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?saved=1")))
+    (expected (text "/nananananananana?saved=1")))
   (test create invalid-id-cannot-inject-query (visibility private)
     (actual (call writingintents::location (text "bad&next=elsewhere") (text "upload") (bool false)))
     (expected (text "/drafts")))

@@ -26,6 +26,7 @@ cleanup(){ if [[ -n "$pid" ]];then kill -TERM "$pid" 2>/dev/null || true;wait "$
 trap cleanup EXIT
 start(){
  bash "$ROOT/ops/index-attention.sh" "$fixture/service.json" >> "$output/attention-index.log" 2>&1
+ bash "$ROOT/ops/index-posts.sh" "$fixture/service.json" >> "$output/post-index.log" 2>&1
  "$LKJ" serve --deployment "$fixture/service.json" >> "$output/server.log" 2>&1 & pid=$!
  export LKJSNS_TEST_SERVER_PID=$pid
  for _ in $(seq 1 150);do if curl -fsS --max-time 2 "$LKJSNS_TEST_URL/healthz" >/dev/null 2>&1;then return;fi;sleep .2;done
@@ -33,7 +34,7 @@ start(){
 }
 start
 node tests/browser/media-fixtures.cjs
-for suite in ${LKJSNS_UX_SUITES:-accounts writing media search security direct-interactions transfer-recovery layout large replies quiet quiet-paging quiet-files quiet-content attention self-profile favicons brand no-script};do
+for suite in ${LKJSNS_UX_SUITES:-accounts writing media search security direct-interactions transfer-recovery layout large replies quiet quiet-paging quiet-files quiet-content attention self-profile favicons brand no-script pager-all reading-flow};do
  echo "--- $suite";node "tests/ux/$suite.cjs" 2>&1 | tee "$output/$suite.log"
 done
 "$LKJ" data verify --root "$fixture/data" > "$output/data-verify.log"

@@ -16,7 +16,7 @@ const {resourceId,isResource,isEditor,chromium,base,output,path,assert,form,clic
   await goto(g,'/search?q=constellation');assert.equal(await g.locator('article.note').count(),0);
   for(const page of [p,m,g]){await goto(page,'/search?q=nebula');assert.equal(await page.locator('article.note').count(),0);}
   pass('Search rechecks Members visibility and never exposes unpublished drafts');
-  await goto(p,'/search?q=Alex');assert(await p.locator('.member').count()||await p.locator('.member-row').count()||await p.locator('.member-list a[href="/profile?user=testowner"]').count());
+  await goto(p,'/search?q=Alex');assert(await p.locator('.member').count()||await p.locator('.member-row').count()||await p.locator('.member-list a[href="/@testowner"]').count());
   await goto(g,'/search?q=Alex');assert.equal(await g.locator('.member-list').count(),0);
   pass('Member name search is available only to registered viewers');
   const japanese=await createPost(p,'日本語の検索も、余計なフィルターなしで。','public');
@@ -29,10 +29,10 @@ const {resourceId,isResource,isEditor,chromium,base,output,path,assert,form,clic
   pass('Japanese matching and escaped query/post output');
   const otherPost=await createPost(m,'A distinctive telescope update from a member.','public');
   await goto(p,'/search?q=telescope');assert.equal(await p.locator('article.note').count(),1);
-  await goto(p,'/profile?user=testmember');const mute=form(p,'mute');
+  await goto(p,'/@testmember');const mute=form(p,'mute');
   if(await mute.locator('button').getAttribute('aria-pressed')!=='true')await click(p,mute.locator('button'));
   await goto(p,'/search?q=telescope');assert.equal(await p.locator('article.note').count(),0);
-  await goto(p,'/profile?user=testmember');await click(p,form(p,'mute').locator('button'));
+  await goto(p,'/@testmember');await click(p,form(p,'mute').locator('button'));
   await goto(p,'/search?q=telescope');assert.equal(await p.locator('article.note').count(),1);
   await goto(m,'/compose?id='+otherPost);await m.getByRole('link',{name:'Delete post',exact:true}).click();await m.getByRole('dialog').waitFor();await click(m,m.getByRole('button',{name:'Delete post',exact:true}));
   await goto(g,'/search?q=telescope');assert.equal(await g.locator('article.note').count(),0);

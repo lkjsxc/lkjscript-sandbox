@@ -61,6 +61,9 @@ apply_fragment account-codec "$ROOT/src/attention/accountcodec.lkjc"
 for name in db preferences page assets auth access codec social compose notes drive; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
+apply_fragment post-ids "$ROOT/src/reading/postids.lkjc"
+apply_fragment post-index "$ROOT/src/reading/postindex.lkjc"
+apply_fragment reading-return "$ROOT/src/reading/returnnav.lkjc"
 apply_fragment attention-store "$ROOT/src/attention/store.lkjc"
 apply_fragment attention-migration "$ROOT/src/attention/migration.lkjc"
 for name in controls navigation; do

@@ -37,6 +37,7 @@
       (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-7))
     (port create unavailable-8 (type (task-function (Request Text Text Text Text Text Text Text Text) Response
       (row (requirement store) (requirement clock) (requirement entropy) (requirement config) (requirement passwords) (requirement bootstrap) (requirement objects) (requirement streams)))) (function unavailable::missing-8))
+    (port create post-index (type (task-function () I64 (row (requirement store)))) (function postindex::run))
     (port create attention-index (type (task-function () I64 (row (requirement store)))) (function attentionmigration::run))
   ))
 (target create lkjsns (component service::app) (runner http)
@@ -144,3 +145,5 @@
 )
 
 (target create attention-index (component service::app) (runner command) (port service::app::attention-index))
+
+(target create post-index (component service::app) (runner command) (port service::app::post-index))

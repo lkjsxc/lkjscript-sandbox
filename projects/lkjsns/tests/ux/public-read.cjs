@@ -23,7 +23,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
     assert(response.headers()['content-security-policy'].includes("script-src 'self'"));checks.push(`${scheme} ${width}px ${route}`);
    }
   }
-  for(const route of ['/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/drafts','/saved','/notifications','/admin','/admin/invitations','/compose','/attention?user=lkjsxc&direction=to','/attention?user=lkjsxc&direction=from']) {
+  for(const route of ['/settings','/settings/profile','/settings/security','/settings/avatar','/drive','/drafts','/saved','/notifications','/admin','/admin/invitations','/compose','/@lkjsxc/attention/to','/@lkjsxc/attention/from']) {
    const r=await context.request.get(origin+route,{maxRedirects:0});assert.equal(r.status(),303,route);assert.equal(r.headers().location,'/login',route);
   }checks.push('Thirteen private routes, including both attention directions, require native sign-in');
   for(const [route,file] of [['/style.css','style.css'],['/ui.js','ui.js'],['/transfer.js','transfer.js']]) {
@@ -33,8 +33,8 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
    const response=await p.goto(origin+route);assert.equal(response.status(),404);assert.equal(await p.locator('main h1').innerText(),'This page is unavailable');
    assert.equal(await p.getByRole('link',{name:'Sign in',exact:true}).count(),0);await checkPageBrand(p);
   }checks.push('Unknown public paths render the branded unavailable page');
-  const absent='f'.repeat(64);const legacy=await context.request.get(origin+'/note?id='+absent,{maxRedirects:0});assert.equal(legacy.status(),303);assert.equal(legacy.headers().location,'/'+absent);
-  const duplicate=await context.request.get(origin+'/'+absent+'?id='+absent);assert.equal(duplicate.status(),400);checks.push('Root-ID redirects and path-authoritative query validation');
+  const absent='f'.repeat(64);const legacy=await context.request.get(origin+'/note?id='+absent,{maxRedirects:0});assert.equal(legacy.status(),404);assert.equal(legacy.headers().location,undefined);
+  const duplicate=await context.request.get(origin+'/'+absent+'?id='+absent);assert.equal(duplicate.status(),400);checks.push('Missing legacy posts and conflicting path identities fail closed');
   for(const [route,file] of [['/favicon.svg','favicon.svg'],['/favicon.ico','favicon.ico'],['/favicon-32.png','favicon-32.png'],['/apple-touch-icon.png','apple-touch-icon.png']]) {const r=await context.request.get(origin+route);assert.equal(r.status(),200);assert.deepEqual(await r.body(),fs.readFileSync(path.join(root,'web',file)));}checks.push('Public favicon/touch assets exactly match the selected source');
   for(const [key,file]of [['svg','favicon.svg'],['ico','favicon.ico'],['png','favicon-32.png'],['touch','apple-touch-icon.png']]){const r=await context.request.get(origin+iconPaths[key]);assert.equal(r.status(),200);assert.deepEqual(await r.body(),fs.readFileSync(path.join(root,'web',file)));}checks.push('Content-versioned personal favicon aliases match the outlined lkjsns artwork');
   await checkPublicAssets(context.request,origin,fs,path,root);checks.push('All six shared brand assets, previous URLs, Apple fallback and application manifest match reviewed source bytes');

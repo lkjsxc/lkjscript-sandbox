@@ -20,7 +20,7 @@ const CHUNK=4*1024*1024;
   assert.deepEqual(seen,[0,1,2]);await p.unroute('**/upload/part?**');
   pass('Browser resume recovers a lost acknowledgement without resending saved parts');
   const guest=await browser.newContext();assert.equal((await guest.request.get(base+'/'+id+'/raw')).status(),404);
-  await goto(p,'/file?id='+id);const before=await fields(p,'file');await p.locator('[name=tags]').fill('first');await click(p,form(p,'file').locator('button'));
+  await goto(p,'/file?id='+id);const before=await fields(p,'file');await p.locator('[name=tags]').fill('first');await click(p,form(p,'file').locator('button'));assert.equal(new URL(p.url()).pathname,'/drive');await goto(p,'/'+id);
   const conflict=await context.request.post(base+'/action',{headers:{Origin:base},form:{...before,tags:'submitted, retry'},maxRedirects:0});assert.equal(conflict.status(),409);
   const html=await conflict.text();assert(html.includes('submitted, retry'));await goto(p,'/file?id='+id);assert.equal(await p.locator('[name=tags]').inputValue(),'first');
   pass('A file metadata conflict preserves submitted tags while keeping the newest saved version');

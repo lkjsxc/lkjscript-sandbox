@@ -2,7 +2,7 @@
   (function create visible
     (visibility public) (parameter create ctx (type Context)) (parameter create note (type Note))
     (returns Bool) (effect pure)
-    (body (if (call util::token (field (local note) (name id))) (if (call std::bool-not (field (local note) (name deleted))) (if (if (call std::text-equal (field (local ctx) (name user)) (field (local note) (name author))) (bool true) (if (if (field (local note) (name published)) (if (if (call std::text-equal (field (local note) (name audience)) (text "public")) (bool true) (if (if (call util::signed (local ctx)) (if (call std::text-equal (field (local note) (name audience)) (text "members")) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool false))))
+    (body (if (call util::post-id (field (local note) (name id))) (if (call std::bool-not (field (local note) (name deleted))) (if (if (call std::text-equal (field (local ctx) (name user)) (field (local note) (name author))) (bool true) (if (if (field (local note) (name published)) (if (if (call std::text-equal (field (local note) (name audience)) (text "public")) (bool true) (if (if (call util::signed (local ctx)) (if (call std::text-equal (field (local note) (name audience)) (text "members")) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool true) (bool false))) (bool true) (bool false)) (bool false)) (bool false))))
 
   (function create media
     (visibility public) (parameter create ctx (type Context)) (parameter create media (type Media)) (parameter create note (type Note))
