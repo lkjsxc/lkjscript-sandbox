@@ -1,17 +1,17 @@
 # lkjsns checkpoint — October 17, 2026
 
-The reading-flow release is live in Coder workspace **devmain**, agent **main**,
-public port **8793**. Cutover completed at **2026-10-17 14:27:21 JST**.
+The modernized pager UX release (Older/Newer labels and balanced flex layout) is live in Coder workspace **devmain**, agent **main**,
+public port **8793**. Cutover completed at **2026-10-17 16:17:02 JST**.
 Existing accounts, posts, private working copies, media and the actual lkjsxc
 profile image were preserved.
 
-Executable source: `3c750cb9005456593923d9c5480ab4dbe6f5c83e`
+Executable source: `9a17c82d45216a137c0c4c0bcf7f6c57b628101c`
 
 Application SHA-256:
-`d9c8f5d9169c46bf9e1f32a25b6075608c2b1a778c177e36cb28e2e7646e2c22`
+`b2c4de6e78813894765588eaedd1d4ce6ed20c92e5c9b1d4d725d15d1ca14714`
 
 Native graph:
-`rev_18b30daec91a23471842fb901930df013f4f3f0e922bb4726585167320c23a11`
+`rev_516689006d06e98281143e0a46684abf8dff6669368a7a408313b649b5fc5561`
 
 Runtime remains checksum-pinned lkjscript **0.1.89**. The final exact candidate
 passed **650 native tests**, **139 full browser groups**, a separate **39-resource
