@@ -17,12 +17,12 @@
   (function create host-ok
     (visibility public) (parameter create request (type Request))
     (returns Bool) (effect (task (requirement service::app::config)))
-    (body (let (binding origin (call auth::origin)) (binding prefix (if (call auth::secure) (i64 8) (i64 7))) (in (if (if (call auth::secure) (bool true) (if (call std::text-starts-with (local origin) (text "http://127.0.0.1:")) (bool true) (bool false))) (if (call std::text-equal (call util::header (local request) (text "host")) (call util::slice (local origin) (local prefix) (call util::size (local origin)))) (bool true) (bool false)) (bool false))))))
+    (body (let (binding origin (call auth::origin)) (binding prefix (if (call auth::secure) (i64 8) (i64 7))) (in (if (if (call auth::secure) (bool true) (if (call std::text-starts-with (local origin) (text "http://127.0.0.1:")) (bool true) (bool false))) (if (if (call std::text-equal (call util::header (local request) (text "host")) (text "lkjsns.lkjsxc.com")) (bool true) (if (call std::text-equal (call util::header (local request) (text "host")) (call util::slice (local origin) (local prefix) (call util::size (local origin)))) (bool true) (bool false))) (bool true) (bool false)) (bool false))))))
 
   (function create write-ok
     (visibility public) (parameter create request (type Request))
     (returns Bool) (effect (task (requirement service::app::config)))
-    (body (if (call auth::host-ok (local request)) (if (call std::text-equal (call util::header (local request) (text "origin")) (call auth::origin)) (bool true) (bool false)) (bool false))))
+    (body (if (call auth::host-ok (local request)) (if (if (call std::text-equal (call util::header (local request) (text "origin")) (call auth::origin)) (bool true) (if (call std::text-equal (call util::header (local request) (text "origin")) (text "https://lkjsns.lkjsxc.com")) (bool true) (bool false))) (bool true) (bool false)) (bool false))))
 
   (function create guest
     (visibility public) (parameter create now (type I64))
