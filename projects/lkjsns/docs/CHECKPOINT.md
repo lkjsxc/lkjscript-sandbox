@@ -1,60 +1,62 @@
 # lkjsns checkpoint — October 17, 2026
 
-The redundant **You** badge is removed from the viewer's own profile. The fix is
-live in Coder workspace **devmain**, agent **main**, public port **8793**, since
-**2026-10-17 04:06:06 JST**. Other profile badges and list identity are unchanged.
+The reading-flow release is live in Coder workspace **devmain**, agent **main**,
+public port **8793**. Cutover completed at **2026-10-17 14:27:21 JST**.
+Existing accounts, posts, private working copies, media and the actual lkjsxc
+profile image were preserved.
 
-Executable source: `864d16814ef77b8f22a5da0bc453bd14e0a42255`
+Executable source: `3c750cb9005456593923d9c5480ab4dbe6f5c83e`
 
 Application SHA-256:
-`611d0fa2e469066a4749f510df08f829f8e8eb65de1cdec76e95844e3b892205`
+`d9c8f5d9169c46bf9e1f32a25b6075608c2b1a778c177e36cb28e2e7646e2c22`
 
 Native graph:
-`rev_4439c2926d26f4afa97ce4ba2ef6a73442bf9e9c1160bcd08e511f365dc6088c`
+`rev_18b30daec91a23471842fb901930df013f4f3f0e922bb4726585167320c23a11`
 
-Runtime remains checksum-pinned **lkjscript 0.1.89**. The exact candidate passed
-**613 native tests**, **29 focused synthetic browser groups**, including **48
-own-profile combinations**, and **49 public read-only browser groups**. Stored
-data, objects and configuration remained unchanged through cutover. No migration
-was required. See [RELEASE.md](RELEASE.md) for verification boundaries; earlier
-media/upgrade suites are historical, not newly rerun for this small correction.
+Runtime remains checksum-pinned lkjscript **0.1.89**. The final exact candidate
+passed **650 native tests**, **139 full browser groups**, a separate **39-resource
+legacy-store upgrade**, **49 public read-only groups**, **16 public pagination
+cases**, **8 public reading/resource groups**, and **8 routing/security groups**.
+Read [RELEASE.md](RELEASE.md) for actual identities, observed verification limits,
+public cutover and preservation evidence.
 
-## Attention contract
+## Collection navigation and completed tasks
 
-Both post reactions and user relationships use **Attention**. Notifications
-separate **Post attention** and **People attention**. Do not restore Follow,
-Following or Follower labels, or rename post reactions Like/React.
+Prev/Next sit after their own collection, not before profiles, tabs or context.
+A post's top Back link is separate from pagination; its native fallback accepts
+only safe same-host reading locations. The first-party enhancement retains bounded
+per-tab addresses/scroll offsets and skips reaction/editor loops. Direct or foreign
+entries fall back to Home. Search post/people histories stay independent.
 
-Profiles expose Attention to / Attention from as native links. Lists are
-member-only, bounded and indexed in both directions. Row identities are profile
-links; their sibling desired-state buttons retain the viewed subject, direction,
-cursor and trail. Mutual-state badges describe the relationship to the viewer.
-The own profile must not display a redundant You badge.
-Mutes remain independent and your own outgoing muted relations stay manageable.
+Successful profile saves go to the profile; published post saves go to that post.
+Independent file settings return to Drive, while settings entered from writing
+return to the same retained working copy. Failed/conflicting input stays recoverable.
 
-The canonical account field is attention. Legacy serialization and notice names
-belong only in the codec boundary. The offline native attention-index command
-must complete before serving an old store. It is resumable, has no HTTP route,
-and never substitutes notifications for the original graph. Preserve a quiescent
-snapshot; rollback after canonical writes requires the matching old state.
-Read [ATTENTION.md](ATTENTION.md) before changing this model.
+Parents and replies are stacked siblings with neutral styling and a quiet line.
+Do not restore the dark nested In reply to box. Keep the three-line preview bound,
+warning/privacy/mute/deletion checks, and the composer’s safe original-post link.
+Read [READING-FLOW.md](READING-FLOW.md) and [PAGINATION.md](PAGINATION.md).
 
-## Circular identity and retained workflow
+## Stable identity, short addresses
 
-The shared icon catalog revision is **23eb76263041**. The original composition
-is clipped to a circle; all raster representations carry actual alpha. Old URLs
-alias current circular bytes. Keep common icons::brand / icons::links components,
-source-byte equality, compact bounded decoding and independent user profile images.
-Read [CIRCULAR-IDENTITY.md](CIRCULAR-IDENTITY.md).
+New post IDs have 16 lowercase base32 characters. Existing 64-character post
+records keep their stored identity and use indexed short public aliases. Profiles
+use /@handle, and relationship lists use /@handle/attention/to or /from. Old
+readable links redirect; path-derived identities cannot be overridden by queries.
+Authentication, CSRF, invitations and media/digest validators are not shortened.
 
-The composer remains Attach file / Post, without a drafts collection or preview
-step. Preserve More navigation, the four-item mobile dock, bookmark history,
-readable reply context, safe links, private Drive tags, 4 MiB transfer parts,
-256 MiB file limit, and the 2 GiB allowance. No Node/Python application server,
-paid API, Codex task or new runtime dependency was introduced.
+The offline post-index command must complete before an old store serves the new
+application. It is resumable and has no HTTP route. Incomplete indexes and colliding
+aliases fail closed. Preserve a stopped-service snapshot before indexing; do not
+restore an old application over later short-ID user writes without reconciling data.
 
-The custom-domain redirect now targets devmain, not the historical workspace.
-Keep the exact Coder Host/Origin, native authentication, port 8793 and stopped
-legacy tunnels. Do not change unrelated services or promote synthetic fixtures.
-See [hosting](CODER-HOSTING.md), [quiet workflows](QUIET-WORKFLOWS.md), and
-[operator responsibilities](OPERATOR-RESPONSIBILITIES.md).
+Both post reactions and relationships remain Attention. Post attention and People
+attention notifications stay distinct. The own-profile You badge remains absent;
+other relationship states and mutes retain their existing meaning. The circular
+icon catalog is still 23eb76263041, with native/browser asset-byte equality and
+independent user-uploaded profile images.
+
+Keep the Coder origin, port, strict Host/Origin/session/CSRF checks and disabled
+legacy tunnels. No unrelated service, runtime budget or paid dependency was changed.
+See [ATTENTION.md](ATTENTION.md), [CIRCULAR-IDENTITY.md](CIRCULAR-IDENTITY.md),
+[CODER-HOSTING.md](CODER-HOSTING.md), and [OPERATOR-RESPONSIBILITIES.md](OPERATOR-RESPONSIBILITIES.md).

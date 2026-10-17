@@ -1,74 +1,178 @@
-# Quiet own profile — October 17, 2026
+# Reading flow and resource addresses — October 17, 2026
 
-The fix was deployed at **2026-10-17 04:06:06 JST** (2026-10-16T19:06:06Z) to
+Published at **2026-10-17 14:27:21 JST** (2026-10-17T05:27:21+00:00) through the existing
 Coder workspace **devmain**, agent **main**, public port **8793**.
-[Open lkjsns](https://8793--main--devmain--lkjsxc.apps.coder.lkjsxc.com).
+The origin remains <https://8793--main--devmain--lkjsxc.apps.coder.lkjsxc.com>.
+The independent domain remains a read-redirect alias, not a second application.
 
-## Changed behavior
+## Pagination belongs to its collection
 
-Your own profile no longer renders the redundant **You** badge. The server
-omits its HTML rather than hiding it with CSS or JavaScript. Edit profile and
-Attention to / Attention from remain in place. Other profiles retain **Mutual
-attention** and **Attention to you**. Relationship-list rows still identify the
-viewer with **You**, separately from the own-profile presentation.
+Prev and Next share a single row after the items they paginate. No previous-page
+control appears above a profile identity, Everyone/Attention tabs, search input,
+file details, picker context or the post being discussed. The left control is
+Prev, or First for a direct cursor without history; Next stays on the right and
+uses the full width when alone. Search has separate named post/people pagination
+and independent cursor histories, so navigating one list retains the other.
 
-Only two executable fragments changed: a scoped profile-badge helper and the
-profile renderer's call to it. The shared list badge is unchanged. Post reactions
-remain Attention. No relationship, account, notification, schema, media, routing,
-style, icon or runtime behavior was changed, and no migration was performed.
+This integrates the unfinished, unpublished pagination changes already in the
+worktree when this request began. They were retained in a private patch and an
+exact source baseline rather than discarded or confused with the live service.
 
-## Exact deployed identity
+## Back to reading is not a previous page of replies
 
-Executable source: `864d16814ef77b8f22a5da0bc453bd14e0a42255`
+Individual posts have a separate Back link at the top. Its native fallback uses
+only bounded, validated same-host reading locations. Foreign, direct, editor and
+self-post entries fall back to Home instead of looping or accepting an arbitrary
+return URL. Native links work without JavaScript.
 
-Source tree: `736540e5cee7ab3f68f0c80cab580faa63689233`
+The existing first-party script additionally restores the original feed/filter,
+page and scroll offset, and avoids returning to an intervening reaction or edit
+submission. It uses the preceding browser entry only when that entry is known
+to match. Otherwise it uses the validated internal link. Per-tab state is bounded
+to 24 reading positions and 24 post-return records, with a 30-minute eligibility
+window, no post text or credentials, and clearing on sign-out. Service-information
+copy now describes that local reading state. No external analytics or JavaScript
+application server was added.
+
+## Short post URLs and profile paths
+
+New posts and working copies use **16-character lowercase base32 IDs** drawn from
+80 random bits. Existing 64-character posts retain their stored identities and
+resolve through explicitly indexed short aliases; old readable URLs redirect.
+Reply indexes, bookmarks and media references are not destructively rewritten.
+Authentication, CSRF, invitation, media and digest validators stay full-length.
+A post ID remains a resource identifier, not a substitute for access checks.
+
+Profiles use **/@handle**, with **/@handle/attention/to** and
+**/@handle/attention/from** for relationship lists. Old query-style profile and
+attention URLs preserve their cursor/trail when redirecting. A query cannot
+override a handle or direction established by the path. Member-only relationship
+lists, ownership, mutes, post audiences and native CSRF/Origin checks remain intact.
+
+The offline native post-index command walks the timeline and working-copy indexes
+in resumable batches of at most 16 steps. It writes only alias/checkpoint data,
+has no HTTP route, and completes before service admission resumes. Incomplete
+indexes return a preparation response and refuse writes rather than displaying
+broken links. A collision never overwrites an existing mapping or silently opens
+a different post; it is rejected. Missing legacy query URLs are checked against
+the original post before redirecting, including the deliberately forced collision
+case in the isolated suite.
+
+## Parent above, reply below
+
+A reply's immediate parent is a separate sibling above the reply article, with
+normal avatar, identity, text color and a quiet connecting line. It is no longer
+a dark In reply to quotation nested inside the reply body. Parent excerpts remain
+bounded to three lines; thread rows avoid repeating the parent already in view.
+
+Warnings never reveal the warned body. Private, deleted, suspended and muted
+parents retain their existing visibility checks. Original attachments are not
+rendered through an inaccessible preview. Composer previews keep the safe
+separate-tab link and the original reply identity. The synthetic mobile layout
+was visually inspected in addition to DOM, geometry and accessibility assertions.
+
+## Saves complete an editing task
+
+Save profile returns to the resulting profile. Saving a published post returns
+to that post's short address. Independent file settings return to Drive and the
+file's anchor; file settings entered from writing return directly to the same
+working copy and retained text. Errors, unauthorized changes and optimistic
+conflicts preserve recoverable input instead of discarding it during a redirect.
+The avatar picker remains a child step of profile editing, and password changes
+retain the intentional fresh-sign-in requirement.
+
+Both post reactions and user relationships remain **Attention**, with separate
+Post attention and People attention notification filters. The prior redundant
+You badge stays absent from the viewer's own profile. Circular favicon/brand
+assets and the user's independent profile image were not redesigned.
+
+## Exact executable identity
+
+Executable source: `3c750cb9005456593923d9c5480ab4dbe6f5c83e`
+
+Source tree: `c7b88049633f91d2502bd4fbdb4532856d676cd2`
 
 Application SHA-256:
-`611d0fa2e469066a4749f510df08f829f8e8eb65de1cdec76e95844e3b892205`
+`d9c8f5d9169c46bf9e1f32a25b6075608c2b1a778c177e36cb28e2e7646e2c22`
 
-Application size: **11,011,047 bytes**.
+Application size: **11,608,801 bytes**.
 
 Native graph:
-`rev_4439c2926d26f4afa97ce4ba2ef6a73442bf9e9c1160bcd08e511f365dc6088c`
+`rev_18b30daec91a23471842fb901930df013f4f3f0e922bb4726585167320c23a11`
 
-Runtime remains checksum-pinned **lkjscript 0.1.89**. The previous accepted
-project was copied into a separate candidate. Both scoped changes were accepted
-through public native draft/plan/apply, followed by a complete check/build with
-an exact source-input manifest. Canonical meaning was not edited directly.
-The ordinary main push was independently read back with Git and the GitHub API.
-This later documentation commit does not change the executable identity.
+Runtime remains checksum-pinned **lkjscript 0.1.89**, executable SHA-256
+`e24c054f9b3e44a71a8875aba5385aad82dc391a1eae88a6c115fca75bc5c9a9`.
+
+The candidate began from an exact isolated copy of the accepted, unpublished
+pagination graph. Every subsequent native change used public draft/plan/apply
+operations. Scoped changes preserve existing declaration identities; canonical
+graph storage was not edited directly. Native inputs, browser assets, operations
+scripts and the complete input file set match the selected manifest. No runtime,
+review budget, paid API or application-server dependency was increased.
 
 ## Completed verification
 
-The new regression test failed against the preceding published bundle because
-its own-profile badge was present. The corrected candidate passed **613 native
-tests**, zero failed, with equal production/reference outcomes.
+The final exact candidate passed **650 native tests**, zero failed, with equal
+production/reference outcomes. The fresh full browser suite passed
+**139 groups**, including native restart, resumed uploads, 256 MiB
+upload/download, media permission boundaries, writing, replies, search, bookmarks,
+Attention, the quiet self-profile and no-script workflows.
 
-A fresh isolated store passed **29 browser groups**: accounts, writing, attention,
-and own-profile regression. The own profile was checked in **48 combinations**
-of four widths (320/390/768/1280px), two themes, JavaScript on/off, and three
-paging-URL variants. Tests assert server-side omission, intact profile controls,
-other people's incoming/mutual state, unchanged list identity, guest boundaries,
-and unchanged user-avatar bytes. The test restores its initial relationships.
-Selected accessibility checks found zero violations in mobile/desktop light/dark
-own-profile views. Native synthetic-store verification also passed.
+The pagination suite covers **16 collection contexts and 256 layout cases**:
+four widths, two themes, JavaScript enabled/disabled, plus real Prev/Next actions.
+Both search histories stay independent, and attachment choices retain the exact
+working-copy, filter, cursor and history. The shared-brand suite retains **312
+page/width/theme cases**; self-profile coverage retains **48 cases**. Reading-flow
+checks cover short IDs, native profile paths, completed saves, sibling parent/
+reply layout, Back through filters/pages/scroll and intervening reactions, direct
+or foreign fallback, and no-script navigation. Selected automated accessibility
+checks cover the new and retained workflows; this is Chromium/selected-rule
+coverage rather than physical iOS/Android/Safari certification.
 
-After cutover, **49 read-only public browser groups** passed. Public CSS, scripts,
-icons and manifest still match their unchanged source bytes. Health and the
-custom-domain profile redirect passed. Authenticated own-profile assertions use
-synthetic accounts only; no real-user login or synthetic write was performed on
-the public store. The preceding full 120-group media/transfer suite is historical,
-not claimed as rerun for this presentation-only correction.
+A separate fresh private store was created with the exact preceding published
+bundle. It contains **39 legacy posts/working copies**, two accounts, replies,
+a bookmark and referenced media created through real native forms. Indexing was
+interrupted after one batch; the incomplete-service 503 and refusal to write
+were checked. Five additional batches completed indexing, and a completed rerun
+was an idempotent one-batch check. Every legacy resource, owner/session/password,
+reply, bookmark and file-reference test passed. A new short-ID reply to an old
+parent and editing the old parent also passed. A forced alias collision was
+rejected for root, note-query and edit-query URLs without replacing its owner.
+These fixtures were never exposed or copied into production.
 
-## Preserved state
+Public verification after the actual cutover passed **49 read-only
+browser groups**, **16 pagination cases**,
+**8 resource/reading-flow groups**, and **8
+routing/security groups**. Public CSS, scripts, icons and manifest matched the
+selected source. Authenticated workflows were tested on synthetic loopback data;
+there were no real-user sign-in tests or synthetic writes against the live store.
+The routing suite's deliberately invalid unauthenticated requests did not create
+or mutate user content. The lightweight repository checker also passed.
 
-A private stopped-service snapshot was retained. Stored data/object paths and
-hashes were identical before replacement, after replacement and immediately after
-restart. Runtime, bootstrap secret, origin and launch-configuration hashes were
-unchanged. No proxy, tunnel or unrelated service was changed.
+The first external reading-flow attempt encountered one 30-second navigation
+timeout. An immediate independent request returned the complete profile with
+HTTP 200 (153 ms to DOM readiness and 357 ms to load); the unchanged suite then
+passed all eight groups, including three public post pages. This records the
+observations without attributing an unverified network or browser cause.
 
-Previous bundle:
-`e1f55a8b462f9b4e3da6ad3bdffecc64d489a136d886864f70ff89bc5b6b4b16`.
+## Preserved live state and deployment
 
-The [Attention and circular-identity release](RELEASE-ATTENTION-2026-10-17.md)
-is archived. See [the Attention contract](ATTENTION.md) for retained behavior.
+A stopped-service private snapshot retained the previous bundle and complete
+state before replacement. Post aliases were indexed in eight native batches before restarting the public
+service. All previously existing immutable data-object hashes remained valid;
+uploaded media paths/bytes and the public lkjsxc avatar matched. Runtime, bootstrap,
+origin and launch configuration remained unchanged. New alias/checkpoint records
+are expected metadata additions; this is not a claim that all metadata files
+stayed byte-identical after migration.
+
+Only the lkjsns service was restarted. The Coder workspace, port, custom-domain
+redirect, strict Host/Origin policy and unrelated services were not changed.
+Private snapshots, credentials, user data, generated graphs and raw acceptance
+outputs are intentionally excluded from Git. Rollback after new short-ID writes
+requires careful reconciliation with the retained matching old state, not an
+unconditional swap to an older application or discarding later user changes.
+
+The previous self-profile release is archived in
+[RELEASE-SELF-PROFILE-2026-10-17.md](RELEASE-SELF-PROFILE-2026-10-17.md).
+See [reading flow](READING-FLOW.md), [pagination](PAGINATION.md),
+[attention relationships](ATTENTION.md), and [hosting](CODER-HOSTING.md).
