@@ -34,6 +34,14 @@ const {chromium,base,assert,fields,goto,click,session,newPostId,pass}=require('.
   await click(page,page.getByRole('button',{name:'Post',exact:true}));
   assert.equal(new URL(page.url()).pathname+new URL(page.url()).search,reading.pathname+reading.search);
   pass('Pagination has disabled boundaries and posting returns to the exact prior timeline after attachment selection');
+  await goto(page,'/?cursor=0');
+  for (const width of [320,390,1280]) {
+    await page.setViewportSize({width,height:900});
+    for (const link of await page.locator('.pager a[rel=first]').all()) {
+      const box=await link.boundingBox();assert(box.width>=64&&box.height>=48,JSON.stringify({width,box}));
+    }
+  }
+  await page.setViewportSize({width:1280,height:1000});
 
   await goto(page,'/');
   await page.keyboard.press('j');
