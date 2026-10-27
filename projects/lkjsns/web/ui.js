@@ -196,6 +196,7 @@ document.addEventListener('click', event => {
     const previous = document.querySelector('#shortcut-help');
     if (previous?.open) return;
     previous?.remove();
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const dialog = document.createElement('dialog');
     dialog.id = 'shortcut-help';
     dialog.className = 'shortcut-help';
@@ -209,15 +210,24 @@ document.addEventListener('click', event => {
     checkbox.addEventListener('change', () => { try { localStorage.setItem(preference, checkbox.checked ? '0' : '1'); } catch {} });
     const close = document.createElement('button'); close.type = 'button'; close.textContent = 'Close';
     close.addEventListener('click', () => dialog.close());
-    dialog.addEventListener('close', () => { dialog.remove(); if (!document.querySelector('#shortcut-help[open]')) document.querySelector('.shortcut-help-button')?.focus(); }, {once:true});
+    dialog.addEventListener('close', () => { dialog.remove(); if (opener?.isConnected) opener.focus({preventScroll:true}); }, {once:true});
     dialog.append(title,description,label,close); document.body.append(dialog); dialog.showModal();
   };
-  if (typeof HTMLDialogElement !== 'undefined') {
-    const area = document.querySelector('.sidebar .account');
+  if (typeof HTMLDialogElement !== 'undefined' && location.pathname === '/more') {
+    const lists = document.querySelectorAll('.more-group .settings-list');
+    const area = lists[lists.length - 1];
     if (area) {
       const button = document.createElement('button');
-      button.type = 'button'; button.className = 'shortcut-help-button';
-      button.textContent = 'Keyboard shortcuts'; button.addEventListener('click',help); area.append(button);
+      button.type = 'button'; button.className = 'settings-row shortcut-help-button';
+      const icon = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      for (const [name,value] of Object.entries({viewBox:'0 0 24 24',fill:'none',stroke:'currentColor','stroke-width':'1.7','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'})) icon.setAttribute(name,value);
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d','M3 7h18v10H3zM6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 13h.01M10 13h.01M13 13h.01M16 13h.01M8 15h8');
+      icon.append(path);
+      const text = document.createElement('span');
+      const title = document.createElement('strong'); title.textContent = 'Keyboard shortcuts';
+      const detail = document.createElement('small'); detail.textContent = 'View keys and preferences.';
+      text.append(title,detail); button.append(icon,text); button.addEventListener('click',help); area.append(button);
     }
   }
   document.addEventListener('keydown', event => {

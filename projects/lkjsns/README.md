@@ -66,7 +66,7 @@ Successful profile saves return to the profile; file settings return to Drive or
 to the same writing context when opened from the composer. Invalid or conflicting
 edits remain recoverable in the editor.
 
-The keyboard guide is available in the sidebar and with `?`. It includes post
+The keyboard guide is available in More and with `?`. It includes post
 and page navigation, search, composition, Attention, bookmarks, and destination
 shortcuts. Single-key shortcuts can be disabled; typing and input methods are
 not intercepted.

@@ -44,6 +44,17 @@ const {chromium,base,assert,fields,goto,click,session,newPostId,pass}=require('.
   await page.setViewportSize({width:1280,height:1000});
 
   await goto(page,'/');
+  assert.equal(await page.locator('.shortcut-help-button').count(),0);
+  await page.setViewportSize({width:390,height:844});
+  await goto(page,'/more');
+  const helpButton=page.getByRole('button',{name:'Keyboard shortcuts View keys and preferences.'});
+  assert.equal(await helpButton.isVisible(),true);
+  await helpButton.click();
+  await page.getByRole('dialog',{name:'Keyboard shortcuts'}).getByRole('button',{name:'Close'}).click();
+  assert.equal(await helpButton.evaluate(element=>document.activeElement===element),true);
+  await page.setViewportSize({width:1280,height:1000});
+  await goto(page,'/');
+  assert.equal(await page.locator('.shortcut-help-button').count(),0);
   await page.keyboard.press('j');
   assert.equal(await page.locator('article.note.keyboard-current').count(),1);
   await page.keyboard.press('k');
