@@ -1,9 +1,9 @@
 // Native reply rendering regression tests. Only synthetic loopback accounts.
-const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,createPost,submit,resourceId,save}=require('./support.cjs');
+const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,createPost,submit,resourceId,shortPostId,save}=require('./support.cjs');
 (async()=>{const browser=await chromium.launch({headless:true});try{
  const owner=await session(browser),member=await session(browser,'member'),guest=await browser.newContext({locale:'en-US'});
  const p=await owner.newPage(),m=await member.newPage(),g=await guest.newPage();p.setDefaultTimeout(20000);
- async function reply(page,to,body,{audience='public',cw='',mode='publish'}={}){await goto(page,'/compose?reply='+to);await page.locator('[name=body]').fill(body);const r=await submit(page,'note',{body,cw,audience,mode});await goto(page,r.headers().location);return resourceId(r.headers().location);}
+ async function reply(page,to,body,{audience='public',cw='',mode='publish'}={}){await goto(page,'/compose?reply='+to);await page.locator('[name=body]').fill(body);const id=shortPostId(await page.locator('input[name=id]').inputValue());const r=await submit(page,'note',{body,cw,audience,mode});await goto(page,mode==='publish'?'/'+id:r.headers().location);return id;}
  async function remove(page,id){await goto(page,'/'+id+'/edit');await page.getByRole('link',{name:'Delete post',exact:true}).click();await page.getByRole('dialog').waitFor();await click(page,page.getByRole('dialog').getByRole('button',{name:'Delete post',exact:true}));}
  const body='A parent line with 日本語 and 🌍.\n'.repeat(30);const parent=await createPost(p,body,'public');
  const child=await reply(m,parent,'This is the first child reply.');const nested=await reply(p,child,'This is a reply to the child, not the root.');
@@ -45,7 +45,7 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
  await goto(p,'/'+parent);assert.equal(await p.locator('.reply-list #post-'+draft).count(),1);assert.equal(await p.locator('#post-'+draft+' .note-body').innerText(),'Edited reply stays in the same conversation.');
  pass('Retained replies publish into their parent once; edits retain the same reply identity');
  // Content warnings must not leak the parent's underlying body through an excerpt.
- await goto(p,'/compose');const warningBody='Hidden parent content 8fb905';const created=await submit(p,'note',{body:warningBody,cw:'Spoilers',audience:'public',mode:'publish'});const warningParent=resourceId(created.headers().location);
+ await goto(p,'/compose');const warningBody='Hidden parent content 8fb905';const warningParent=shortPostId(await p.locator('input[name=id]').inputValue());await submit(p,'note',{body:warningBody,cw:'Spoilers',audience:'public',mode:'publish'});
  const warningChild=await reply(m,warningParent,'A safe reply to a warning.');await goto(g,'/'+warningChild);
  assert((await g.locator('.parent-card').innerText()).includes('Content warning: Spoilers'));assert(!(await g.content()).includes(warningBody));assert.equal(await g.locator('.parent-card img:not(.avatar img),.parent-card video,.parent-card audio').count(),0);
  const privateParent=await createPost(p,'Private parent d48649','members');const privateChild=await reply(m,privateParent,'Private child 90d091',{audience:'members'});

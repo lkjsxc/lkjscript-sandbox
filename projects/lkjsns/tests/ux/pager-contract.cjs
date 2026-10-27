@@ -1,10 +1,12 @@
-// One bottom pagination group; native DOM order and visible geometry must agree.
+// Check the bottom group and any matching top group in native DOM order.
 'use strict';
 const assert=require('node:assert/strict');
 async function assertPager(page,{name='Pagination',content,previous=true,next=true}={}){
- const pager=page.getByRole('navigation',{name,exact:true});assert.equal(await pager.count(),1,page.url());
+ const groups=page.getByRole('navigation',{name,exact:true});const count=await groups.count();assert(count===1||count===2,page.url());
+ const pager=groups.last();
+ if(count===2){const top=groups.first();assert.equal(await top.locator('a[rel=prev],a[rel=first]').count(),Number(previous));assert.equal(await top.locator('a[rel=next]').count(),Number(next));}
  const backward=pager.locator('a[rel=prev],a[rel=first]'),forward=pager.locator('a[rel=next]');
- assert.equal(await backward.count(),Number(previous));assert.equal(await forward.count(),Number(next));
+ assert.equal(await backward.count(),Number(previous),page.url()+' previous');assert.equal(await forward.count(),Number(next),page.url()+' next');
  const report=await pager.evaluate((nav,selector)=>{
   const box=e=>{const b=e.getBoundingClientRect();return {left:b.left,top:b.top,right:b.right,bottom:b.bottom,width:b.width,height:b.height}};
   const items=Array.from(document.querySelectorAll(selector));const links=Array.from(nav.querySelectorAll('a'));

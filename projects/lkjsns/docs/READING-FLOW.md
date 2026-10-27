@@ -2,12 +2,11 @@
 
 ## Two different kinds of going back
 
-Pagination changes the window inside a collection. Its single Prev/Next row
-belongs **after that collection**, never before a profile identity, feed tabs,
-search input, file details or the post being discussed. The two search result
-collections retain independent cursor histories and named pagination controls.
-A direct cursor without an observed history offers First rather than inventing
-an earlier window. Next remains full-width when it is the only direction.
+Pagination changes the window inside a collection. Timeline pages after the
+first have Previous and Next above and below their post list; unavailable
+directions remain disabled. Controls follow profile identity and tabs. Direct
+cursors without history offer First, and search collections retain independent
+histories.
 
 An individual post has a separate **Back** link at the top. The native fallback
 uses a bounded, validated same-host reading referrer; direct, foreign, self-post
@@ -86,7 +85,9 @@ Composition keeps the safe separate-tab parent link and its retained reply targe
 
 ## A successful save completes the task
 
-Save profile returns to the resulting profile. Saving a published post returns
+Publishing a new post returns to the same validated screen from which the
+composer was opened; attachment selection preserves that destination. Save
+profile returns to the resulting profile, and saving a published post returns
 to that post. Saving file settings opened independently returns to Drive and the
 file's anchor; settings opened while writing return directly to the same working
 copy. These are successful-write redirects only: invalid, unauthorized or

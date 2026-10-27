@@ -39,8 +39,8 @@ const {resourceId,isResource,isEditor,chromium,base,fixture,output,path,assert,f
   assert.equal(await p.locator('[name=body]').inputValue(),'Unsubmitted text must survive Cancel.');
   await p.locator('[name=body]').fill('A small observation from the riverside.');
   pass('Direct delete action opens a single native confirmation; Cancel preserves unsubmitted writing');
-  await click(p,p.getByRole('button',{name:'Post',exact:true}));assert(isResource(p.url()));
-  const publicId=resourceId(p.url());
+  const publicId=draft;
+  await click(p,p.getByRole('button',{name:'Post',exact:true}));assert.equal(new URL(p.url()).pathname,'/');
   await goto(p,'/');const card=p.locator('article.note').filter({hasText:'A small observation from the riverside.'});
   await click(p,card.getByText('A small observation from the riverside.',{exact:true}));
   assert.equal(resourceId(p.url()),publicId);

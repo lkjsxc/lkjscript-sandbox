@@ -93,7 +93,7 @@ const post=async(context,body,status=303)=>{
  let row=p.locator('.attention-row').filter({has:p.locator('.attention-person[href="/@'+secondPage[0]+'"]')});
  await click(p,row.locator('button'));const after=new URL(p.url()),before=new URL(beforeUrl);assert.equal(after.search,before.search);assert.equal(after.hash,'#attention-'+secondPage[0]);
  row=p.locator('#attention-'+secondPage[0]);await click(p,row.locator('button'));assert.equal(new URL(p.url()).search,before.search);
- await click(p,p.getByRole('link',{name:/^(Newer|Prev)$/}));assert.deepEqual(await people(p),firstPage);
+ await click(p,p.getByRole('link',{name:/^(Newer|Prev|Previous)$/}));assert.deepEqual(await people(p),firstPage);
  pass('Newest attention first, 30-row native pagination, no duplicates, exact Prev and same-page actions across a 34-person incoming graph');
  const reports=[];const script=process.env.LKJSNS_AXE?fs.readFileSync(process.env.LKJSNS_AXE,'utf8'):null;
  for(const scheme of ['light','dark'])for(const width of [320,390,768,1280]){

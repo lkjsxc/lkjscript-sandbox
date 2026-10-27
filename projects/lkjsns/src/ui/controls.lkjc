@@ -22,7 +22,9 @@
   (function create audience (visibility public)
     (parameter create value (type Text))
     (returns Text) (effect pure)
-    (body (call std::text-join (list Text (text "<label class=\"audience\">Audience<select name=\"audience\"><option value=\"members\"") (if (call std::text-equal (local value) (text "members")) (text " selected") (text "")) (text ">Members</option><option value=\"public\"") (if (call std::text-equal (local value) (text "public")) (text " selected") (text "")) (text ">Public — anyone</option></select></label>")) (text ""))))
+    (body (call std::text-join (list Text (text "<label class=\"audience\">Audience<select name=\"audience\"><option value=\"members\"") (if (call std::text-equal (local value) (text "members")) (text " selected") (text "")) (text ">Members</option><option value=\"public\"") (if (call std::text-equal (local value) (text "public")) (text " selected") (text "")) (text ">Public — anyone</option><option value=\"link-only\"")
+ (if (call std::text-equal (local value) (text "link-only")) (text " selected") (text ""))
+ (text ">Link-only — anyone with the link</option></select></label>")) (text ""))))
 
   (function create set-member (visibility public)
     (parameter create items (type (list Text)))

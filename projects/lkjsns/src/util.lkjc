@@ -103,6 +103,29 @@
     (returns Bool) (effect pure)
     (body (if (call util::signed (local ctx)) (if (call std::text-equal (field (local ctx) (name csrf)) (call util::value (local form) (text "csrf"))) (bool true) (bool false)) (bool false))))
 
+  (function create sharing (visibility public)
+    (parameter create ctx (type Context)) (parameter create token (type Text))
+    (returns Context) (effect pure)
+    (body (record structural (field user (field (local ctx) (name user)))
+      (field csrf (field (local ctx) (name csrf))) (field session (field (local ctx) (name session)))
+      (field now (field (local ctx) (name now)))
+      (field share (if (call util::token (local token)) (local token) (text ""))))))
+
+  (function create share-audience (visibility public)
+    (parameter create token (type Text)) (returns Text) (effect pure)
+    (body (if (call util::token (local token))
+      (call std::text-join (list Text (text "link:") (call util::digest (local token))) (text "")) (text ""))))
+
+  (function create with-share (visibility public)
+    (parameter create url (type Text)) (parameter create token (type Text)) (returns Text) (effect pure)
+    (body (if (call util::token (local token))
+      (call std::text-join (list Text (local url) (if (call std::text-contains (local url) (text "?")) (text "&share=") (text "?share=")) (local token)) (text ""))
+      (local url))))
+
+  (function create post-link (visibility public)
+    (parameter create id (type Text)) (parameter create token (type Text)) (returns Text) (effect pure)
+    (body (call util::with-share (call std::text-join (list Text (text "/") (call util::short-id (local id))) (text "")) (local token))))
+
   (function create cookie-parts
     (visibility public) (parameter create value (type Bytes)) (parameter create start (type I64)) (parameter create index (type I64)) (parameter create prefix (type Text)) (parameter create found (type Text)) (parameter create count (type I64))
     (returns Text) (effect pure)

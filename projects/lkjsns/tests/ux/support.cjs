@@ -21,9 +21,11 @@ async function submit(page, intent, extra = {}, status = 303) {
 async function createPost(page, body, audience='members', mode='publish') {
   await s.goto(page,'/compose'); await page.locator('[name=body]').fill(body);
   await page.locator('select[name=audience]').selectOption(audience);
+  const id=await page.locator('input[name=id]').inputValue();
   const response=await submit(page,'note',{body,audience,mode});
-  const location=response.headers().location; await s.goto(page,location);
-  return resourceId(location);
+  const location=response.headers().location;
+  if(mode==='publish') await s.goto(page,'/'+shortPostId(id)); else await s.goto(page,location);
+  return shortPostId(id);
 }
 function save(name,value) {s.fs.writeFileSync(s.path.join(s.fixture,name+'.json'),JSON.stringify(value,null,2),{mode:0o600});}
 function load(name) {return JSON.parse(s.fs.readFileSync(s.path.join(s.fixture,name+'.json')));}

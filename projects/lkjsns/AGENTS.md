@@ -34,11 +34,10 @@ for UX and media boundaries, and docs/RELEASE.md when a verified public release 
 been recorded. Media HEAD is deliberately unsupported until the native runtime
 can express representation metadata independently of a response body.
 
-The user requires hosting through the Coder workspace. The canonical entry is
-its existing public port 8793, not a dedicated custom-domain tunnel; consult
-docs/CODER-HOSTING.md. Both dedicated Cloudflare tunnel units are stopped and
-disabled. Do not reintroduce them through old systemd Wants/After dependencies.
-The custom domain is only a read-redirect alias. Keep the exact Coder Host/Origin
+Production is the dedicated lkjsns Incus service and the canonical custom
+domain is https://lkjsns.lkjsxc.com. The older Coder service may hold divergent
+live data; preserve and reconcile it before changing routing or stopping it.
+Do not reintroduce the retired dedicated tunnel units. Keep exact Host/Origin
 checks and native session/CSRF validation. Source/run selection and live routing
 evidence remain separate authorities.
 
@@ -95,18 +94,16 @@ before public cutover. Do not reset accounts or expose a migration HTTP endpoint
 
 ## Pagination layout
 
-Render one shared paging::controls (or named paging::render for Search) after
-each paginated collection. Prev belongs on the left of Next in the same bottom
-row, never above profile identity, filters, breadcrumbs or the list. Next alone
-retains full width. Direct cursors without history offer First; last pages retain
-the left-hand backward link. Do not implement positioning with CSS order or DOM
-reparenting. Read docs/PAGINATION.md for independent Search histories and tests.
+Use shared Previous and Next controls with disabled states at collection
+boundaries. Post timelines after the first page have controls above and below
+the collection. A direct cursor without history offers First without guessing a
+previous cursor. Preserve independent Search histories and native no-script
+navigation. See docs/PAGINATION.md.
 
 ## Reading-flow contract
 
-Read docs/READING-FLOW.md and docs/PAGINATION.md. Prev/Next belong after their
-collection, not above profile identity or tabs. Post Back is a separate, safe
-reading-history action. Preserve its bounded, same-origin fallback and no-script
+Read docs/READING-FLOW.md and docs/PAGINATION.md. Top timeline controls follow
+profile identity and tabs. Post Back is a separate, safe reading-history action. Preserve its bounded, same-origin fallback and no-script
 behavior. Profiles use /@handle; post IDs are 16 characters, while authentication
 and media tokens retain their original full-strength validator. Do not truncate
 util::token globally. Legacy post aliases must be indexed offline on a retained

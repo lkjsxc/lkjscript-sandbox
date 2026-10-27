@@ -18,7 +18,7 @@
           (call returnnav::characters (call std::bytes-from-text (local url)) (i64 0)) (bool false)) (bool false)) (bool false))
       (let (binding path (call util::slice (local url) (i64 0) (call returnnav::path-end (local url) (i64 0))))
         (in (if (call util::has (list Text (text "/") (text "/saved") (text "/search") (text "/notifications") (text "/people")
-          (text "/drive") (text "/attention") (text "/profile") (text "/note") (text "/file") (text "/more")) (local path) (i64 0)) (bool true)
+          (text "/drive") (text "/link-posts") (text "/attention") (text "/profile") (text "/note") (text "/file") (text "/more")) (local path) (i64 0)) (bool true)
           (if (call util::handle (call paths::member-id (local path))) (bool true)
             (if (call util::post-id (call paths::id (local path))) (call std::text-equal (call paths::suffix (local path)) (text "")) (bool false)))))) (bool false))))
   (function create local-referrer (visibility public) (parameter create host (type Text)) (parameter create referrer (type Text))

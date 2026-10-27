@@ -76,7 +76,7 @@
     (body (if (call std::less (i64 360) (call util::size (local value))) (call std::text-join (list Text (call util::slice (local value) (i64 0) (call searchtext::boundary (call std::bytes-from-text (local value)) (i64 360))) (text "…")) (text "")) (local value))))
 
   (function create preview (visibility public) (parameter create note (type Note)) (parameter create composing (type Bool))
-    (returns Text) (effect pure) (body (call conversation::preview-view (local note) (call db::empty-user) (field (local note) (name created)) (local composing))))
+    (returns Text) (effect pure) (body (call conversation::preview-view (local note) (call db::empty-user) (field (local note) (name created)) (local composing) (text ""))))
 
   (function create parent (visibility public)
     (parameter create ctx (type Context))
@@ -84,7 +84,8 @@
     (parameter create viewer (type User))
     (parameter create composing (type Bool))
     (returns Text) (effect (task (requirement service::app::store)))
-    (body (if (call util::post-id (local id)) (let (binding note (call db::note (local id))) (binding actor (call db::user (field (local note) (name author)))) (in (if (call conversation::readable (local ctx) (local note) (local viewer) (local actor)) (call conversation::preview-view (local note) (local actor) (field (local ctx) (name now)) (local composing)) (if (local composing) (text "<aside class=\"reply-preview parent-unavailable\" aria-label=\"Original post\"><p class=\"field-help\">The original post is unavailable. You can still save this reply as a draft.</p></aside>") (text "<div class=\"reply-context parent-unavailable\" role=\"note\">Original post unavailable.</div>"))))) (text ""))))
+    (body (if (call util::post-id (local id)) (let (binding note (call db::note (local id))) (binding actor (call db::user (field (local note) (name author)))) (in (if (call conversation::readable (local ctx) (local note) (local viewer) (local actor)) (call conversation::preview-view (local note) (local actor) (field (local ctx) (name now)) (local composing)
+  (if (call std::text-equal (field (local note) (name audience)) (call util::share-audience (field (local ctx) (name share)))) (field (local ctx) (name share)) (text ""))) (if (local composing) (text "<aside class=\"reply-preview parent-unavailable\" aria-label=\"Original post\"><p class=\"field-help\">The original post is unavailable. You can still save this reply as a draft.</p></aside>") (text "<div class=\"reply-context parent-unavailable\" role=\"note\">Original post unavailable.</div>"))))) (text ""))))
 
   (function create show-parent (visibility public)
     (parameter create note (type Note))
@@ -100,10 +101,10 @@
 
 
   (function create preview-view (visibility public) (parameter create note (type Note)) (parameter create actor (type User))
-    (parameter create now (type I64)) (parameter create composing (type Bool)) (returns Text) (effect pure)
+    (parameter create now (type I64)) (parameter create composing (type Bool)) (parameter create share (type Text)) (returns Text) (effect pure)
     (body (call std::text-join (list Text
       (text "<a class=\"reply-preview parent-card\" aria-label=\"Original post\" href=\"")
-      (call std::html-escape-text (call paths::post (field (local note) (name id)))) (text "\"")
+      (call std::html-escape-text (call util::post-link (field (local note) (name id)) (local share))) (text "\"")
       (if (local composing) (text " target=\"_blank\" rel=\"noopener noreferrer\"") (text ""))
       (text "><span class=\"parent-identity\">") (call page::avatar (field (local note) (name author)))
       (text "<span class=\"parent-person\"><strong>")

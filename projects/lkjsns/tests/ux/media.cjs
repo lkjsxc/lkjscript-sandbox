@@ -61,7 +61,7 @@ async function upload(page,file,draft='') {
   const attached=resourceId(attachmentURL,base);
   assert.equal((await guest.request.get(base+attachmentURL)).status(),404);
   await p.locator('select[name=audience]').selectOption('public');
-  await click(p,p.getByRole('button',{name:'Post',exact:true}));const postId=resourceId(p.url());
+  await click(p,p.getByRole('button',{name:'Post',exact:true}));const postId=draft;assert.equal(new URL(p.url()).pathname,'/');
   const publicFile=await guest.request.get(base+'/media?id='+attached+'&note='+postId);assert.equal(publicFile.status(),200);
   const range=await guest.request.get(base+'/media?id='+attached+'&note='+postId,{headers:{Range:'bytes=2-15'}});assert.equal(range.status(),206);
   assert.deepEqual(await range.body(),fs.readFileSync(path.join(files,'sample-1.png')).subarray(2,16));

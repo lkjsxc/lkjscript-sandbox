@@ -1,5 +1,5 @@
 // Real native requests on the isolated UX store. Never run against public data.
-const {chromium,base,output,fs,path,assert,form,fields,click,goto,pass,session,submit,createPost,load,save,resourceId}=require('./support.cjs');
+const {chromium,base,output,fs,path,assert,form,fields,click,goto,pass,session,submit,createPost,load,save,resourceId,shortPostId}=require('./support.cjs');
 (async()=>{const browser=await chromium.launch({headless:true});try{
  const owner=await session(browser),member=await session(browser,'member'),other=await session(browser,'other'),guest=await browser.newContext({locale:'en-US'});
  const p=await owner.newPage(),m=await member.newPage(),o=await other.newPage(),g=await guest.newPage();p.setDefaultTimeout(20000);
@@ -47,7 +47,7 @@ const {chromium,base,output,fs,path,assert,form,fields,click,goto,pass,session,s
  const cold=await session(browser,'owner',{javaScriptEnabled:false});const np=await cold.newPage();await goto(np,'/'+linked);assert.equal(await np.locator('.note-detail .post-link[target="_blank"]').count(),2);await cold.close();
  pass('Native links preserve Unicode and punctuation, escape markup, open a separate tab without opener/referrer, and work without JavaScript');
  // Count exactly the same directly readable replies as the conversation list.
- async function reply(page,body,audience,mode='publish'){await goto(page,'/compose?reply='+parent);const r=await submit(page,'note',{body,audience,mode});return resourceId(r.headers().location);}
+ async function reply(page,body,audience,mode='publish'){await goto(page,'/compose?reply='+parent);const id=shortPostId(await page.locator('input[name=id]').inputValue());await submit(page,'note',{body,audience,mode});return id;}
  const pub=await reply(m,'Counted public reply.','public');await reply(o,'Counted members reply.','members');await reply(p,'Private working reply must not count.','members','draft');
  const nested=await createPost(p,'Independent non-reply must not count.','public');assert(nested);
  async function count(page,expected){await goto(page,'/'+parent);assert.equal(await page.locator('.note-detail .reply-count').innerText(),String(expected));assert.equal(await page.locator('.reply-list > article.note').count(),expected);}

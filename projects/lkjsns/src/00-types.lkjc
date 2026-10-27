@@ -3,7 +3,7 @@
 (type-alias Request (record (body (stream Bytes)) (headers (list Header)) (method Text) (path Text) (query Text) (query_parameters (map Text (list Text)))))
 (type-alias Response (record (status I64) (headers (list Header)) (body Bytes)))
 (type-alias Form (record (valid Bool) (items (list forms::field))))
-(type-alias Context (record (user Text) (csrf Text) (session Text) (now I64)))
+(type-alias Context (record (user Text) (csrf Text) (session Text) (now I64) (share Text)))
 (type-alias User (record (handle Text) (password Text) (display Text) (bio Text) (admin Bool) (suspended Bool) (created I64) (failures I64) (locked I64) (sessions (list Text)) (attention (list Text)) (muted (list Text)) (saved (list Text)) (used I64) (version I64)))
 (type-alias Session (record (user Text) (csrf Text) (expires I64)))
 (type-alias Invite (record (id Text) (label Text) (expires I64) (remaining I64) (revoked Bool)))

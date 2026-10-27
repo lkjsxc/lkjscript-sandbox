@@ -60,7 +60,7 @@
 
   (test create stable-toggle-label (visibility private)
     (actual (call std::text-contains (call attentionui::toggle
-      (record structural (field user (text "alice")) (field csrf (text "fixture")) (field session (text "")) (field now (i64 0)))
+      (record structural (field user (text "alice")) (field csrf (text "fixture")) (field session (text "")) (field now (i64 0)) (field share (text "")))
       (text "bravo") (bool true) (text "bravo") (text "profile") (text "") (text ""))
       (text "aria-label=\"Attention to @bravo\" aria-pressed=\"true\""))) (expected (bool true)))
 

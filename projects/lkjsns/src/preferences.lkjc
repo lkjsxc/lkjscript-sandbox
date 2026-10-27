@@ -15,6 +15,7 @@
   (function create audience (visibility public)
     (parameter create ctx (type Context))
     (returns Text) (effect (task (requirement service::app::store)))
-    (body (if (call std::text-equal (call preferences::read (text "audience") (field (local ctx) (name user))) (text "public")) (text "public") (text "members"))))
+    (body (let (binding value (call preferences::read (text "audience") (field (local ctx) (name user))))
+ (in (if (call util::has (list Text (text "public") (text "members") (text "link-only")) (local value) (i64 0)) (local value) (text "members"))))))
 
 )

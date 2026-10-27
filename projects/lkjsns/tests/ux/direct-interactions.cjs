@@ -1,5 +1,5 @@
 // Real native interactions on an isolated store; no public test writes.
-const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,load,save,createPost,resourceId,crypto}=require('./support.cjs');
+const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,load,save,createPost,resourceId,shortPostId,crypto}=require('./support.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try {
@@ -38,7 +38,7 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
   assert.equal(await p.locator('.parent-card').getAttribute('href'),'/'+posts.publicId);
   await p.locator('[name=body]').fill('A reply with direct original context.');const body=await fields(p,'note');
   let response=await owner.request.post(base+'/action',{headers:{Origin:base},form:{...body,mode:'publish'},maxRedirects:0});assert.equal(response.status(),303);
-  const reply=resourceId(response.headers().location);await goto(p,'/'+reply);assert.equal(await p.locator('.parent-card').getAttribute('href'),'/'+posts.publicId);
+  const reply=shortPostId(body.id);await goto(p,'/'+reply);assert.equal(await p.locator('.parent-card').getAttribute('href'),'/'+posts.publicId);
   assert.equal(await p.getByText(/View original post|Open original post|View the original post/).count(),0);
   pass('Reply context is directly linked without a separate original-post button');
   await goto(p,'/compose');await p.locator('[name=body]').fill('Tap previews to select reusable files.');await click(p,p.getByRole('button',{name:'Attach file',exact:true}));

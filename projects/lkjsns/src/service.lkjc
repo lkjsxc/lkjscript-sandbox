@@ -49,6 +49,7 @@
   (route create get-4 (method GET) (path "/compose") (port service::app::view))
   (route create get-5 (method GET) (path "/note") (port service::app::view))
   (route create get-6 (method GET) (path "/drafts") (port service::app::view))
+  (route create link-posts (method GET) (path "/link-posts") (port service::app::view))
   (route create get-7 (method GET) (path "/saved") (port service::app::view))
   (route create get-8 (method GET) (path "/settings") (port service::app::view))
   (route create get-9 (method GET) (path "/people") (port service::app::view))

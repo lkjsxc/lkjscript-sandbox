@@ -4,12 +4,11 @@ An invitation-only community built with native lkjscript inside lkjscript-sandbo
 The interface is English, with chronological posts, explicit audiences, reusable
 files, private tags, and a focused writing workspace.
 
-Open [lkjsns on Coder](https://8793--main--devmain--lkjsxc.apps.coder.lkjsxc.com).
-The native app runs in workspace `devmain` on public port **8793**.
-The custom domain redirects to this Coder entrypoint. Guest pages do not require
-Coder authentication; community accounts require an application invitation.
-[The release record](docs/RELEASE.md) identifies the exact deployed bundle and
-separates local acceptance from public-service verification.
+The canonical service address is [lkjsns.lkjsxc.com](https://lkjsns.lkjsxc.com/).
+The production service runs in its dedicated Incus container behind the GitOps
+HTTPS edge. Community accounts require an application invitation. Source,
+candidate acceptance, and the currently deployed service are separate authorities;
+check the release and infrastructure records before claiming a public cutover.
 
 ## Reading, writing, and navigation
 
@@ -26,11 +25,14 @@ administration, and service information. Settings contains profile/security
 settings and sign-out rather than a second site map. About is no longer pinned
 to the sidebar footer. Every product-owned label remains English.
 
-Bookmarks put the most recently bookmarked item first. One pagination row sits
-below each collection: Prev on the left and Next on the right. On the first page,
-Next retains the full available width. Prev restores the preceding page and filter. The bounded
-native cursor trail also survives reactions and attachment selection; it works
-without JavaScript. Direct cursor URLs without a preceding trail offer First.
+Bookmarks put the most recently bookmarked item first. Pagination keeps Previous
+and Next visible, disabling a direction at the end of its range. Timeline pages
+after the first have controls above and below the collection. Prev restores the
+preceding page and filter; direct cursor URLs without a preceding trail offer First.
+The bounded native cursor trail survives reactions and attachment selection.
+Home and Attention initially render ten indexed entries, then load the remainder
+of the same stable page in the background. A normal link loads the complete page
+when JavaScript is disabled or a request fails.
 
 Posts support replies, muting, Attention, bookmarks, and notifications.
 User relationships also use Attention: profiles link to Attention to and
@@ -58,9 +60,16 @@ service documents describe the implementation, not unimplemented encryption,
 automated account deletion, or a promise of immediate backup erasure. See
 [operator responsibilities](docs/OPERATOR-RESPONSIBILITIES.md).
 
-Successful profile saves return to the profile. Post saves return to the post;
-file settings return to Drive or to the same writing context when opened from
-the composer. Invalid or conflicting edits remain recoverable in the editor.
+Publishing a new post returns to the screen where writing began, including
+after attachment selection. Editing an existing post returns to that post.
+Successful profile saves return to the profile; file settings return to Drive or
+to the same writing context when opened from the composer. Invalid or conflicting
+edits remain recoverable in the editor.
+
+The keyboard guide is available in the sidebar and with `?`. It includes post
+and page navigation, search, composition, Attention, bookmarks, and destination
+shortcuts. Single-key shortcuts can be disabled; typing and input methods are
+not intercepted.
 
 ## Drive and profile images
 
@@ -159,10 +168,14 @@ production acceptance. Normal repository CI remains lightweight.
 
 ## Boundaries
 
-A Members post is readable by all registered
-members, independently of attention relationships. Public posts and their attachments are readable
-without signing in. Removing a reference revokes future access, not copies that
-someone already downloaded.
+A Members post is readable by all registered members, independently of attention
+relationships. Public posts and their attachments are readable without signing
+in. Link-only posts and their referenced files require the random share URL;
+they do not appear in public timelines, profiles, or search. Authors can recover
+share links from More → Link-only posts. Replies within a link-only thread inherit
+its share capability. Anyone who receives a share URL can pass it on; this is not
+end-to-end encryption. Removing a reference revokes future access, not copies
+that someone already downloaded.
 
 The account allowance is **2 GiB**, including incomplete upload reservations.
 Incomplete uploads can be removed after the existing five-minute stale-upload

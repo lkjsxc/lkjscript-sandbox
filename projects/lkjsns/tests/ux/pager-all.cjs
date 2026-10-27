@@ -2,7 +2,7 @@
 'use strict';
 const{newPostId,chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,session,submit,resourceId,load,save,crypto}=require('./support.cjs');
 const{assertPager}=require('./pager-contract.cjs');
-const controls=(p,name='Pagination')=>p.getByRole('navigation',{name,exact:true});
+const controls=(p,name='Pagination')=>p.getByRole('navigation',{name,exact:true}).last();
 const nextLink=(p,name='Pagination')=>controls(p,name).locator('a[rel=next]');
 const prevLink=(p,name='Pagination')=>controls(p,name).locator('a[rel=prev]');
 const localPath=p=>new URL(p.url()).pathname+new URL(p.url()).search;
@@ -57,7 +57,7 @@ async function identities(p,selector){return p.locator(selector).evaluateAll(es=
   await click(p,prevLink(p,name));assert.deepEqual(await identities(p,spec.items),initial,spec.id);
   cases.push({...spec,second,hasNext:forward});
  }
- pass('All sixteen feed/list/search contexts keep Prev and Next below their own content, restore the exact first page, and avoid detached top controls');
+ pass('All sixteen feed/list/search contexts retain a bottom pager and restore the exact first page');
  // Independent histories prevent a post-page Prev from appearing above People.
  await goto(p,'/search?q=person');const peopleFirst=await identities(p,'.member-list .member-row');
  await click(p,nextLink(p,'People pagination'));const memberSecond=new URL(p.url()).searchParams.get('members');
@@ -86,7 +86,7 @@ async function identities(p,selector){return p.locator(selector).evaluateAll(es=
   for(const spec of cases){await goto(page,spec.second);await click(page,prevLink(page,spec.name||'Pagination'));const key=spec.id==='search-people'?'members':'cursor';assert.equal(new URL(page.url()).searchParams.get(key),null,spec.id);}
   await context.close();
  }
- pass('Sixteen paginated contexts at four widths in two themes, with and without JavaScript: 256 bottom-layout cases and real backward navigation');
+ pass('Sixteen paginated contexts at four widths in two themes, with and without JavaScript: 256 layout cases and real backward navigation');
  const reports=[];
  if(process.env.LKJSNS_AXE){const axe=fs.readFileSync(process.env.LKJSNS_AXE,'utf8');
   for(const id of ['home','search-posts','search-people','attachments','attention-from']){
@@ -96,12 +96,12 @@ async function identities(p,selector){return p.locator(selector).evaluateAll(es=
   pass('Selected accessibility checks pass on feed, both search lists, attachment picker and relationship pagination');
  }
  for(const query of ['members-trail=_.-1','members-trail=_.1..2','members-trail=https://evil.test','members-trail=_&members-trail=_','members-trail='+Array(65).fill('1').join('.')])assert.equal((await owner.request.get(base+'/search?q=person&'+query)).status(),400,query);
- await goto(p,'/saved?cursor=0');assert.equal(await p.locator('a[rel=first]').count(),1);assert.equal(await p.locator('a[rel=prev]').count(),0);await assertPager(p,{content:'main .feed',previous:true,next:false});
+ await goto(p,'/saved?cursor=0');assert.equal(await p.locator('a[rel=first]').count(),2);assert.equal(await p.locator('a[rel=prev]').count(),0);await assertPager(p,{content:'main .feed',previous:true,next:false});
  await goto(p,'/saved?cursor=0&trail=_');await assertPager(p,{content:'main .feed',previous:true,next:false});
- await p.locator('.pager a').scrollIntoViewIfNeeded();await p.keyboard.press('Tab');await p.locator('.pager a').focus();const focus=await p.locator('.pager a').evaluate(e=>({outline:getComputedStyle(e).outlineStyle,width:getComputedStyle(e).outlineWidth}));assert(focus.outline!=='none'&&parseFloat(focus.width)>0);
+ await p.locator('.pager a').last().scrollIntoViewIfNeeded();await p.keyboard.press('Tab');await p.locator('.pager a').last().focus();const focus=await p.locator('.pager a').last().evaluate(e=>({outline:getComputedStyle(e).outlineStyle,width:getComputedStyle(e).outlineWidth}));assert(focus.outline!=='none'&&parseFloat(focus.width)>0);
  pass('Direct deep links offer First, last pages keep Prev, invalid people histories are rejected and keyboard focus remains visible');
  for(const [width,theme]of [[390,'light'],[1280,'light'],[390,'dark']]){
-  await p.setViewportSize({width,height:900});await p.emulateMedia({colorScheme:theme});await goto(p,cases.find(c=>c.id==='home').second);await p.locator('.pager').scrollIntoViewIfNeeded();await p.screenshot({path:path.join(output,`pager-home-${width}-${theme}.png`)});
+  await p.setViewportSize({width,height:900});await p.emulateMedia({colorScheme:theme});await goto(p,cases.find(c=>c.id==='home').second);await p.locator('.pager').last().scrollIntoViewIfNeeded();await p.screenshot({path:path.join(output,`pager-home-${width}-${theme}.png`)});
  }
  for(const handle of attention.created)await action({...relation,handle,subject:handle,direction:'profile',enabled:'0'});
  // Keep the existing attention persistence fixture's expected graph unchanged.

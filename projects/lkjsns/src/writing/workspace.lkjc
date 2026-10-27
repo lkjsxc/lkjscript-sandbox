@@ -18,7 +18,7 @@
           (call std::text-join (list Text (local out)
             (if (call access::media (local ctx) (local media) (local note))
               (call std::text-join (list Text (text "<div class=\"writing-attachment\">")
-                (call mediaui::render (local media) (field (local note) (name id)))
+                (call mediaui::render (local media) (field (local note) (name id)) (text ""))
                 (if (field (local note) (name published)) (text "")
                   (call std::text-join (list Text (text "<div class=\"attachment-edit row\"><button class=\"compact subtle\" name=\"mode\" value=\"detach:") (field (local media) (name id)) (text "\">Remove</button><button class=\"compact subtle\" name=\"mode\" value=\"details:") (field (local media) (name id)) (text "\">File options</button></div>")) (text "")))
                 (text "</div>")) (text ""))

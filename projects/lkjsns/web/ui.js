@@ -15,7 +15,7 @@ if (composer && audience) {
   const key = `lkjsns:pending-audience:${composer.dataset.user}`;
   if (composer.dataset.fresh === '1' && !composer.dataset.reply) {
     try { const pending = JSON.parse(localStorage.getItem(key));
-      if (pending && Date.now()-pending.at<120000 && ['members','public'].includes(pending.value)) audience.value=pending.value;
+      if (pending && Date.now()-pending.at<120000 && ['members','public','link-only'].includes(pending.value)) audience.value=pending.value;
     } catch {}
   }
   audience.addEventListener('change', () => {
@@ -140,10 +140,162 @@ document.addEventListener('click', event => {
       });
     }
   }
+  const composerForm = document.querySelector('.composer form');
+  composerForm?.addEventListener('submit', event => {
+    if (event.submitter?.name !== 'mode' || event.submitter?.value !== 'publish') return;
+    const raw = composerForm.elements.namedItem('return')?.value;
+    let target; try { target = raw && canonical(raw); } catch { return; }
+    if (!readable(target)) return;
+    const latest = load();
+    const position = (Array.isArray(latest.positions) ? latest.positions : []).find(x => x.path === relative(target) && safeEntry(x));
+    latest.restore = {to:relative(target), y:position?.y || 0, at:Date.now()};
+    store(latest);
+  });
   const state=load(),restore=state.restore;
   if(readable(current)&&safeEntry(restore)&&restore.to===relative(current)){
     delete state.restore;store(state);
     const apply=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>scrollTo({top:Math.max(0,Number(restore.y)||0),behavior:'instant'})));
     if(document.readyState==='complete')apply();else addEventListener('load',apply,{once:true});
+    document.addEventListener('lkjsns:timeline-loaded',apply,{once:true});
   }
+})();
+
+// Keyboard navigation stays on native links and forms; the server still authorizes every action.
+(() => {
+  const preference = 'lkjsns:shortcuts-disabled';
+  let prefix = 0;
+  let current = null;
+  const disabled = () => { try { return localStorage.getItem(preference) === '1'; } catch { return false; } };
+  const editable = target => target instanceof Element &&
+    !!target.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"]),[role="textbox"]');
+  const cards = () => [...document.querySelectorAll('article.note[data-href]')];
+  const selectCard = direction => {
+    const items = cards();
+    if (!items.length) return;
+    let index = current && items.includes(current) ? items.indexOf(current) : -1;
+    index = Math.max(0, Math.min(items.length - 1, index < 0 && direction < 0 ? items.length - 1 : index + direction));
+    current?.classList.remove('keyboard-current');
+    current = items[index];
+    current.classList.add('keyboard-current');
+    current.tabIndex = -1;
+    current.focus({preventScroll:true});
+    current.scrollIntoView({block:'nearest',behavior:'auto'});
+  };
+  const follow = selector => {
+    const link = document.querySelector(selector);
+    if (link instanceof HTMLAnchorElement) { location.assign(link.href); return true; }
+    return false;
+  };
+  const action = intent => {
+    const form = current?.querySelector(`form:has(input[name="intent"][value="${intent}"])`);
+    if (!(form instanceof HTMLFormElement)) return false;
+    form.requestSubmit();
+    return true;
+  };
+  const help = () => {
+    const previous = document.querySelector('#shortcut-help');
+    if (previous?.open) return;
+    previous?.remove();
+    const dialog = document.createElement('dialog');
+    dialog.id = 'shortcut-help';
+    dialog.className = 'shortcut-help';
+    dialog.setAttribute('aria-labelledby','shortcut-help-title');
+    const title = document.createElement('h2'); title.id = 'shortcut-help-title'; title.textContent = 'Keyboard shortcuts';
+    const description = document.createElement('p');
+    description.textContent = 'N: new post · /: search · J/K: move between posts · O: open · R: reply · A: Attention · B: bookmark · [ / ]: newer / older · G then H, N, B, D or P: Home, Notifications, Bookmarks, Drive or your profile · Ctrl/Cmd+Enter: submit a post';
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = !disabled();
+    label.append(checkbox,document.createTextNode(' Enable single-key shortcuts'));
+    checkbox.addEventListener('change', () => { try { localStorage.setItem(preference, checkbox.checked ? '0' : '1'); } catch {} });
+    const close = document.createElement('button'); close.type = 'button'; close.textContent = 'Close';
+    close.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => { dialog.remove(); if (!document.querySelector('#shortcut-help[open]')) document.querySelector('.shortcut-help-button')?.focus(); }, {once:true});
+    dialog.append(title,description,label,close); document.body.append(dialog); dialog.showModal();
+  };
+  if (typeof HTMLDialogElement !== 'undefined') {
+    const area = document.querySelector('.sidebar .account');
+    if (area) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'shortcut-help-button';
+      button.textContent = 'Keyboard shortcuts'; button.addEventListener('click',help); area.append(button);
+    }
+  }
+  document.addEventListener('keydown', event => {
+    if (event.defaultPrevented || event.isComposing || event.repeat || event.altKey) return;
+    if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.key === 'Enter' &&
+        composer && composer.contains(event.target)) {
+      const button = composer.querySelector('button[name="mode"][value="publish"]');
+      if (button && !button.disabled) { event.preventDefault(); button.form.requestSubmit(button); }
+      return;
+    }
+    if (event.ctrlKey || event.metaKey || editable(event.target) || window.getSelection()?.toString()) return;
+    if (event.key === '?' && typeof HTMLDialogElement !== 'undefined') { event.preventDefault(); help(); return; }
+    if (disabled() || document.querySelector('dialog[open]')) return;
+    const key = event.key.toLowerCase();
+    if (prefix && Date.now() - prefix < 1200) {
+      prefix = 0;
+      const routes = {h:'/', n:'/notifications', b:'/saved', d:'/drive'};
+      if (routes[key]) { event.preventDefault(); location.assign(routes[key]); return; }
+      if (key === 'p' && follow('.account-identity')) { event.preventDefault(); return; }
+    }
+    if (key === 'g' && !event.shiftKey) { prefix = Date.now(); event.preventDefault(); return; }
+    if (event.shiftKey) return;
+    let handled = true;
+    switch (key) {
+      case 'n': handled = follow('a[href="/compose"]'); break;
+      case '/': handled = follow('a[href="/search"]'); break;
+      case 'j': selectCard(1); break;
+      case 'k': selectCard(-1); break;
+      case 'o': if (current) location.assign(current.dataset.href); else handled = false; break;
+      case 'r': {
+        const link = current?.querySelector('.note-actions a[href*="reply="]');
+        if (link instanceof HTMLAnchorElement) location.assign(link.href); else handled = false;
+        break;
+      }
+      case 'a': handled = action('eyes'); break;
+      case 'b': handled = action('bookmark'); break;
+      case '[': handled = follow('.pager a[rel="prev"], .pager a[rel="first"]'); break;
+      case ']': handled = follow('.pager a[rel="next"]'); break;
+      default: handled = false;
+    }
+    if (handled) event.preventDefault();
+  });
+})();
+
+// Render the first part of a timeline immediately and complete the same stable page in the background.
+(() => {
+  const feed = document.querySelector('.feed[data-progressive="timeline"]');
+  const link = document.querySelector('[data-load-all]');
+  const current = new URL(location.href);
+  if (!feed || !link || current.searchParams.has('chunk') || !/^[0-9]+$/.test(feed.dataset.anchor || '')) return;
+  const status = document.querySelector('.timeline-status');
+  const abort = new AbortController();
+  addEventListener('pagehide', () => abort.abort(), {once:true});
+  const load = async () => {
+    status.textContent = 'Loading more posts…';
+    try {
+      for (const chunk of ['1','2']) {
+        const url = new URL(current);
+        url.searchParams.set('chunk',chunk);
+        url.searchParams.set('snapshot',feed.dataset.anchor);
+        const response = await fetch(url,{credentials:'same-origin',signal:abort.signal});
+        if (!response.ok || new URL(response.url).pathname !== current.pathname) throw new Error('Timeline unavailable');
+        const parsed = new DOMParser().parseFromString(await response.text(),'text/html');
+        const section = parsed.querySelector('.feed[data-progressive="timeline"]');
+        if (!section) throw new Error('Timeline changed');
+        for (const child of section.children) {
+          if (!child.matches('article.note,.conversation-pair')) continue;
+          const article = child.matches('article.note') ? child : child.querySelector('article.note');
+          if (article?.id && document.getElementById(article.id)) continue;
+          feed.append(document.importNode(child,true));
+        }
+      }
+      if (feed.querySelector('article.note')) feed.querySelector(':scope > .empty')?.remove();
+      link.hidden = true; status.textContent = '';
+      document.dispatchEvent(new Event('lkjsns:timeline-loaded'));
+    } catch (error) {
+      if (error.name !== 'AbortError') status.textContent = 'Could not load more posts. Use the link to try again.';
+    }
+  };
+  load();
 })();

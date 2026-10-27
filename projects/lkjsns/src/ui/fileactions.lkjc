@@ -19,7 +19,7 @@
     (body (record structural (field user (text "alice"))
       (field csrf (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
       (field session (text "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))
-      (field now (i64 1)))))
+      (field now (i64 1)) (field share (text "")))))
 
   (function create sample-file (visibility private)
     (parameter create owner (type Text))
