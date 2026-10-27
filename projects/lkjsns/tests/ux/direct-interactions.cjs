@@ -59,7 +59,15 @@ const {chromium,base,fixture,output,fs,path,assert,form,fields,click,goto,pass,s
   await goto(p,'/file?id='+media.avatarId);assert.equal(await p.getByRole('button',{name:'Use as profile image',exact:true}).count(),0);
   await goto(p,'/settings/profile');assert.equal(await p.getByRole('link',{name:'Change image',exact:true}).count(),0);
   await click(p,p.getByRole('link',{name:'Change profile image',exact:true}));const choice=form(p,'avatar').filter({has:p.locator('input[name=id][value="'+media.avatarId+'"]')}).locator('.media-choice');
-  assert.equal(await choice.getAttribute('aria-pressed'),'true');await choice.focus();await Promise.all([p.waitForNavigation(),p.keyboard.press('Enter')]);
+  assert.equal(await choice.getAttribute('aria-pressed'),'true');
+  for(const width of [320,390,768,1280]){
+   await p.setViewportSize({width,height:900});
+   const box=await choice.locator('.file-thumb').boundingBox();
+   assert(Math.abs(box.width-box.height)<=1,JSON.stringify({width,box}));
+   if(width===1280)assert(box.height<=150,JSON.stringify({width,box}));
+  }
+  await p.setViewportSize({width:1280,height:1000});
+  await choice.focus();await Promise.all([p.waitForNavigation(),p.keyboard.press('Enter')]);
   assert.equal(new URL(p.url()).pathname,'/settings/profile');
   pass('Profile image itself opens its picker; the selected preview is the keyboard-accessible action');
   // Invitations have no product cap. Empty is deliberately unlimited/never, not zero.

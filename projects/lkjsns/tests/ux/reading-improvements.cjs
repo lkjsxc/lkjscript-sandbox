@@ -22,7 +22,9 @@ const {chromium,base,assert,fields,goto,click,session,newPostId,pass}=require('.
   pagers=page.getByRole('navigation',{name:'Pagination',exact:true});
   assert.equal(await pagers.count(),2);
   assert.equal(await pagers.locator('a[rel=prev]').count(),2);
-  assert.equal(await pagers.locator('button.pager-next:disabled').count(),2);
+  const olderLinks=await pagers.locator('a[rel=next]').count();
+  const disabledOlder=await pagers.locator('button.pager-next:disabled').count();
+  assert((olderLinks===2&&disabledOlder===0)||(olderLinks===0&&disabledOlder===2));
   const reading=new URL(page.url());assert(reading.searchParams.has('cursor'));
   await page.evaluate(()=>scrollTo(0,300));
   await click(page,page.locator('.sidebar a[href="/compose"]'));
@@ -35,6 +37,10 @@ const {chromium,base,assert,fields,goto,click,session,newPostId,pass}=require('.
   assert.equal(new URL(page.url()).pathname+new URL(page.url()).search,reading.pathname+reading.search);
   pass('Pagination has disabled boundaries and posting returns to the exact prior timeline after attachment selection');
   await goto(page,'/?cursor=0');
+  pagers=page.getByRole('navigation',{name:'Pagination',exact:true});
+  assert.equal(await pagers.count(),2);
+  assert.equal(await pagers.locator('button.pager-next:disabled').count(),2);
+  assert.equal(await pagers.locator('a[rel=first]').count(),2);
   for (const width of [320,390,1280]) {
     await page.setViewportSize({width,height:900});
     for (const link of await page.locator('.pager a[rel=first]').all()) {
