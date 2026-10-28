@@ -82,6 +82,11 @@ The same readability check remains authoritative. A content warning summarizes
 the warning without leaking its body; a private, deleted, suspended or muted
 parent remains unavailable. Parent previews do not render unapproved media.
 Composition keeps the safe separate-tab parent link and its retained reply target.
+Reply actions on all post cards open the selected post’s composer directly.
+Shared-thread replies preserve the capability and the original thread location,
+including pagination, even when the browser sends only an origin referrer.
+Detail pages render each visible post time in UTC and enhance it to the
+browser’s local timezone when JavaScript is available. Timelines remain relative.
 
 ## A successful save completes the task
 

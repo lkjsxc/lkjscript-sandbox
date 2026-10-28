@@ -20,7 +20,7 @@ const {resourceId,isResource,isEditor,chromium,base,fixture,output,fs,path,asser
   pass('Primary navigation and account identity destinations');
   await goto(p,'/settings'); assert.equal(await p.locator('h1').innerText(),'Settings');
   assert.equal(await p.locator('input[name=password]').count(),0);
-  assert.deepEqual(await p.locator('.settings-row').evaluateAll(es=>es.map(e=>e.getAttribute('href'))),['/settings/profile','/settings/security']);
+  assert.deepEqual(await p.locator('a.settings-row').evaluateAll(es=>es.map(e=>e.getAttribute('href'))),['/settings/profile','/settings/security']);
   await goto(p,'/more');for(const route of ['/search','/saved','/drive','/people','/settings','/admin','/about','/privacy','/terms','/guidelines','/contact']) assert.equal(await p.locator(`main .settings-row[href="${route}"]`).count(),1,route);
   assert.equal(await p.locator('a[href="/drafts"]').count(),0);
   pass('More contains navigation and service information; Settings contains only settings');

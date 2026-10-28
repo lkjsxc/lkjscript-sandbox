@@ -8,7 +8,9 @@
     (parameter create note (type Note))
     (parameter create place (type Text))
     (returns Text) (effect pure)
-    (body (if (call util::post-id (field (local note) (name id))) (if (call std::text-equal (local place) (call std::text-join (list Text (text "thread:") (field (local note) (name id))) (text ""))) (call std::text-join (list Text (text "/compose?reply=") (field (local note) (name id))) (text "")) (call paths::canonical (call std::text-join (list Text (text "/note?id=") (field (local note) (name id)) (text "")) (text "")))) (text "/"))))
+    (body (if (call util::post-id (field (local note) (name id)))
+      (call std::text-join (list Text (text "/compose?reply=") (field (local note) (name id))) (text ""))
+      (text "/"))))
 
   (function create readable (visibility public)
     (parameter create ctx (type Context))
@@ -22,7 +24,7 @@
     (parameter create ctx (type Context))
     (parameter create id (type Text))
     (returns Text) (effect (task (requirement service::app::store)))
-    (body (call conversation::parent (local ctx) (local id) (call db::user (field (local ctx) (name user))) (bool true))))
+    (body (call conversation::parent (local ctx) (local id) (call db::user (field (local ctx) (name user))) (bool true) (bool false))))
 
   (test create warning-preview-never-includes-body (visibility private)
     (actual (call conversation::summary (record structural (field id (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")) (field author (text "alice")) (field body (text "Hidden body <script> & emoji 🌍")) (field cw (text "Spoilers <em>")) (field audience (text "public")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))))) (expected (text "Content warning: Spoilers <em>")))
@@ -33,14 +35,14 @@
   (test create media-only-preview (visibility private)
     (actual (call conversation::summary (record structural (field id (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")) (field author (text "alice")) (field body (text "")) (field cw (text "")) (field audience (text "public")) (field reply (text "")) (field media (list Text (text "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))))) (expected (text "Media attachment")))
 
-  (test create feed-reply-opens-conversation (visibility private)
-    (actual (call conversation::destination (record structural (field id (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")) (field author (text "alice")) (field body (text "Hidden body <script> & emoji 🌍")) (field cw (text "Spoilers <em>")) (field audience (text "public")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))) (text "home"))) (expected (text "/nananananananana")))
+  (test create feed-reply-opens-editor (visibility private)
+    (actual (call conversation::destination (record structural (field id (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")) (field author (text "alice")) (field body (text "Hidden body <script> & emoji 🌍")) (field cw (text "Spoilers <em>")) (field audience (text "public")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))) (text "home"))) (expected (text "/compose?reply=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")))
 
   (test create parent-reply-opens-editor (visibility private)
     (actual (call conversation::destination (record structural (field id (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")) (field author (text "alice")) (field body (text "Hidden body <script> & emoji 🌍")) (field cw (text "Spoilers <em>")) (field audience (text "public")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))) (text "thread:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))) (expected (text "/compose?reply=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")))
 
-  (test create nested-reply-opens-own-conversation (visibility private)
-    (actual (call conversation::destination (record structural (field id (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")) (field author (text "alice")) (field body (text "Hidden body <script> & emoji 🌍")) (field cw (text "Spoilers <em>")) (field audience (text "public")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))) (text "thread:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))) (expected (text "/nananananananana")))
+  (test create nested-reply-opens-editor (visibility private)
+    (actual (call conversation::destination (record structural (field id (text "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")) (field author (text "alice")) (field body (text "Hidden body <script> & emoji 🌍")) (field cw (text "Spoilers <em>")) (field audience (text "public")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))) (text "thread:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))) (expected (text "/compose?reply=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")))
 
   (test create invalid-destination-fails-closed (visibility private)
     (actual (call conversation::destination (record structural (field id (text "bad&query")) (field author (text "alice")) (field body (text "Hidden body <script> & emoji 🌍")) (field cw (text "Spoilers <em>")) (field audience (text "public")) (field reply (text "")) (field media (list Text)) (field eyes (list Text)) (field created (i64 1)) (field edited (i64 1)) (field version (i64 1)) (field published (bool true)) (field deleted (bool false))) (text "home"))) (expected (text "/")))
@@ -76,16 +78,17 @@
     (body (if (call std::less (i64 360) (call util::size (local value))) (call std::text-join (list Text (call util::slice (local value) (i64 0) (call searchtext::boundary (call std::bytes-from-text (local value)) (i64 360))) (text "…")) (text "")) (local value))))
 
   (function create preview (visibility public) (parameter create note (type Note)) (parameter create composing (type Bool))
-    (returns Text) (effect pure) (body (call conversation::preview-view (local note) (call db::empty-user) (field (local note) (name created)) (local composing) (text ""))))
+    (returns Text) (effect pure) (body (call conversation::preview-view (local note) (call db::empty-user) (field (local note) (name created)) (local composing) (text "") (bool false))))
 
   (function create parent (visibility public)
     (parameter create ctx (type Context))
     (parameter create id (type Text))
     (parameter create viewer (type User))
     (parameter create composing (type Bool))
+    (parameter create absolute (type Bool))
     (returns Text) (effect (task (requirement service::app::store)))
     (body (if (call util::post-id (local id)) (let (binding note (call db::note (local id))) (binding actor (call db::user (field (local note) (name author)))) (in (if (call conversation::readable (local ctx) (local note) (local viewer) (local actor)) (call conversation::preview-view (local note) (local actor) (field (local ctx) (name now)) (local composing)
-  (if (call std::text-equal (field (local note) (name audience)) (call util::share-audience (field (local ctx) (name share)))) (field (local ctx) (name share)) (text ""))) (if (local composing) (text "<aside class=\"reply-preview parent-unavailable\" aria-label=\"Original post\"><p class=\"field-help\">Original post unavailable.</p></aside>") (text "<div class=\"reply-context parent-unavailable\" role=\"note\">Original post unavailable.</div>"))))) (text ""))))
+  (if (call std::text-equal (field (local note) (name audience)) (call util::share-audience (field (local ctx) (name share)))) (field (local ctx) (name share)) (text "")) (local absolute)) (if (local composing) (text "<aside class=\"reply-preview parent-unavailable\" aria-label=\"Original post\"><p class=\"field-help\">Original post unavailable.</p></aside>") (text "<div class=\"reply-context parent-unavailable\" role=\"note\">Original post unavailable.</div>"))))) (text ""))))
 
   (function create show-parent (visibility public)
     (parameter create note (type Note))
@@ -101,7 +104,7 @@
 
 
   (function create preview-view (visibility public) (parameter create note (type Note)) (parameter create actor (type User))
-    (parameter create now (type I64)) (parameter create composing (type Bool)) (parameter create share (type Text)) (returns Text) (effect pure)
+    (parameter create now (type I64)) (parameter create composing (type Bool)) (parameter create share (type Text)) (parameter create absolute (type Bool)) (returns Text) (effect pure)
     (body (call std::text-join (list Text
       (text "<a class=\"reply-preview parent-card\" href=\"")
       (call std::html-escape-text (call util::post-link (field (local note) (name id)) (local share))) (text "\"")
@@ -110,7 +113,7 @@
       (text "<span class=\"parent-person\"><strong>")
       (call std::html-escape-text (if (call std::text-equal (field (local actor) (name display)) (text "")) (field (local note) (name author)) (field (local actor) (name display))))
       (text "</strong><span class=\"meta\">@") (call std::html-escape-text (field (local note) (name author)))
-      (text " · ") (call std::html-escape-text (call page::ago (local now) (field (local note) (name created))))
+      (text " · ") (call page::post-time (local now) (field (local note) (name created)) (local absolute))
       (text "</span></span></span><span class=\"context-copy\">")
       (call std::html-escape-text (call conversation::summary (local note)))
       (text "</span>") (if (local composing) (text "<span class=\"sr-only\">Opens in a new tab</span>") (text "")) (text "</a>")) (text ""))))

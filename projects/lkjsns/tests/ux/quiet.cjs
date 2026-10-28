@@ -13,7 +13,7 @@ const {chromium,base,output,fs,path,assert,form,fields,click,goto,pass,session,s
  }
  await goto(p,'/more');assert.equal(await p.locator('main .settings-row[href="/admin"]').count(),1);
  await goto(m,'/more');assert.equal(await m.locator('main a[href="/admin"]').count(),0);
- await goto(p,'/settings');assert.deepEqual(await p.locator('main .settings-row').evaluateAll(es=>es.map(e=>e.getAttribute('href'))),['/settings/profile','/settings/security']);
+ await goto(p,'/settings');assert.deepEqual(await p.locator('main a.settings-row').evaluateAll(es=>es.map(e=>e.getAttribute('href'))),['/settings/profile','/settings/security']);
  for(const route of ['/more','/about','/privacy','/terms','/guidelines','/contact']){await goto(g,route);assert.equal(await g.locator('html').getAttribute('lang'),'en');assert.equal(await g.locator('main a[href="/admin"]').count(),0);}
  await goto(g,'/contact');assert.equal(await g.locator('main a[href="mailto:lkjsxc@gmail.com"]').count(),1);
  await goto(g,'/join');assert.equal(await g.locator('form a[href="/terms"]').count(),1);assert.equal(await g.locator('form a[href="/privacy"]').count(),1);

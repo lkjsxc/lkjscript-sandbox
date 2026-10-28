@@ -8,6 +8,17 @@ document.addEventListener('click', event => {
   const card = event.target.closest('article.note[data-href]');
   if (card) window.location.assign(card.dataset.href);
 });
+// The server supplies an absolute UTC fallback; display the same instant locally when possible.
+for (const time of document.querySelectorAll('time[data-local-time]')) {
+  try {
+    const instant = new Date(time.dateTime);
+    if (!Number.isFinite(instant.getTime())) continue;
+    time.textContent = new Intl.DateTimeFormat('en-US', {
+      year:'numeric', month:'short', day:'numeric',
+      hour:'numeric', minute:'2-digit', timeZoneName:'short'
+    }).format(instant);
+  } catch { /* Keep the server-rendered UTC time. */ }
+}
 const composer = document.querySelector('.composer');
 const audience = composer?.querySelector('select[name="audience"]');
 const textarea = composer?.querySelector('textarea[name="body"]');

@@ -34,6 +34,11 @@ Home and Attention initially render ten indexed entries, then load the remainder
 of the same stable page in the background. A normal link loads the complete page
 when JavaScript is disabled or a request fails.
 
+Reply actions open the composer for the selected post directly, including in
+nested conversations. Publishing returns to the screen where writing began.
+Post-detail pages show absolute times in the browser’s local timezone, with a
+UTC fallback when JavaScript is unavailable; timelines keep relative times.
+
 Posts support replies, muting, Attention, bookmarks, and notifications.
 User relationships also use Attention: profiles link to Attention to and
 Attention from, with native in-list controls and mutual-state labels.

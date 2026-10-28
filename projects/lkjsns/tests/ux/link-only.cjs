@@ -1,8 +1,10 @@
 // Synthetic browser acceptance for capability-based post and file access.
 'use strict';
-const {chromium,base,output,path,assert,form,click,goto,pass,session}=require('./support.cjs');
+const {base,output,path,assert,form,click,goto,pass,session,shortPostId}=require('./support.cjs');
+const browserType=require(process.env.LKJSNS_PLAYWRIGHT||'playwright')[process.env.LKJSNS_POLISH_BROWSER||'chromium'];
+assert(browserType,'Unknown browser engine');
 (async()=>{
- const browser=await chromium.launch({headless:true});
+ const browser=await browserType.launch({headless:true});
  try{
   const owner=await session(browser),p=await owner.newPage();p.setDefaultTimeout(30000);
   await goto(p,'/');await click(p,p.locator('.sidebar a[href="/compose"]'));
@@ -59,6 +61,7 @@ const {chromium,base,output,path,assert,form,click,goto,pass,session}=require('.
   await click(m,m.locator('.note-detail').getByRole('link',{name:/^Reply/}));
   assert.equal(await m.locator('[name=audience]').inputValue(),'link-only');
   await m.locator('[name=body]').fill('A **reply** visible only inside the shared thread');
+  const child=shortPostId(await m.locator('[name=id]').inputValue());
   await click(m,m.getByRole('button',{name:'Post',exact:true}));
   assert.equal(new URL(m.url()).pathname+new URL(m.url()).search,sharedURL.pathname+sharedURL.search);
   assert((await m.locator('main').innerText()).includes('A reply visible only inside the shared thread'));
@@ -66,6 +69,32 @@ const {chromium,base,output,path,assert,form,click,goto,pass,session}=require('.
   assert((await anonymous.locator('main').innerText()).includes('A reply visible only inside the shared thread'));
   assert.equal(await anonymous.locator('.reply-list .note-body strong').innerText(),'reply');
   pass('Bookmarks and replies retain access only within the shared thread');
+
+  const olderThread=sharedURL.pathname+sharedURL.search+'&cursor=0&trail=_';
+  await goto(m,olderThread);
+  await click(m,m.locator('.note-detail').getByRole('link',{name:/^Reply/}));
+  assert.equal(await m.locator('[name=return]').inputValue(),olderThread);
+  await goto(m,sharedURL.pathname+sharedURL.search);
+
+  await click(m,m.locator('.reply-list #post-'+child+' .note-actions').getByRole('link',{name:/^Reply/}));
+  assert.equal(new URL(m.url()).pathname,'/compose');
+  assert.equal(await m.locator('[name=reply]').inputValue(),child);
+  assert.equal(await m.locator('[name=return]').inputValue(),sharedURL.pathname+sharedURL.search);
+  assert.equal(await m.locator('[name=share]').inputValue(),sharedURL.searchParams.get('share'));
+  await m.locator('[name=body]').fill('Nested capability reply');
+  await click(m,m.getByRole('button',{name:'Post',exact:true}));
+  assert.equal(new URL(m.url()).pathname+new URL(m.url()).search,sharedURL.pathname+sharedURL.search);
+
+  const offline=await session(browser,'member',{javaScriptEnabled:false});
+  const n=await offline.newPage();await goto(n,sharedURL.pathname+sharedURL.search);
+  await click(n,n.locator('.reply-list #post-'+child+' .note-actions').getByRole('link',{name:/^Reply/}));
+  assert.equal(await n.locator('[name=reply]').inputValue(),child);
+  assert.equal(await n.locator('[name=return]').inputValue(),sharedURL.pathname+sharedURL.search);
+  await n.locator('[name=body]').fill('Nested capability reply without JavaScript');
+  await click(n,n.getByRole('button',{name:'Post',exact:true}));
+  assert.equal(new URL(n.url()).pathname+new URL(n.url()).search,sharedURL.pathname+sharedURL.search);
+  await offline.close();
+  pass('Nested shared replies open their composer and return to the capability thread with and without JavaScript');
   await member.close();await guest.close();
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});
