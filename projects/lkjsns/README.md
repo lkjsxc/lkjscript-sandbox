@@ -51,9 +51,10 @@ Posts, replies, and profile bios support a bounded Markdown subset, including
 headings, emphasis, lists, task lists, quotes, links, code blocks, and tables.
 Raw HTML is displayed as text. Markdown images become links; attach a file to
 display it. Editing retains the original Markdown source. Long posts show a
-compact preview, with a paged reading view for the complete text. Code fences
-continue across pages. A Markdown token that spans a page boundary in an unusually
-long unbroken line may appear as literal text on those pages.
+compact preview, with a continuous reading view for the complete text. The
+full view loads automatically in bounded batches and requires JavaScript. Code
+fences continue across batches. A Markdown token spanning a batch boundary in an
+unusually long unbroken line may appear as literal text at that boundary.
 
 HTTP(S) links in posts and profile text open separately, with opener/referrer
 protection and a small external-link indicator. Native rendering escapes content,

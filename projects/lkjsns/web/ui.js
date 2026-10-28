@@ -539,3 +539,131 @@ document.addEventListener('click', event => {
     }
   });
 })();
+
+// Read a long post in one continuous view using authorized native fragments.
+(() => {
+  const reader = document.querySelector('[data-post-reader]');
+  if (!reader) return;
+  const preview = reader.querySelector('[data-post-preview]');
+  const body = reader.querySelector('[data-post-complete]');
+  const status = reader.querySelector('[data-post-status]');
+  const retry = reader.querySelector('[data-post-retry]');
+  const warning = reader.closest('details.cw');
+  const size = Number(reader.dataset.size);
+  if (!preview || !body || !status || !retry || !Number.isSafeInteger(size) || size <= 0) return;
+
+  let offset = 0, fence = 0, line = 0, loading = false, finished = false;
+  let controller = null, pageActive = true, resume = false;
+  const setStatus = value => { status.textContent = value; status.hidden = !value; };
+  const asNumber = value => /^\d+$/.test(value || '') ? Number(value) : NaN;
+  const codeOf = node => node?.matches('pre') ? node.querySelector(':scope > code') : null;
+
+  function appendBatch(batch) {
+    const next = asNumber(batch.dataset.next), endFence = asNumber(batch.dataset.fence);
+    const endLine = asNumber(batch.dataset.line), total = asNumber(batch.dataset.size);
+    if (asNumber(batch.dataset.offset) !== offset || total !== size ||
+        !Number.isSafeInteger(next) || next <= offset || next > size ||
+        !Number.isSafeInteger(endFence) || ![0, 1].includes(endLine)) {
+      throw new Error('The post text response is invalid.');
+    }
+    const pieces = [...batch.children];
+    if (!pieces.length || pieces.some(piece => !piece.matches('[data-post-piece]'))) {
+      throw new Error('The post text response is incomplete.');
+    }
+    let expected = fence;
+    let previousCode = expected ? codeOf(body.lastElementChild) : null;
+    for (const piece of pieces) {
+      const before = asNumber(piece.dataset.fenceIn), after = asNumber(piece.dataset.fenceOut);
+      const sentinel = piece.dataset.sentinel;
+      if (before !== expected || !Number.isSafeInteger(after) || !['0', '1'].includes(sentinel)) {
+        throw new Error('The post text continuation is invalid.');
+      }
+      const first = before ? codeOf(piece.firstElementChild) : null;
+      if (before && (!first || !previousCode)) throw new Error('The code block continuation is invalid.');
+      if (sentinel === '1') {
+        const firstText = first?.firstChild;
+        if (!firstText || firstText.nodeType !== Node.TEXT_NODE || !firstText.data.startsWith('x')) {
+          throw new Error('The code block continuation is invalid.');
+        }
+        firstText.deleteData(0, 1);
+      }
+      previousCode = after ? codeOf(piece.lastElementChild) : null;
+      if (after && !previousCode) throw new Error('The code block continuation is invalid.');
+      expected = after;
+    }
+    if (expected !== endFence) throw new Error('The post text continuation is invalid.');
+
+    for (const piece of pieces) {
+      if (asNumber(piece.dataset.fenceIn)) {
+        const original = codeOf(body.lastElementChild);
+        const first = piece.firstElementChild;
+        const continuation = codeOf(first);
+        while (continuation.firstChild) original.append(continuation.firstChild);
+        first.remove();
+      }
+      body.append(...piece.childNodes);
+    }
+    offset = next;
+    fence = endFence;
+    line = endLine;
+    preview.hidden = true;
+    body.hidden = false;
+  }
+
+  async function load() {
+    if (loading || finished || !pageActive || (warning && !warning.open)) return;
+    loading = true;
+    controller = new AbortController();
+    retry.hidden = true;
+    reader.setAttribute('aria-busy', 'true');
+    setStatus('Loading full post…');
+    try {
+      while (offset < size) {
+        const url = new URL('/post-body/read', location.origin);
+        url.searchParams.set('note', reader.dataset.note);
+        url.searchParams.set('version', reader.dataset.version);
+        if (reader.dataset.share) url.searchParams.set('share', reader.dataset.share);
+        url.searchParams.set('fragment', '1');
+        url.searchParams.set('offset', String(offset));
+        url.searchParams.set('fence', String(fence));
+        url.searchParams.set('line', String(line));
+        const response = await fetch(url, {credentials:'same-origin', cache:'no-store', redirect:'error', signal:controller.signal});
+        if (response.status === 404 || response.status === 409) {
+          const error = new Error('This post is unavailable or has changed. Return to the post and open it again.');
+          error.changed = true;
+          throw error;
+        }
+        if (!response.ok) throw new Error('The full post could not be loaded. Try again.');
+        const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const batch = doc.querySelector('[data-post-batch]');
+        if (!batch) throw new Error('The post text response is invalid. Try again.');
+        appendBatch(batch);
+        setStatus('Loading full post… ' + Math.floor(offset * 100 / size) + '%');
+      }
+      finished = true;
+      setStatus('');
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        setStatus(error.message || 'The full post could not be loaded. Try again.');
+        retry.hidden = !!error.changed;
+      }
+    } finally {
+      loading = false;
+      controller = null;
+      reader.removeAttribute('aria-busy');
+      if (resume) { resume = false; queueMicrotask(load); }
+    }
+  }
+
+  retry.addEventListener('click', load);
+  warning?.addEventListener('toggle', () => { if (warning.open) load(); });
+  addEventListener('pagehide', () => { pageActive = false; controller?.abort(); });
+  addEventListener('pageshow', event => {
+    pageActive = true;
+    if (event.persisted && !finished) {
+      if (loading) resume = true;
+      else load();
+    }
+  });
+  load();
+})();

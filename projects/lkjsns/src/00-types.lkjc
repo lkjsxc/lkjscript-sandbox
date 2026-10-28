@@ -36,5 +36,6 @@
 (type-alias PostBodyGrant (record (valid Bool) (blob Text) (part I64) (version I64) (size I64)))
 
 (type-alias PostReadGrant (record (valid Bool) (note Note) (stage PostBodyStage) (ctx Context)))
+(type-alias PostReadBatch (record (valid Bool) (used I64) (fence I64) (line Bool) (html Text)))
 (type-alias PostSearchCandidate (record (valid Bool) (note Note) (stage PostBodyStage) (ctx Context) (viewer User)))
 (type-alias PostSearchCheck (record (valid Bool) (rows Text)))
