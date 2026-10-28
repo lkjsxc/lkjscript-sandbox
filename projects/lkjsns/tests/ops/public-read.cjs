@@ -16,7 +16,7 @@ const output=fs.mkdtempSync(path.join(root,'.build/public-read-'));fs.chmodSync(
   for(const route of ['/','/login','/join','/about']){
    const response=await page.goto(base+route,{waitUntil:'load'});assert.equal(response.status(),200,route);
    assert.equal(new URL(page.url()).origin,base);assert.equal(await page.locator('html').getAttribute('lang'),'en');assert.equal(await page.locator('h1').count(),1);
-   assert(response.headers()['content-security-policy'].includes("script-src 'none'"));assert(response.headers()['cache-control'].includes('no-store'));
+   assert(response.headers()['content-security-policy'].includes("default-src 'none'"));assert(response.headers()['content-security-policy'].includes("script-src 'self'"));assert(response.headers()['cache-control'].includes('no-store'));
    assert.equal(response.headers()['referrer-policy'],'same-origin');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
    assert(!/[\u3040-\u30ff\u3400-\u9fff]/u.test((await page.locator('nav,h1,label,button').allTextContents()).join(' ')),'Product-owned labels must be English');
    checks.push({route,width,colorScheme,status:response.status()});
