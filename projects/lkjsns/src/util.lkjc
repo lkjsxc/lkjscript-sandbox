@@ -56,7 +56,7 @@
   (function create parse
     (visibility public) (parameter create data (type Bytes))
     (returns Form) (effect pure)
-    (body (match (call forms::decode (local data) (i64 65536) (i64 32)) (arm forms::result::valid (payload items (list forms::field)) (record structural (field valid (bool true)) (field items (local items)))) (arm forms::result::invalid (payload error Text) (record structural (field valid (bool false)) (field items (list forms::field)))))))
+    (body (match (call forms::decode (local data) (i64 1048576) (i64 32)) (arm forms::result::valid (payload items (list forms::field)) (record structural (field valid (bool true)) (field items (local items)))) (arm forms::result::invalid (payload error Text) (record structural (field valid (bool false)) (field items (list forms::field)))))))
 
   (function create values
     (visibility public) (parameter create items (type (list forms::field))) (parameter create name (type Text)) (parameter create index (type I64)) (parameter create out (type (list Text)))

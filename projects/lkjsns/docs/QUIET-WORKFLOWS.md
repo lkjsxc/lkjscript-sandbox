@@ -52,11 +52,10 @@ migration and avoids counting private replies through a public aggregate.
 
 ## Text admission
 
-Browser boundary tests exposed a pre-existing mismatch: the application advertised
-16,000 bytes, while a shared web-editor sample helper rejected text above 4,096.
-The SNS now owns its bounded native text validation and CRLF/CR normalization.
-It still rejects disallowed C0 controls and DEL; other form fields keep their own
-smaller limits. This is an application fix, not a patched language binary.
+Post text has no separate application length limit. The SNS validates UTF-8,
+normalizes CRLF/CR to LF, and rejects disallowed C0 controls and DEL. Other form
+fields keep their own limits. Text over 64 KiB uses JavaScript and bounded native
+transfers; available shared Drive storage and browser resources still apply.
 
 ## Files and links
 

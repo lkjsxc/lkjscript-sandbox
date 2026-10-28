@@ -24,7 +24,9 @@ for ((step=1; step<=steps; step++)); do
   fi
   status=$(jq -er 'select(type=="number" and (.==0 or .==1 or . == -1 or . == -2))' "$result")
   case "$status" in
-    0) printf 'Post address index ready; native batches=%s.\n' "$step"; exit 0 ;;
+    0) printf 'Post address index ready; native batches=%s.\n' "$step"
+       bash "$ROOT/ops/index-post-usage.sh" "$descriptor"
+       exit 0 ;;
     1) ;;
     *) echo 'Post address indexing refused a conflict or colliding address. Existing aliases were not overwritten; inspect the checkpoint before resuming.' >&2; exit 1 ;;
   esac

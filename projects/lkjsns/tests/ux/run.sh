@@ -34,7 +34,7 @@ start(){
 }
 start
 node tests/browser/media-fixtures.cjs
-for suite in ${LKJSNS_UX_SUITES:-accounts writing media search security direct-interactions transfer-recovery layout large replies markdown link-only quiet quiet-paging quiet-files quiet-content attention self-profile favicons brand no-script pager-all reading-flow reading-improvements reading-polish timeline-progress density};do
+for suite in ${LKJSNS_UX_SUITES:-accounts writing post-storage postblob postread-search media search security direct-interactions transfer-recovery layout large replies markdown link-only quiet quiet-paging quiet-files quiet-content attention self-profile favicons brand no-script pager-all reading-flow reading-improvements reading-polish timeline-progress density};do
  echo "--- $suite";node "tests/ux/$suite.cjs" 2>&1 | tee "$output/$suite.log"
 done
 "$LKJ" data verify --root "$fixture/data" > "$output/data-verify.log"

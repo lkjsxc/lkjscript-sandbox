@@ -60,9 +60,11 @@ apply_fragment icons "$ROOT/src/icons.lkjc"
 apply_fragment account-codec "$ROOT/src/attention/accountcodec.lkjc"
 for name in db preferences page assets auth access codec social compose notes drive; do
   apply_fragment "$name" "$ROOT/src/$name.lkjc"
+  if [[ "$name" == db ]]; then apply_fragment post-quota "$ROOT/src/postquota.lkjc"; fi
 done
 apply_fragment post-ids "$ROOT/src/reading/postids.lkjc"
 apply_fragment post-index "$ROOT/src/reading/postindex.lkjc"
+apply_fragment post-usage "$ROOT/src/reading/postusage.lkjc"
 apply_fragment reading-return "$ROOT/src/reading/returnnav.lkjc"
 apply_fragment attention-store "$ROOT/src/attention/store.lkjc"
 apply_fragment attention-migration "$ROOT/src/attention/migration.lkjc"
@@ -83,6 +85,9 @@ apply_fragment search-text "$ROOT/src/searchtext.lkjc"
 apply_fragment links "$ROOT/src/reading/links.lkjc"
 for name in mdinline mdline mdlists mdtable markdown; do
   apply_fragment "$name" "$ROOT/src/reading/$name.lkjc"
+done
+for name in postblob postgc postflow postread; do
+  apply_fragment "$name" "$ROOT/src/$name.lkjc"
 done
 for name in admission mediaui; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
@@ -109,6 +114,7 @@ for name in driveview mediaflow recovery; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done
 apply_fragment search-view "$ROOT/src/searchview.lkjc"
+apply_fragment post-search "$ROOT/src/postsearch.lkjc"
 apply_fragment confirmation "$ROOT/src/confirmation.lkjc"
 for name in flow download; do
   apply_fragment "transfer-$name" "$ROOT/src/transfers/$name.lkjc"

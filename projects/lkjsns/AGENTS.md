@@ -63,8 +63,9 @@ Keep cursor trails bounded and destination-free. Preserve the exact reading plac
 (e.g. bookmarks, not the saved URL name) through reaction forms. File options must
 return directly to the owned editor. HTTP(S) links remain natively escaped and
 new-tab safe, and reply metrics must not count unreadable/deleted/muted records.
-The SNS textinput module owns its 16,000-byte normalization boundary; do not
-reintroduce the web-editor sample's unrelated 4 KiB admission cap.
+The SNS textinput module validates and normalizes post text without a separate
+post-body size cap. Large bodies use bounded transfers and share the account's
+Drive quota; other fields keep their own limits.
 
 Service-information pages must match implemented behavior. Do not invent legal
 identity details, retention periods, automatic account deletion/export, or a

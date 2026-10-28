@@ -35,6 +35,18 @@ case "${1:-}" in
     bundle="$dev/bundles/$selected_sha.lkja"
     [[ ! -L "$bundle" ]] || exit 2
     if [[ ! -e "$bundle" ]]; then
+      # Offline indexes and quota reconciliation can change existing metadata.
+      # Keep a private, verified restore point once per newly selected bundle.
+      [[ ! -L "$dev/snapshots" ]] || { echo 'Refusing a linked snapshot directory.' >&2; exit 2; }
+      mkdir -p -m 700 "$dev/snapshots"
+      snapshot=$(mktemp -d "$dev/snapshots/before-bundle-XXXXXXXX")
+      cp -a --reflink=auto -- "$dev/data" "$snapshot/data"
+      cp -a --reflink=auto -- "$dev/objects" "$snapshot/objects"
+      if [[ -f "$dev/service.json" && ! -L "$dev/service.json" ]]; then
+        cp -a -- "$dev/service.json" "$snapshot/service.before.json"
+      fi
+      "$LKJ" data verify --root "$snapshot/data" > "$snapshot/verify.log"
+      printf 'Saved a private pre-upgrade snapshot: %s\n' "$snapshot"
       cp -- "$selected/lkjsns.lkja" "$bundle.next"
       [[ "$(sha256sum "$bundle.next" | cut -d ' ' -f 1)" == "$selected_sha" ]]
       mv -- "$bundle.next" "$bundle"

@@ -6,7 +6,37 @@
       (text "Anyone, including people who are not signed in, will be able to read this post and its attachments.")
       (text "Everyone registered here will be able to read this post and its attachments. This is independent of attention relationships."))))
 
-  (function create content (visibility public) (parameter create ctx (type Context)) (parameter create note (type Note)) (returns Text) (effect (task (requirement service::app::store))) (body (call std::text-join (list Text (text "<div class=\"note-body markdown\">") (call markdown::render (field (local note) (name body))) (text "</div>") (if (call std::less (i64 0) (call std::list-length (types Text) (field (local note) (name media)))) (call std::text-join (list Text (text "<div class=\"media-grid\">") (call mediaui::attachments (local ctx) (local note) (i64 0) (text "")) (text "</div>")) (text "")) (text ""))) (text ""))))
+  (function create body-link (visibility public) (parameter create ctx (type Context)) (parameter create note (type Note))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (if (call std::text-equal (call postblob::reference (field (local note) (name id))) (text "")) (text "")
+      (call std::text-join (list Text (text "<p class=\"field-help\"><a href=\"")
+        (call std::html-escape-text (call util::with-share
+          (call std::text-join (list Text (text "/post-body/read?note=") (field (local note) (name id))
+            (text "&version=") (call std::i64-to-text (field (local note) (name version)))) (text ""))
+          (field (local ctx) (name share))))
+        (text "\">Read full post</a></p>")) (text "")))))
+
+  (function create content (visibility public) (parameter create ctx (type Context)) (parameter create note (type Note)) (returns Text) (effect (task (requirement service::app::store))) (body (call std::text-join (list Text (text "<div class=\"note-body markdown\">") (call markdown::render (field (local note) (name body))) (text "</div>") (call writingview::body-link (local ctx) (local note)) (if (call std::less (i64 0) (call std::list-length (types Text) (field (local note) (name media)))) (call std::text-join (list Text (text "<div class=\"media-grid\">") (call mediaui::attachments (local ctx) (local note) (i64 0) (text "")) (text "</div>")) (text "")) (text ""))) (text ""))))
+
+  (function create excerpt (visibility public)
+    (parameter create ctx (type Context)) (parameter create note (type Note))
+    (returns Text) (effect (task (requirement service::app::store)))
+    (body (let (binding body (field (local note) (name body)))
+      (binding end (call markdown::excerpt-end (local body)))
+      (binding ref (call postblob::reference (field (local note) (name id))))
+      (in (if (if (call std::text-equal (local ref) (text ""))
+                (call std::less (local end) (call util::size (local body))) (bool true))
+        (call std::text-join (list Text
+          (text "<div class=\"note-body markdown\">")
+          (call markdown::render (call util::slice (local body) (i64 0) (local end)))
+          (text "<p><a href=\"")
+          (call std::html-escape-text (call util::post-link (field (local note) (name id)) (field (local ctx) (name share))))
+          (text "\">Read full post</a></p></div>")
+          (if (call std::less (i64 0) (call std::list-length (types Text) (field (local note) (name media))))
+            (call std::text-join (list Text (text "<div class=\"media-grid\">")
+              (call mediaui::attachments (local ctx) (local note) (i64 0) (text "")) (text "</div>")) (text ""))
+            (text ""))) (text ""))
+        (call writingview::content (local ctx) (local note)))))))
 
   (function create files (visibility public)
     (parameter create ctx (type Context)) (parameter create note (type Note))

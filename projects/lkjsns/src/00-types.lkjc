@@ -24,7 +24,17 @@
 (type-alias AttentionProgress (record (user I64) (edge I64) (done Bool)))
 
 (type-alias PostIndexProgress (record (phase I64) (user I64) (index I64) (done Bool) (valid Bool)))
+(type-alias PostUsageRow (record (id Text) (owner Text) (amount I64) (valid Bool)))
+(type-alias PostUsagePage (record (rows (list PostUsageRow)) (next Text) (valid Bool)))
 
 (type-alias MarkdownBlock (record (html Text) (next I64)))
 (type-alias MarkdownItem (record (valid Bool) (indent I64) (kind Text) (content I64) (start Text)))
 (type-alias MarkdownToken (record (valid Bool) (next I64) (html Text)))
+
+(type-alias PostBodyStage (record (id Text) (post Text) (owner Text) (version I64) (size I64) (written I64) (lengths (list I64)) (hashes (list Text)) (preview Text) (state Text) (reserved I64) (created I64)))
+(type-alias PostBodyGarbage (record (id Text) (owner Text) (next I64) (count I64) (notbefore I64)))
+(type-alias PostBodyGrant (record (valid Bool) (blob Text) (part I64) (version I64) (size I64)))
+
+(type-alias PostReadGrant (record (valid Bool) (note Note) (stage PostBodyStage) (ctx Context)))
+(type-alias PostSearchCandidate (record (valid Bool) (note Note) (stage PostBodyStage) (ctx Context) (viewer User)))
+(type-alias PostSearchCheck (record (valid Bool) (rows Text)))
