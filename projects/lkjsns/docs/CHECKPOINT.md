@@ -1,5 +1,7 @@
 # lkjsns checkpoint — October 17, 2026
 
+> The current production release is documented in [Post storage and long posts](RELEASE-POST-STORAGE-2026-10-28.md). The checkpoint below records the October 17 release.
+
 The modernized pager UX release (Older/Newer labels and balanced flex layout) is live in Coder workspace **devmain**, agent **main**,
 public port **8793**. Cutover completed at **2026-10-17 16:17:02 JST**.
 Existing accounts, posts, private working copies, media and the actual lkjsxc

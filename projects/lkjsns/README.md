@@ -211,7 +211,8 @@ after the existing five-minute stale-upload interval. Originals are not transcod
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [Markdown support](docs/MARKDOWN.md),
+See the [post-storage release record](docs/RELEASE-POST-STORAGE-2026-10-28.md),
+[Markdown support](docs/MARKDOWN.md),
 [reading flow and resource addresses](docs/READING-FLOW.md),
 [collection-local pagination](docs/PAGINATION.md),
 [attention relationships](docs/ATTENTION.md),
