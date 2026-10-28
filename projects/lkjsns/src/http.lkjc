@@ -1,6 +1,6 @@
 (module create http
   (function create query-fields (visibility public) (parameter create request (type Request)) (returns (list Text)) (effect pure) (body (if (call util::handle (call paths::member-id (field (local request) (name path)))) (list Text (text "cursor") (text "trail")) (if (call std::text-equal (field (local request) (name path)) (text "/attention")) (list Text (text "user") (text "direction") (text "cursor") (text "trail")) (if (call icons::known (field (local request) (name path))) (list Text) (if (call util::post-id (call paths::id (field (local request) (name path)))) (call resources::fields (call paths::suffix (field (local request) (name path)))) (if (call std::text-equal (field (local request) (name path)) (text "/post-body/read"))
- (list Text (text "note") (text "version") (text "offset") (text "fence") (text "line") (text "prev") (text "prev-fence") (text "prev-line") (text "share"))
+ (list Text (text "note") (text "version") (text "offset") (text "fence") (text "line") (text "prev") (text "prev-fence") (text "prev-line") (text "share") (text "fragment"))
  (if (call std::text-equal (field (local request) (name path)) (text "/search-long"))
   (list Text (text "q") (text "cursor") (text "offset"))
   (if (call std::text-equal (field (local request) (name path)) (text "/post-body/raw"))
