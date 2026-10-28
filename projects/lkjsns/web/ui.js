@@ -323,3 +323,219 @@ document.addEventListener('click', event => {
   };
   load();
 })();
+
+// Large post text uses native, authorized chunk transfers; the server publishes it.
+(() => {
+  const composer = document.querySelector('.composer[data-post-body]');
+  const form = composer?.querySelector('form');
+  const textarea = form?.elements.namedItem('body');
+  if (!form || !(textarea instanceof HTMLTextAreaElement)) return;
+  const id = form.elements.namedItem('id')?.value;
+  const version = form.elements.namedItem('version')?.value;
+  const csrf = form.elements.namedItem('csrf')?.value;
+  const share = form.elements.namedItem('share')?.value || '';
+  const blobField = form.elements.namedItem('blob');
+  const loadedField = form.elements.namedItem('body-loaded');
+  if (!id || !csrf || !blobField || !loadedField) return;
+
+  const currentBlob = composer.dataset.bodyBlob || '';
+  const parts = Number(composer.dataset.bodyParts || 0);
+  let active = composer.dataset.activeBlob || '', activeText = null, busy = false, stageKnown = Boolean(active);
+  const status = document.createElement('p');
+  status.className = 'field-help post-transfer-status';
+  status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+  status.hidden = true;
+  const setStatus = value => { status.textContent = value; status.hidden = !value; };
+  textarea.closest('label').after(status);
+  const discard = document.createElement('button');
+  discard.type = 'button'; discard.className = 'subtle';
+  discard.textContent = 'Discard unfinished upload'; discard.hidden = !active;
+  status.after(discard);
+
+  function endpoint(kind, blob, index) {
+    const url = new URL('/post-body/' + kind, location.origin);
+    url.searchParams.set('id', blob);
+    if (index !== undefined) url.searchParams.set('part', String(index));
+    return url;
+  }
+  async function send(kind, blob, body, index) {
+    const response = await fetch(endpoint(kind, blob, index), {
+      method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error',
+      headers: {'X-CSRF-Token': csrf, ...(body instanceof Blob ? {'Content-Type':'application/octet-stream'} :
+        body ? {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'} : {})},
+      body
+    });
+    if (!response.ok) {
+      const raw = await response.text();
+      const doc = new DOMParser().parseFromString(raw, 'text/html');
+      const error = new Error(doc.querySelector('[role=alert]')?.textContent?.trim().slice(0,300) ||
+        'The post transfer could not be completed. Your text is still here.');
+      error.status = response.status; throw error;
+    }
+    return response;
+  }
+  async function cleanup(blob) {
+    for (let i = 0; i < 12; i++) {
+      const response = await send('gc', blob);
+      if (response.status === 204 || response.status === 202) return;
+      if (response.status !== 200) throw new Error('Cleanup could not be completed.');
+    }
+  }
+  async function cancel(blob) {
+    try { await send('cancel', blob); }
+    catch (error) { if (stageKnown || error.status !== 409) throw error; }
+    if (stageKnown) { try { await cleanup(blob); } catch {} }
+    if (active === blob) { active = ''; activeText = null; stageKnown = false; discard.hidden = true; }
+  }
+  discard.addEventListener('click', async () => {
+    if (busy || !active) return;
+    busy = true; discard.disabled = true; setStatus('Discarding unfinished upload…');
+    try { await cancel(active); setStatus('Unfinished upload discarded.'); }
+    catch (error) { setStatus(error.message); }
+    finally { busy = false; discard.disabled = false; }
+  });
+
+  if (active) setStatus('An unfinished post upload is using Drive storage.');
+  if (currentBlob) {
+    textarea.disabled = true;
+    const buttons = [...form.querySelectorAll('button[type=submit],button:not([type]),input[type=submit]')];
+    buttons.forEach(button => { button.disabled = true; });
+    setStatus('Loading the complete post…');
+    (async () => {
+      if (!Number.isSafeInteger(parts) || parts < 1 || parts > 514) throw new Error('The stored post could not be verified.');
+      const pieces = [];
+      for (let part = 0; part < parts; part++) {
+        const url = new URL('/post-body/raw', location.origin);
+        url.searchParams.set('note', id); url.searchParams.set('part', String(part));
+        url.searchParams.set('version', version); if (share) url.searchParams.set('share', share);
+        const response = await fetch(url, {credentials:'same-origin', cache:'no-store', redirect:'error'});
+        if (!response.ok) throw new Error('The complete post could not be loaded. Reopen it before editing.');
+        pieces.push(await response.text());
+      }
+      textarea.value = pieces.join(''); loadedField.value = '1'; textarea.disabled = false;
+      buttons.forEach(button => { button.disabled = false; });
+      setStatus(active ? 'An unfinished post upload is using Drive storage.' : '');
+    })().catch(error => { setStatus(error.message); });
+  }
+
+  async function boundary(data, start) {
+    let end = Math.min(start + 4194304, data.size);
+    while (end < data.size && end > start) {
+      const byte = new Uint8Array(await data.slice(end, end + 1).arrayBuffer())[0];
+      if ((byte & 0xc0) !== 0x80) break;
+      end--;
+    }
+    if (end <= start) throw new Error('A text boundary could not be verified.');
+    return end;
+  }
+  function randomId() {
+    return [...crypto.getRandomValues(new Uint8Array(32))].map(x => x.toString(16).padStart(2,'0')).join('');
+  }
+
+  form.addEventListener('submit', async event => {
+    if (busy) { event.preventDefault(); return; }
+    if (currentBlob && loadedField.value !== '1') {
+      event.preventDefault(); setStatus('Wait for the complete post to load before saving.'); return;
+    }
+    const value = textarea.value.replace(/\r\n?/g, '\n');
+    const data = new Blob([value], {type:'text/plain;charset=utf-8'});
+    if (data.size <= 65536 && !currentBlob && !active) return;
+    event.preventDefault();
+    const submitter = event.submitter;
+    const payload = new FormData(form);
+    const mode = submitter?.name === 'mode' ? submitter.value :
+      form.querySelector('input[type=submit][name=mode]')?.value || 'draft';
+    payload.set('mode', mode);
+    const buttons = [...form.querySelectorAll('button[type=submit],button:not([type]),input[type=submit]')];
+    busy = true; buttons.forEach(button => { button.disabled = true; }); textarea.readOnly = true;
+    try {
+      if (active && activeText !== null && activeText !== value) await cancel(active);
+      if (active && activeText === null) throw new Error('Discard the unfinished upload before starting another.');
+      let preview = value;
+      if (data.size > 65536) {
+        if (!active) { active = randomId(); activeText = value; discard.hidden = false; }
+        const response = await send('start', active,
+          new URLSearchParams({post:id, version, size:String(data.size)}));
+        stageKnown = true;
+        const position = Number(await response.text());
+        if (!Number.isSafeInteger(position) || position < 0 || position > 514)
+          throw new Error('The saved transfer position could not be verified.');
+        let start = 0, part = 0;
+        while (start < data.size) {
+          const end = await boundary(data, start);
+          if (part >= position) {
+            setStatus('Uploading post · ' + Math.floor(start / data.size * 100) + '%');
+            await send('part', active, data.slice(start, end), part);
+          }
+          start = end; part++;
+        }
+        if (position > part) throw new Error('The saved transfer position no longer matches this text.');
+        setStatus('Saving post…');
+        preview = await (await send('finish', active)).text();
+        payload.set('blob', active);
+      } else {
+        payload.set('blob', '');
+      }
+      payload.set('body', preview);
+      payload.set('body-loaded', '1');
+      const response = await fetch(form.action, {method:'POST', credentials:'same-origin',
+        headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'},
+        body:new URLSearchParams(payload), redirect:'follow', cache:'no-store'});
+      const destination = new URL(response.url, location.href);
+      if (!response.redirected || destination.origin !== location.origin || destination.pathname === '/login') {
+        const raw = await response.text();
+        const doc = new DOMParser().parseFromString(raw, 'text/html');
+        throw new Error(doc.querySelector('[role=alert]')?.textContent?.trim().slice(0,300) ||
+          'The post was not saved. Your text is still here.');
+      }
+      const oldBlob = currentBlob;
+      active = ''; activeText = null; discard.hidden = true;
+      if (oldBlob) { try { await cleanup(oldBlob); } catch {} }
+      location.assign(destination.href);
+    } catch (error) {
+      const message = error.message || 'The connection was interrupted.';
+      setStatus(/text is still here/i.test(message) ? message : message + ' Your text is still here.');
+    } finally {
+      busy = false; textarea.readOnly = false; buttons.forEach(button => { button.disabled = false; });
+    }
+  });
+})();
+
+// Search long post bodies in bounded pages; the ordinary link works without script.
+(() => {
+  const box = document.querySelector('[data-long-search]');
+  const link = box?.querySelector('a[data-long-search-link]');
+  const results = box?.querySelector('[data-long-search-results]');
+  const status = box?.querySelector('[role=status]');
+  if (!link || !results || !status) return;
+  const setStatus = value => { status.textContent = value; status.hidden = !value; };
+  let active = false;
+  link.addEventListener('click', async event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+    event.preventDefault(); if (active) return;
+    active = true; link.setAttribute('aria-disabled','true'); setStatus('Searching long posts…');
+    try {
+      for (let pages = 0; pages < 4; pages++) {
+        const url = new URL(link.href, location.href);
+        if (url.origin !== location.origin || url.pathname !== '/search-long') throw new Error('The search link is invalid.');
+        const response = await fetch(url, {credentials:'same-origin', cache:'no-store', redirect:'error'});
+        if (!response.ok) throw new Error('The search could not continue. Use the link to retry.');
+        const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const feed = doc.querySelector('.long-post-search .feed');
+        const next = doc.querySelector('.long-post-search a[rel=next]');
+        const items = feed ? [...feed.children].filter(item => item.matches('article.note,.conversation-pair')) : [];
+        for (const item of items) results.append(document.importNode(item, true));
+        if (!next) { link.hidden = true; setStatus('Finished searching long posts.'); return; }
+        const nextUrl = new URL(next.getAttribute('href'), location.origin);
+        if (nextUrl.origin !== location.origin || nextUrl.pathname !== '/search-long') throw new Error('The search continuation is invalid.');
+        link.href = nextUrl.href; link.textContent = 'Continue searching long posts';
+        if (items.length) { setStatus(''); return; }
+      }
+      setStatus('More long posts remain to search.');
+    } catch (error) {
+      setStatus(error.message || 'The search could not continue. Use the link to retry.');
+    } finally {
+      active = false; link.removeAttribute('aria-disabled');
+    }
+  });
+})();

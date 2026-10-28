@@ -82,7 +82,9 @@ The browser resumes an interrupted upload from the first unacknowledged part
 while the upload page and selected file remain available. A page refresh does
 not reconstruct the browser's file handle. Quota includes incomplete reservations;
 incomplete files remain owner-only and may be removed after the existing five-minute
-stale-upload interval. Each account retains its existing 2 GiB total allowance.
+stale-upload interval. The existing 2 GiB allowance is shared by files and the
+author's post text, metadata, and per-post indexes. Attachments count only once.
+Posts do not appear in the file library; staging and shared overhead are excluded.
 
 The native server ignores untrusted upload MIME labels. Recognized raster images,
 audio, and video can render in the browser; other formats, including HTML and SVG,
@@ -115,7 +117,8 @@ Work per request is bounded: post search checks at most four windows of 30 index
 IDs before offering the next page. Member search pages independently. This is not
 ranked, fuzzy, federated, or unbounded full-text search. A future inverted index
 can replace candidate selection without changing the readability checks or the
-single-query UI.
+single-query UI. Long-post bodies can be searched through the explicit continuation
+link, scanning bounded ranges while rechecking current visibility.
 
 The native router currently has exact capture fallbacks for one through eight
 nonempty path segments. Ordinary unknown application paths render a branded

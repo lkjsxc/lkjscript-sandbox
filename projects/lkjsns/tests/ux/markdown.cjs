@@ -64,8 +64,10 @@ const {chromium,base,output,path,assert,goto,pass,session,submit,createPost,shor
   await p.setViewportSize({width:390,height:844});await goto(p,'/'+id);await p.evaluate(()=>document.documentElement.style.fontSize='200%');
   assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   await p.screenshot({path:path.join(output,'markdown-mobile.png'),fullPage:true});
+  const shortCode=await createPost(p,'```\nSelectable code\n```','public');
   await p.setViewportSize({width:1280,height:900});await goto(p,'/');
-  const card=p.locator('#post-'+id);await card.waitFor();const before=p.url();
+  await p.locator('#post-'+id).getByRole('link',{name:'Read full post'}).waitFor();
+  const card=p.locator('#post-'+shortCode);await card.waitFor();const before=p.url();
   await p.evaluate(()=>sessionStorage.removeItem('lkjsns:reading:v1'));
   await card.locator('pre code').click();assert.equal(p.url(),before);
   assert.equal(await p.evaluate(()=>sessionStorage.getItem('lkjsns:reading:v1')),null);

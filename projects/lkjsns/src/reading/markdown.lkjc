@@ -88,6 +88,33 @@
         (in (call mdinline::join3 (call markdown::plain (call util::slice (local value) (i64 0) (local end))) (text "…") (text ""))))
       (call markdown::plain (local value)))))
 
+  ;; Keep timeline work proportional to the preview, even for very long posts.
+  (function create excerpt-stop (visibility private)
+    (parameter create data (type Bytes)) (parameter create index (type I64))
+    (parameter create lines (type I64)) (returns I64) (effect pure)
+    (body (if (if (call std::less (local index) (call std::bytes-length (local data)))
+                 (if (call std::less (local index) (i64 2048))
+                   (call std::less (local lines) (i64 12)) (bool false)) (bool false))
+      (call markdown::excerpt-stop (local data) (call std::add (local index) (i64 1))
+        (if (call std::i64-equal (call std::bytes-get (local data) (local index)) (i64 10))
+          (call std::add (local lines) (i64 1)) (local lines)))
+      (local index))))
+
+  (function create excerpt-end (visibility public)
+    (parameter create value (type Text)) (returns I64) (effect pure)
+    (body (let (binding data (call std::bytes-from-text (local value)))
+      (in (if (if (call std::less-equal (call std::bytes-length (local data)) (i64 2048))
+              (call std::bool-not (call std::text-contains (local value) (text "\n"))) (bool false))
+        (call std::bytes-length (local data))
+        (call searchtext::boundary (local data) (call markdown::excerpt-stop (local data) (i64 0) (i64 0))))))))
+
+  (test create excerpt-short-unicode (visibility private)
+    (actual (call markdown::excerpt-end (text "日本語🌱")))
+    (expected (i64 13)))
+  (test create excerpt-twelve-lines (visibility private)
+    (actual (call markdown::excerpt-end (text "1\n2\n3\n4\n5\n6\n7\n8\n9\n0\na\nb\nc")))
+    (expected (i64 24)))
+
   (test create inline-emphasis (visibility private)
     (actual (call markdown::render (text "Hello **bold** and *soft* ~~old~~.")))
     (expected (text "Hello <strong>bold</strong> and <em>soft</em> <del>old</del>.")))

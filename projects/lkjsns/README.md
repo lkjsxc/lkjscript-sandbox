@@ -50,7 +50,10 @@ positive count carries a plus sign rather than pretending to be exact.
 Posts, replies, and profile bios support a bounded Markdown subset, including
 headings, emphasis, lists, task lists, quotes, links, code blocks, and tables.
 Raw HTML is displayed as text. Markdown images become links; attach a file to
-display it. Editing retains the original Markdown source.
+display it. Editing retains the original Markdown source. Long posts show a
+compact preview, with a paged reading view for the complete text. Code fences
+continue across pages. A Markdown token that spans a page boundary in an unusually
+long unbroken line may appear as literal text on those pages.
 
 HTTP(S) links in posts and profile text open separately, with opener/referrer
 protection and a small external-link indicator. Native rendering escapes content,
@@ -61,7 +64,8 @@ text selection. Conflicting versions retain the attempted input for comparison.
 Search finds readable published posts and, for signed-in viewers, people by
 handle or display name. Literal substring matching, ASCII case folding, Unicode,
 and bounded pagination are supported. Private working copies, deleted posts,
-and muted authors are not exposed in search.
+and muted authors are not exposed in search. Choose **Search inside long posts**
+to continue through their complete text in bounded steps.
 
 About, Privacy policy, Terms of service, Community guidelines, and Contact are
 publicly readable from More. Registration links to the terms and privacy copy.
@@ -116,7 +120,9 @@ Invitation counts and durations no longer have the old 20-person/30-day caps; bl
 Authentication, authorization, posts, settings, tags, search, storage, and HTML
 rendering remain native lkjscript. There is no Node/Python application server.
 Browser JavaScript provides post-card navigation, preference delivery, confirmation
-dialogs, and file-transfer progress/resumption.
+dialogs, and transfer progress/resumption. Post text has no separate application
+length limit; text over 64 KiB uses JavaScript and bounded upload parts. Browser
+resources and the shared storage allowance still limit what can be submitted.
 
 Large files use native 4 MiB upload parts, not a 256 MiB HTTP body. Completed parts
 are acknowledged durably; the browser can resume an interrupted transfer while
@@ -159,7 +165,9 @@ does not silently switch to a moving latest release.
 The source manifest binds every native source fragment, authored stylesheet,
 browser script, operation script, and deployment configuration to the selected
 bundle. Executable-input changes require rebuilding. Development binds loopback;
-prepare/run do not deploy the public service.
+prepare/run do not deploy the public service. Before running a newly selected bundle,
+the local service retains a private verified snapshot of its data and objects under
+`runtime/development/snapshots`.
 
 Optional browser acceptance uses an already-installed Node/Playwright toolchain:
 
@@ -174,7 +182,14 @@ audit. `tests/ux/run.sh` creates a fresh private synthetic store and exercises r
 forms, media, search, request security, responsive layout, a 256 MiB upload/download,
 no-script operation, and native restart. It stops its own service afterward.
 `tests/ux/public-read.cjs` is a separate read-only public check, not authenticated
-production acceptance. Normal repository CI remains lightweight.
+production acceptance. To exercise the shared 2 GiB boundary without creating large
+files, run a fresh fixture with `LKJSNS_UX_SUITES="accounts post-quota-boundary"`;
+the test intentionally fills that fixture with incomplete file reservations. The
+optional `tests/ux/post-quota-upgrade.sh` checks a migration using a separately
+provided, checksum-verified previous production bundle in `LKJSNS_OLD_BUNDLE`.
+`tests/ux/local-upgrade-snapshot.sh` can then check local startup using the
+resulting synthetic fixture supplied in `LKJSNS_UPGRADE_FIXTURE`.
+Normal repository CI remains lightweight.
 
 ## Boundaries
 
@@ -187,9 +202,12 @@ its share capability. Anyone who receives a share URL can pass it on; this is no
 end-to-end encryption. Removing a reference revokes future access, not copies
 that someone already downloaded.
 
-The account allowance is **2 GiB**, including incomplete upload reservations.
-Incomplete uploads can be removed after the existing five-minute stale-upload
-interval. Originals are not transcoded, compressed, or stripped of location
+The account allowance is **2 GiB** shared by files and posts, including post
+text, per-post records and indexes, and incomplete upload reservations. Attached
+files count once as files; posts do not appear as Drive files. Existing posts are
+counted during the one-time upgrade. Temporary staging, shared service overhead,
+and backups are not included in the meter. Incomplete file uploads can be removed
+after the existing five-minute stale-upload interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
