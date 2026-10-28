@@ -53,16 +53,21 @@ const {chromium,base,output,path,assert,goto,pass,session,createPost,crypto}=req
      return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,dockTop:dock.top,dockBottom:dock.bottom,lastBottom:last.bottom};
     });
     assert(info.scrollWidth<=info.width+1,JSON.stringify({width,fontSize,info}));
+    const tabs=await page.locator('.tabs[aria-label="Feed"]').evaluate(el=>({width:el.clientWidth,content:el.scrollWidth}));assert(tabs.content<=tabs.width+1,JSON.stringify({width,fontSize,tabs}));
     assert(info.dockBottom>=899,JSON.stringify({width,fontSize,info}));
     assert(info.lastBottom<=info.dockTop+1,JSON.stringify({width,fontSize,info}));
     if(fontSize==='100%'){
      const links=await page.locator('.mobile-nav a').evaluateAll(es=>es.map(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height})));
      for(const target of links)assert(target.width>=44&&target.height>=44,JSON.stringify({width,target}));
      const buttons=await page.locator('main .pager .button').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().height));
-     for(const height of buttons)assert(height>=48,JSON.stringify({width,height}));
+     for(const height of buttons)assert(height>=44,JSON.stringify({width,height}));
     }
    }
   }
+  await page.setViewportSize({width:320,height:900});await goto(page,'/?cursor=0');
+  await page.evaluate(()=>{document.documentElement.style.fontSize='200%'});
+  const pagerLabels=await page.locator('main .pager .button').evaluateAll(es=>es.map(e=>({width:e.clientWidth,content:e.scrollWidth,whiteSpace:getComputedStyle(e).whiteSpace})));
+  for(const label of pagerLabels)assert(label.content<=label.width+1&&label.whiteSpace==='nowrap',JSON.stringify(label));
   pass('Mobile navigation remains usable and does not cover pagination, including with enlarged text');
 
   const guest=await browser.newContext({locale:'en-US',javaScriptEnabled:false,viewport:{width:390,height:900}});

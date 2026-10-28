@@ -1,8 +1,9 @@
 // Progressive browser conveniences. The server owns all data and authorization.
 'use strict';
+const cardInteractiveSelector = 'a,button,input,textarea,select,summary,video,audio,label,pre,code';
 document.addEventListener('click', event => {
   if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  if (event.target.closest('a,button,input,textarea,select,summary,video,audio,label')) return;
+  if (event.target.closest(cardInteractiveSelector)) return;
   if (window.getSelection()?.toString()) return;
   const card = event.target.closest('article.note[data-href]');
   if (card) window.location.assign(card.dataset.href);
@@ -106,7 +107,7 @@ document.addEventListener('click', event => {
   document.addEventListener('click',event=>{
     if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||!readable(current))return;
     const link=event.target.closest('a[href]');
-    const card=!link&&!event.target.closest('button,input,textarea,select,summary,video,audio,label')&&!getSelection()?.toString()?event.target.closest('article.note[data-href]'):null;
+    const card=!link&&!event.target.closest(cardInteractiveSelector)&&!getSelection()?.toString()?event.target.closest('article.note[data-href]'):null;
     if(!link&&!card || link?.hasAttribute('data-post-back') || link?.target==='_blank')return;
     let target;try{target=canonical(link?.href||card.dataset.href);}catch{return;}
     if(!readable(target)||relative(target)===relative(current))return;
@@ -302,6 +303,8 @@ document.addEventListener('click', event => {
       }
       if (feed.querySelector('article.note')) feed.querySelector(':scope > .empty')?.remove();
       link.hidden = true; status.textContent = '';
+      const loading = link.closest('.timeline-loading');
+      if (loading) loading.hidden = true;
       document.dispatchEvent(new Event('lkjsns:timeline-loaded'));
     } catch (error) {
       if (error.name !== 'AbortError') status.textContent = 'Could not load more posts. Use the link to try again.';

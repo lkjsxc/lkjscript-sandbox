@@ -1,0 +1,68 @@
+(module create mdline
+
+  (function create line-end (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (returns I64) (effect pure)
+    (body (call mdinline::seek (local data) (local at) (call std::bytes-length (local data)) (i64 10))))
+
+  (function create after-line (visibility public) (parameter create data (type Bytes)) (parameter create end (type I64)) (returns I64) (effect pure)
+    (body (if (call std::less (local end) (call std::bytes-length (local data))) (call std::add (local end) (i64 1)) (local end))))
+
+  (function create trim-left (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (returns I64) (effect pure)
+    (body (if (if (call std::less (local at) (local end)) (if (call std::i64-equal (call mdinline::byte (local data) (local at)) (i64 32)) (bool true) (call std::i64-equal (call mdinline::byte (local data) (local at)) (i64 9))) (bool false))
+      (call mdline::trim-left (local data) (call std::add (local at) (i64 1)) (local end)) (local at))))
+
+  (function create trim-right (visibility public) (parameter create data (type Bytes)) (parameter create start (type I64)) (parameter create end (type I64)) (returns I64) (effect pure)
+    (body (if (if (call std::less (local start) (local end)) (if (call std::i64-equal (call mdinline::byte (local data) (call std::subtract (local end) (i64 1))) (i64 32)) (bool true) (call std::i64-equal (call mdinline::byte (local data) (call std::subtract (local end) (i64 1))) (i64 9))) (bool false))
+      (call mdline::trim-right (local data) (local start) (call std::subtract (local end) (i64 1))) (local end))))
+
+  (function create repeat-end (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (parameter create b (type I64)) (returns I64) (effect pure)
+    (body (if (if (call std::less (local at) (local end)) (call std::i64-equal (call mdinline::byte (local data) (local at)) (local b)) (bool false))
+      (call mdline::repeat-end (local data) (call std::add (local at) (i64 1)) (local end) (local b)) (local at))))
+
+  (function create fence-start (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (returns Bool) (effect pure)
+    (body (let (binding b (call mdinline::byte (local data) (local at)))
+      (in (if (if (call std::i64-equal (local b) (i64 96)) (bool true) (call std::i64-equal (local b) (i64 126)))
+        (call std::less-equal (call std::add (local at) (i64 3)) (call mdline::repeat-end (local data) (local at) (local end) (local b))) (bool false)))))
+
+  )
+
+  (function create fence-end (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create b (type I64)) (parameter create width (type I64)) (returns I64) (effect pure)
+    (body (if (call std::less (local at) (call std::bytes-length (local data)))
+      (let (binding end (call mdline::line-end (local data) (local at)))
+        (in (if (if (call std::less-equal (call std::add (local at) (local width)) (call mdline::repeat-end (local data) (local at) (local end) (local b)))
+                (call std::i64-equal (call mdline::trim-left (local data) (call mdline::repeat-end (local data) (local at) (local end) (local b)) (local end)) (local end)) (bool false))
+          (local at) (call mdline::fence-end (local data) (call mdline::after-line (local data) (local end)) (local b) (local width)))))
+      (call std::bytes-length (local data)))))
+
+  (function create fence-block (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (parameter create mode (type I64)) (returns MarkdownBlock) (effect pure)
+    (body (let (binding start (call mdline::after-line (local data) (local end)))
+               (binding close (call mdline::fence-end (local data) (call mdline::after-line (local data) (local end)) (call mdinline::byte (local data) (local at)) (call std::subtract (call mdline::repeat-end (local data) (local at) (local end) (call mdinline::byte (local data) (local at))) (local at))))
+      (in (record structural
+        (field html (call mdinline::tag (text "pre") (call mdinline::tag (text "code") (if (call std::i64-equal (local mode) (i64 1)) (call util::slice (local value) (local start) (local close)) (call std::html-escape-text (call util::slice (local value) (local start) (local close)))) (local mode)) (local mode)))
+        (field next (if (call std::less (local close) (call std::bytes-length (local data))) (call mdline::after-line (local data) (call mdline::line-end (local data) (local close))) (local close)))))))
+
+  )
+
+  (function create heading-level (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (returns I64) (effect pure)
+    (body (let (binding stop (call mdline::repeat-end (local data) (local at) (local end) (i64 35)))
+      (in (if (if (call std::less (local at) (local stop)) (call std::less-equal (call std::subtract (local stop) (local at)) (i64 6)) (bool false))
+        (if (if (call std::i64-equal (local stop) (local end)) (bool true) (call std::i64-equal (call mdinline::byte (local data) (local stop)) (i64 32)))
+          (call std::subtract (local stop) (local at)) (i64 0)) (i64 0)))))
+
+  )
+
+  (function create rule-count (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (parameter create b (type I64)) (parameter create count (type I64)) (returns I64) (effect pure)
+    (body (if (call std::less (local at) (local end))
+      (let (binding byte (call mdinline::byte (local data) (local at)))
+        (in (if (call std::i64-equal (local byte) (local b)) (call mdline::rule-count (local data) (call std::add (local at) (i64 1)) (local end) (local b) (call std::add (local count) (i64 1)))
+          (if (if (call std::i64-equal (local byte) (i64 32)) (bool true) (call std::i64-equal (local byte) (i64 9)))
+            (call mdline::rule-count (local data) (call std::add (local at) (i64 1)) (local end) (local b) (local count)) (i64 0))))) (local count))))
+
+  (function create rule (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (returns Bool) (effect pure)
+    (body (let (binding b (call mdinline::byte (local data) (local at)))
+      (in (if (if (call std::i64-equal (local b) (i64 45)) (bool true) (if (call std::i64-equal (local b) (i64 42)) (bool true) (call std::i64-equal (local b) (i64 95))))
+        (call std::less-equal (i64 3) (call mdline::rule-count (local data) (local at) (local end) (local b) (i64 0))) (bool false)))))
+
+  )
+
+
+)

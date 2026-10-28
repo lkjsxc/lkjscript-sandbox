@@ -2,7 +2,7 @@
   (function create summary (visibility public)
     (parameter create note (type Note))
     (returns Text) (effect pure)
-    (body (call conversation::excerpt (if (call std::bool-not (call std::text-equal (field (local note) (name cw)) (text ""))) (call std::text-join (list Text (text "Content warning: ") (field (local note) (name cw))) (text "")) (if (call std::text-equal (field (local note) (name body)) (text "")) (if (call std::less (i64 0) (call std::list-length (types Text) (field (local note) (name media)))) (text "Media attachment") (text "Empty post")) (field (local note) (name body)))))))
+    (body (call conversation::excerpt (if (call std::bool-not (call std::text-equal (field (local note) (name cw)) (text ""))) (call std::text-join (list Text (text "Content warning: ") (field (local note) (name cw))) (text "")) (if (call std::text-equal (field (local note) (name body)) (text "")) (if (call std::less (i64 0) (call std::list-length (types Text) (field (local note) (name media)))) (text "Media attachment") (text "Empty post")) (call markdown::preview (field (local note) (name body))))))))
 
   (function create destination (visibility public)
     (parameter create note (type Note))
@@ -85,7 +85,7 @@
     (parameter create composing (type Bool))
     (returns Text) (effect (task (requirement service::app::store)))
     (body (if (call util::post-id (local id)) (let (binding note (call db::note (local id))) (binding actor (call db::user (field (local note) (name author)))) (in (if (call conversation::readable (local ctx) (local note) (local viewer) (local actor)) (call conversation::preview-view (local note) (local actor) (field (local ctx) (name now)) (local composing)
-  (if (call std::text-equal (field (local note) (name audience)) (call util::share-audience (field (local ctx) (name share)))) (field (local ctx) (name share)) (text ""))) (if (local composing) (text "<aside class=\"reply-preview parent-unavailable\" aria-label=\"Original post\"><p class=\"field-help\">The original post is unavailable. You can still save this reply as a draft.</p></aside>") (text "<div class=\"reply-context parent-unavailable\" role=\"note\">Original post unavailable.</div>"))))) (text ""))))
+  (if (call std::text-equal (field (local note) (name audience)) (call util::share-audience (field (local ctx) (name share)))) (field (local ctx) (name share)) (text ""))) (if (local composing) (text "<aside class=\"reply-preview parent-unavailable\" aria-label=\"Original post\"><p class=\"field-help\">Original post unavailable.</p></aside>") (text "<div class=\"reply-context parent-unavailable\" role=\"note\">Original post unavailable.</div>"))))) (text ""))))
 
   (function create show-parent (visibility public)
     (parameter create note (type Note))
@@ -103,10 +103,10 @@
   (function create preview-view (visibility public) (parameter create note (type Note)) (parameter create actor (type User))
     (parameter create now (type I64)) (parameter create composing (type Bool)) (parameter create share (type Text)) (returns Text) (effect pure)
     (body (call std::text-join (list Text
-      (text "<a class=\"reply-preview parent-card\" aria-label=\"Original post\" href=\"")
+      (text "<a class=\"reply-preview parent-card\" href=\"")
       (call std::html-escape-text (call util::post-link (field (local note) (name id)) (local share))) (text "\"")
       (if (local composing) (text " target=\"_blank\" rel=\"noopener noreferrer\"") (text ""))
-      (text "><span class=\"parent-identity\">") (call page::avatar (field (local note) (name author)))
+      (text "><span class=\"sr-only\">Original post by </span><span class=\"parent-identity\">") (call page::avatar (field (local note) (name author)))
       (text "<span class=\"parent-person\"><strong>")
       (call std::html-escape-text (if (call std::text-equal (field (local actor) (name display)) (text "")) (field (local note) (name author)) (field (local actor) (name display))))
       (text "</strong><span class=\"meta\">@") (call std::html-escape-text (field (local note) (name author)))

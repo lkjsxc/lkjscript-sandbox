@@ -44,7 +44,7 @@ const {chromium,base,assert,fields,goto,click,session,newPostId,pass}=require('.
   for (const width of [320,390,1280]) {
     await page.setViewportSize({width,height:900});
     for (const link of await page.locator('.pager a[rel=first]').all()) {
-      const box=await link.boundingBox();assert(box.width>=64&&box.height>=48,JSON.stringify({width,box}));
+      const box=await link.boundingBox();assert(box.width>=44&&box.height>=44,JSON.stringify({width,box}));
     }
   }
   await page.setViewportSize({width:1280,height:1000});

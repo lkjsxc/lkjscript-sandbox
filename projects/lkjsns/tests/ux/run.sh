@@ -34,11 +34,11 @@ start(){
 }
 start
 node tests/browser/media-fixtures.cjs
-for suite in ${LKJSNS_UX_SUITES:-accounts writing media search security direct-interactions transfer-recovery layout large replies quiet quiet-paging quiet-files quiet-content attention self-profile favicons brand no-script pager-all reading-flow reading-improvements density};do
+for suite in ${LKJSNS_UX_SUITES:-accounts writing media search security direct-interactions transfer-recovery layout large replies markdown link-only quiet quiet-paging quiet-files quiet-content attention self-profile favicons brand no-script pager-all reading-flow reading-improvements timeline-progress density};do
  echo "--- $suite";node "tests/ux/$suite.cjs" 2>&1 | tee "$output/$suite.log"
 done
 "$LKJ" data verify --root "$fixture/data" > "$output/data-verify.log"
-if [[ -f "$fixture/large.json" && -f "$fixture/pending-transfer.json" ]];then cleanup;pid='';start;node tests/ux/persistence.cjs 2>&1|tee "$output/persistence.log";fi
+if [[ -f "$fixture/large.json" && -f "$fixture/pending-transfer.json" ]];then node tests/ux/capture-persistence.cjs 2>&1|tee "$output/persistence-before.log";cleanup;pid='';start;node tests/ux/persistence.cjs 2>&1|tee "$output/persistence.log";fi
 sha256sum "$fixture/candidate.lkja" > "$output/bundle.sha256"
 find tests/ux -type f -print0|sort -z|xargs -0 sha256sum > "$output/tests.sha256"
 printf 'Evidence: %s\n' "$output"

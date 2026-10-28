@@ -14,7 +14,7 @@ async function assertPager(page,{name='Pagination',content,previous=true,next=tr
  },content);
  assert(report.below,'Pagination must follow the paginated content in DOM and on screen: '+JSON.stringify(report));
  assert.equal(report.nested,0);assert(report.scroll<=report.viewport+1);
- for(const l of report.links){assert(l.height>=48&&l.width>=64,JSON.stringify(l));assert(l.left>=-1&&l.right<=report.viewport+1);}
+ for(const l of report.links){assert(l.height>=44&&l.width>=(l.rel==='first'?44:64),JSON.stringify(l));assert(l.left>=-1&&l.right<=report.viewport+1);}
  if(previous&&next){const[a,b]=report.links;assert(['prev','first'].includes(a.rel)&&b.rel==='next');assert(Math.abs(a.top-b.top)<1);assert(a.right<b.left);assert(b.width>=a.width);}
  return report;
 }

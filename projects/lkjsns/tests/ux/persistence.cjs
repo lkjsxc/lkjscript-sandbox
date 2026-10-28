@@ -14,7 +14,7 @@ const {resourceId,isResource,isEditor,chromium,base,assert,click,goto,pass,sessi
   const target=p.locator('#post-'+load('search').japanese);let pages=0;
   while(await target.count()===0 && await p.getByRole('link',{name:/^(Older|Next)$/}).count()) {
    assert(++pages<=8,'Search must find the retained specimen within this bounded fixture');
-   await click(p,p.getByRole('link',{name:/^(Older|Next)$/}));
+   await click(p,p.getByRole('link',{name:/^(Older|Next)$/}).last());
   }
   assert.equal(await target.count(),1);assert((await target.innerText()).includes('日本語の検索'));
 
@@ -37,7 +37,7 @@ const {resourceId,isResource,isEditor,chromium,base,assert,click,goto,pass,sessi
   const attention=load('attention');await goto(p,'/@testowner/attention/from');
   const readPeople=()=>p.locator('.attention-person').evaluateAll(es=>es.map(e=>new URL(e.href).pathname.split('/')[1].slice(1)));
   const first=await readPeople();assert.deepEqual(first,attention.firstPage);
-  await click(p,p.getByRole('link',{name:/^(Older|Next)$/}));const second=await readPeople();
+  await click(p,p.getByRole('link',{name:/^(Older|Next)$/}).last());const second=await readPeople();
   assert.equal(new Set([...first,...second]).size,attention.expectedIncoming);
   await goto(p,'/@testowner/attention/to');assert.deepEqual(await readPeople(),['testmember']);
   pass('Both attention indexes, relation state and paginated member lists survive a native server restart');

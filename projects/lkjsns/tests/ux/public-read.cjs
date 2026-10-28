@@ -15,7 +15,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
   for(const scheme of ['light','dark'])for(const width of [390,1280]) {
    await p.emulateMedia({colorScheme:scheme,reducedMotion:'reduce'});await p.setViewportSize({width,height:900});
    for(const route of ['/','/login','/join','/about','/search','/more','/privacy','/terms','/guidelines','/contact']) {
-    const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');if(route==='/privacy')assert.equal(await p.locator('.effective').innerText(),'Updated October 17, 2026');
+    const response=await p.goto(origin+route);assert.equal(response.status(),200,route);assert.equal(await p.locator('html').getAttribute('lang'),'en');if(route==='/privacy')assert.equal(await p.locator('.effective').innerText(),'Updated October 17, 2026');if(route==='/about')assert.equal(await p.getByRole('heading',{name:'Markdown',exact:true}).count(),1);
     assert.equal(await p.locator('.page-header').count(),0,route);assert((await p.locator('main h1').getAttribute('class')).includes('sr-only'),route);
     assert.equal(await p.locator('head link[rel=icon][type="image/svg+xml"]').getAttribute('href'),iconPaths.svg);
     await checkPageBrand(p);

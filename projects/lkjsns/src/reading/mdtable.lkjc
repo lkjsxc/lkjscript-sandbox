@@ -1,0 +1,69 @@
+(module create mdtable
+
+  (function create pipe (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (returns I64) (effect pure)
+    (body (if (call std::less (local at) (local end))
+      (if (if (call std::i64-equal (call mdinline::byte (local data) (local at)) (i64 124)) (call std::bool-not (call std::i64-equal (call mdinline::byte (local data) (call std::subtract (local at) (i64 1))) (i64 92))) (bool false))
+        (local at) (call mdtable::pipe (local data) (call std::add (local at) (i64 1)) (local end))) (local end))))
+
+  (function create divider-scan (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (parameter create dashes (type I64)) (returns Bool) (effect pure)
+    (body (if (call std::less (local at) (local end))
+      (let (binding b (call mdinline::byte (local data) (local at)))
+        (in (if (call std::i64-equal (local b) (i64 45)) (call mdtable::divider-scan (local data) (call std::add (local at) (i64 1)) (local end) (call std::add (local dashes) (i64 1)))
+          (if (if (call std::i64-equal (local b) (i64 124)) (bool true) (if (call std::i64-equal (local b) (i64 58)) (bool true) (if (call std::i64-equal (local b) (i64 32)) (bool true) (call std::i64-equal (local b) (i64 9)))))
+            (call mdtable::divider-scan (local data) (call std::add (local at) (i64 1)) (local end) (local dashes)) (bool false)))))
+      (call std::less-equal (i64 3) (local dashes)))))
+
+  (function create table-start (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (returns Bool) (effect pure)
+    (body (if (call std::less (call mdtable::pipe (local data) (local at) (local end)) (local end))
+      (let (binding next (call mdline::after-line (local data) (local end)))
+        (in (let (binding line (call mdline::line-end (local data) (local next)))
+          (in (if (call std::less (call mdtable::pipe (local data) (local next) (local line)) (local line))
+            (call mdtable::divider-scan (local data) (local next) (local line) (i64 0)) (bool false)))))) (bool false))))
+
+  (function create table-cells (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (parameter create header (type Bool)) (parameter create mode (type I64)) (parameter create fuel (type I64)) (parameter create out (type (list Text))) (returns Text) (effect pure)
+    (body (if (if (call std::less (local at) (local end)) (call std::less (i64 0) (local fuel)) (bool false))
+      (let (binding stop (call mdtable::pipe (local data) (local at) (local end)))
+        (in (let (binding left (call mdline::trim-left (local data) (local at) (local stop)))
+          (in (let (binding right (call mdline::trim-right (local data) (local left) (local stop)))
+            (in (call mdtable::table-cells (local value) (local data) (if (call std::less (local stop) (local end)) (call std::add (local stop) (i64 1)) (local stop)) (local end) (local header) (local mode) (call std::subtract (local fuel) (i64 1))
+              (call std::list-append (types Text) (local out) (call mdinline::join3
+                (call mdinline::tag (if (local header) (text "th") (text "td")) (call mdinline::inline (call util::slice (local value) (local left) (local right)) (i64 0) (local mode)) (local mode))
+                (if (call std::i64-equal (local mode) (i64 1)) (text " ") (text "")) (text ""))))))))))
+      (call std::text-join
+        (if (call std::less (local at) (local end))
+          (call std::list-append (types Text) (local out)
+            (call mdinline::tag (if (local header) (text "th") (text "td")) (call mdinline::emit (call util::slice (local value) (local at) (local end)) (local mode)) (local mode)))
+          (local out)) (text "")))))
+
+  (function create table-row (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (parameter create header (type Bool)) (parameter create mode (type I64)) (returns Text) (effect pure)
+    (body (let (binding left (call mdline::trim-left (local data) (local at) (local end)))
+               (binding right (call mdline::trim-right (local data) (local at) (local end)))
+      (in (let (binding start (if (call std::i64-equal (call mdinline::byte (local data) (local left)) (i64 124)) (call std::add (local left) (i64 1)) (local left)))
+               (binding stop (if (call std::i64-equal (call mdinline::byte (local data) (call std::subtract (local right) (i64 1))) (i64 124)) (call std::subtract (local right) (i64 1)) (local right)))
+        (in (call mdinline::join3 (call mdinline::tag (text "tr") (call mdtable::table-cells (local value) (local data) (local start) (local stop) (local header) (local mode) (i64 64) (list Text)) (local mode))
+          (if (call std::i64-equal (local mode) (i64 1)) (text "\n") (text "")) (text "")))))))
+
+  )
+
+  (function create table-rows (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create mode (type I64)) (parameter create fuel (type I64)) (parameter create out (type (list Text))) (returns MarkdownBlock) (effect pure)
+    (body (let (binding end (call mdline::line-end (local data) (local at)))
+      (in (if (if (call std::less (i64 0) (local fuel)) (call std::less (call mdtable::pipe (local data) (local at) (local end)) (local end)) (bool false))
+        (call mdtable::table-rows (local value) (local data) (call mdline::after-line (local data) (local end)) (local mode) (call std::subtract (local fuel) (i64 1))
+          (call std::list-append (types Text) (local out) (call mdtable::table-row (local value) (local data) (local at) (local end) (bool false) (local mode))))
+        (record structural (field html (call std::text-join (local out) (text ""))) (field next (local at)))))))
+
+  )
+
+  (function create table-block (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (parameter create mode (type I64)) (returns MarkdownBlock) (effect pure)
+    (body (let (binding divider (call mdline::after-line (local data) (local end)))
+      (in (let (binding next (call mdline::after-line (local data) (call mdline::line-end (local data) (local divider))))
+        (in (let (binding rows (call mdtable::table-rows (local value) (local data) (local next) (local mode) (i64 128) (list Text)))
+          (in (record structural (field html
+            (if (call std::i64-equal (local mode) (i64 1)) (call mdinline::join3 (call mdtable::table-row (local value) (local data) (local at) (local end) (bool true) (local mode)) (field (local rows) (name html)) (text ""))
+              (call std::text-join (list Text (text "<div class=\"markdown-table\"><table><thead>") (call mdtable::table-row (local value) (local data) (local at) (local end) (bool true) (local mode)) (text "</thead><tbody>") (field (local rows) (name html)) (text "</tbody></table></div>")) (text ""))))
+            (field next (field (local rows) (name next))))))))))
+
+  ))
+
+
+)

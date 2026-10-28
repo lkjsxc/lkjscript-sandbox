@@ -24,3 +24,7 @@
 (type-alias AttentionProgress (record (user I64) (edge I64) (done Bool)))
 
 (type-alias PostIndexProgress (record (phase I64) (user I64) (index I64) (done Bool) (valid Bool)))
+
+(type-alias MarkdownBlock (record (html Text) (next I64)))
+(type-alias MarkdownItem (record (valid Bool) (indent I64) (kind Text) (content I64) (start Text)))
+(type-alias MarkdownToken (record (valid Bool) (next I64) (html Text)))

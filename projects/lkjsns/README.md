@@ -42,6 +42,11 @@ Reply counts follow current readability, mute, and deletion checks, not a count
 of hidden records. Up to 256 indexed replies are inspected per card; an incomplete
 positive count carries a plus sign rather than pretending to be exact.
 
+Posts, replies, and profile bios support a bounded Markdown subset, including
+headings, emphasis, lists, task lists, quotes, links, code blocks, and tables.
+Raw HTML is displayed as text. Markdown images become links; attach a file to
+display it. Editing retains the original Markdown source.
+
 HTTP(S) links in posts and profile text open separately, with opener/referrer
 protection and a small external-link indicator. Native rendering escapes content,
 handles punctuation and Unicode, and does not fetch remote previews. Clicking
@@ -183,7 +188,8 @@ interval. Originals are not transcoded, compressed, or stripped of location
 metadata. Browser codec support varies. There is no federation, email-based
 password recovery, or promise of physical erasure from retained history/backups.
 
-See [reading flow and resource addresses](docs/READING-FLOW.md),
+See [Markdown support](docs/MARKDOWN.md),
+[reading flow and resource addresses](docs/READING-FLOW.md),
 [collection-local pagination](docs/PAGINATION.md),
 [attention relationships](docs/ATTENTION.md),
 [circular identity](docs/CIRCULAR-IDENTITY.md),

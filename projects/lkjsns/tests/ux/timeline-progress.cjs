@@ -19,6 +19,15 @@ const {chromium,base,assert,fields,goto,click,session,newPostId,pass}=require('.
   assert.equal(await plain.locator('.feed[data-progressive] article.note').count(),30);
   await noScript.close();
 
+  const chunk=url=>url.searchParams.get('chunk')==='1';
+  const fail=route=>route.abort();
+  await p.route(chunk,fail);await goto(p,'/');
+  await p.getByText('Could not load more posts. Use the link to try again.').waitFor();
+  assert(await p.locator('.timeline-loading').isVisible());
+  assert(await p.locator('[data-load-all]').isVisible());
+  await p.unroute(chunk,fail);
+  pass('A failed progressive request keeps a visible native fallback');
+
   let inserted=false;
   await p.route(url=>url.searchParams.get('chunk')==='1',async route=>{
    if(!inserted){inserted=true;await create('Concurrent newer post');}
@@ -26,6 +35,7 @@ const {chromium,base,assert,fields,goto,click,session,newPostId,pass}=require('.
   });
   await goto(p,'/');
   await p.locator('[data-load-all][hidden]').waitFor({state:'attached'});
+  assert.equal(await p.locator('.timeline-loading').evaluate(el=>el.getBoundingClientRect().height),0);
   const rendered=await p.locator('.feed[data-progressive] article.note').evaluateAll(nodes=>nodes.map(n=>n.id.replace(/^post-/,'')));
   assert.equal(rendered.length,30);assert.equal(new Set(rendered).size,30);
   assert.deepEqual(rendered,ids.slice().reverse().slice(0,30));

@@ -81,6 +81,9 @@ apply_fragment library-path "$ROOT/src/reading/librarypath.lkjc"
 apply_fragment tags "$ROOT/src/tags.lkjc"
 apply_fragment search-text "$ROOT/src/searchtext.lkjc"
 apply_fragment links "$ROOT/src/reading/links.lkjc"
+for name in mdinline mdline mdlists mdtable markdown; do
+  apply_fragment "$name" "$ROOT/src/reading/$name.lkjc"
+done
 for name in admission mediaui; do
   apply_fragment "$name" "$ROOT/src/ui/$name.lkjc"
 done

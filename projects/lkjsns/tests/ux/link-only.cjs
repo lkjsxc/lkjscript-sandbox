@@ -7,7 +7,7 @@ const {chromium,base,output,path,assert,form,click,goto,pass,session}=require('.
   const owner=await session(browser),p=await owner.newPage();p.setDefaultTimeout(30000);
   await goto(p,'/');await click(p,p.locator('.sidebar a[href="/compose"]'));
   const id=await p.locator('input[name=id]').inputValue();
-  await p.locator('textarea[name=body]').fill('Unlisted telescope with attached image');
+  await p.locator('textarea[name=body]').fill('Unlisted **telescope** with attached image');
   await p.locator('select[name=audience]').selectOption('link-only');
   await click(p,p.getByRole('button',{name:'Attach file',exact:true}));
   await click(p,p.getByRole('link',{name:/Upload/}).first());
@@ -30,6 +30,7 @@ const {chromium,base,output,path,assert,form,click,goto,pass,session}=require('.
   assert.equal((await guest.request.get(wrong.href)).status(),404);
   await goto(anonymous,sharedURL.pathname+sharedURL.search);
   assert((await anonymous.locator('main').innerText()).includes('Unlisted telescope'));
+  assert.equal(await anonymous.locator('.note-detail .note-body strong').innerText(),'telescope');
   assert.equal(await anonymous.locator('meta[name=robots]').getAttribute('content'),'noindex, nofollow');
   assert.equal(await anonymous.locator('meta[name=referrer]').getAttribute('content'),'strict-origin');
   let externalReferrer='';
@@ -57,12 +58,13 @@ const {chromium,base,output,path,assert,form,click,goto,pass,session}=require('.
   await goto(m,sharedURL.pathname+sharedURL.search);
   await click(m,m.locator('.note-detail').getByRole('link',{name:/^Reply/}));
   assert.equal(await m.locator('[name=audience]').inputValue(),'link-only');
-  await m.locator('[name=body]').fill('A reply visible only inside the shared thread');
+  await m.locator('[name=body]').fill('A **reply** visible only inside the shared thread');
   await click(m,m.getByRole('button',{name:'Post',exact:true}));
   assert.equal(new URL(m.url()).pathname+new URL(m.url()).search,sharedURL.pathname+sharedURL.search);
   assert((await m.locator('main').innerText()).includes('A reply visible only inside the shared thread'));
   await goto(anonymous,sharedURL.pathname+sharedURL.search);
   assert((await anonymous.locator('main').innerText()).includes('A reply visible only inside the shared thread'));
+  assert.equal(await anonymous.locator('.reply-list .note-body strong').innerText(),'reply');
   pass('Bookmarks and replies retain access only within the shared thread');
   await member.close();await guest.close();
  }finally{await browser.close();}

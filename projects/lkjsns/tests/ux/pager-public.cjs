@@ -11,7 +11,7 @@ assert(output.startsWith(path.join(root,'.build')+path.sep));fs.mkdirSync(output
    await p.setViewportSize({width,height:900});await p.emulateMedia({colorScheme});
    for(const route of ['/?cursor=0&trail=_','/@lkjsxc?cursor=0&trail=_']){
     const r=await p.goto(origin+route);assert.equal(r.status(),200);await assertPager(p,{content:'main .feed',previous:true,next:false});
-    assert.equal(await p.locator('main>nav.pager').count(),1);await p.locator('a[rel=prev]').click();assert.equal(new URL(p.url()).searchParams.get('cursor'),null);checks++;
+    assert.equal(await p.locator('main>nav.pager').count(),2);await p.locator('a[rel=prev]').last().click();assert.equal(new URL(p.url()).searchParams.get('cursor'),null);checks++;
    }
   }
   await context.close();

@@ -1,0 +1,67 @@
+(module create mdlists
+
+  (function create digit-end (visibility public) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create end (type I64)) (returns I64) (effect pure)
+    (body (if (if (call std::less (local at) (local end)) (if (call std::less-equal (i64 48) (call mdinline::byte (local data) (local at))) (call std::less-equal (call mdinline::byte (local data) (local at)) (i64 57)) (bool false)) (bool false))
+      (call mdlists::digit-end (local data) (call std::add (local at) (i64 1)) (local end)) (local at))))
+
+  (function create no-item (visibility public) (returns MarkdownItem) (effect pure)
+    (body (record structural (field valid (bool false)) (field indent (i64 0)) (field kind (text "")) (field content (i64 0)) (field start (text "")))))
+
+  (function create item (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (returns MarkdownItem) (effect pure)
+    (body (let (binding end (call mdline::line-end (local data) (local at)))
+      (in (let (binding start (call mdline::trim-left (local data) (local at) (local end)))
+        (in (let (binding b (call mdinline::byte (local data) (local start)))
+                 (binding digits (call mdlists::digit-end (local data) (local start) (local end)))
+          (in (if (if (if (call std::i64-equal (local b) (i64 45)) (bool true) (if (call std::i64-equal (local b) (i64 42)) (bool true) (call std::i64-equal (local b) (i64 43))))
+                  (call std::i64-equal (call mdinline::byte (local data) (call std::add (local start) (i64 1))) (i64 32)) (bool false))
+            (record structural (field valid (bool true)) (field indent (call std::subtract (local start) (local at))) (field kind (text "ul")) (field content (call mdline::trim-left (local data) (call std::add (local start) (i64 2)) (local end))) (field start (text "")))
+            (if (if (call std::less (local start) (local digits))
+                  (if (call std::less-equal (call std::subtract (local digits) (local start)) (i64 9))
+                    (if (if (call std::i64-equal (call mdinline::byte (local data) (local digits)) (i64 46)) (bool true) (call std::i64-equal (call mdinline::byte (local data) (local digits)) (i64 41)))
+                      (call std::i64-equal (call mdinline::byte (local data) (call std::add (local digits) (i64 1))) (i64 32)) (bool false)) (bool false)) (bool false))
+              (record structural (field valid (bool true)) (field indent (call std::subtract (local start) (local at))) (field kind (text "ol")) (field content (call mdline::trim-left (local data) (call std::add (local digits) (i64 2)) (local end))) (field start (call util::slice (local value) (local start) (local digits))))
+              (call mdlists::no-item)))))))))))
+
+  (function create task-body (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create start (type I64)) (parameter create end (type I64)) (parameter create mode (type I64)) (returns Text) (effect pure)
+    (body (if (if (call std::i64-equal (call mdinline::byte (local data) (local start)) (i64 91))
+                  (if (call std::i64-equal (call mdinline::byte (local data) (call std::add (local start) (i64 2))) (i64 93))
+                    (if (call std::i64-equal (call mdinline::byte (local data) (call std::add (local start) (i64 3))) (i64 32))
+                      (if (call std::i64-equal (call mdinline::byte (local data) (call std::add (local start) (i64 1))) (i64 32)) (bool true)
+                        (if (call std::i64-equal (call mdinline::byte (local data) (call std::add (local start) (i64 1))) (i64 120)) (bool true) (call std::i64-equal (call mdinline::byte (local data) (call std::add (local start) (i64 1))) (i64 88)))) (bool false)) (bool false)) (bool false))
+      (call mdinline::join3
+        (if (call std::i64-equal (local mode) (i64 1)) (text "") (if (call std::i64-equal (call mdinline::byte (local data) (call std::add (local start) (i64 1))) (i64 32))
+          (text "<input type=\"checkbox\" disabled aria-label=\"Incomplete task\"> ") (text "<input type=\"checkbox\" checked disabled aria-label=\"Completed task\"> ")))
+        (call mdinline::inline (call util::slice (local value) (call std::add (local start) (i64 4)) (local end)) (i64 0) (local mode)) (text ""))
+      (call mdinline::inline (call util::slice (local value) (local start) (local end)) (i64 0) (local mode)))))
+
+  (function create list-items (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create indent (type I64)) (parameter create kind (type Text)) (parameter create depth (type I64)) (parameter create mode (type I64)) (parameter create fuel (type I64)) (parameter create out (type (list Text))) (returns MarkdownBlock) (effect pure)
+    (body (let (binding item (call mdlists::item (local value) (local data) (local at)))
+      (in (if (if (call std::less (i64 0) (local fuel)) (if (field (local item) (name valid)) (if (call std::i64-equal (field (local item) (name indent)) (local indent)) (call std::text-equal (field (local item) (name kind)) (local kind)) (bool false)) (bool false)) (bool false))
+        (let (binding end (call mdline::line-end (local data) (local at)))
+          (in (let (binding next (call mdline::after-line (local data) (local end)))
+            (in (let (binding child (call mdlists::item (local value) (local data) (local next)))
+              (in (let (binding nested (if (if (call std::less (local depth) (i64 15)) (if (field (local child) (name valid)) (call std::less (local indent) (field (local child) (name indent))) (bool false)) (bool false))
+                     (call mdlists::list-group (local value) (local data) (local next) (call std::add (local depth) (i64 1)) (local mode))
+                     (record structural (field html (text "")) (field next (local next)))))
+                (in (call mdlists::list-items (local value) (local data) (field (local nested) (name next)) (local indent) (local kind) (local depth) (local mode) (call std::subtract (local fuel) (i64 1))
+                  (call std::list-append (types Text) (local out)
+                    (call mdinline::join3 (call mdinline::tag (text "li") (call mdinline::join3 (call mdlists::task-body (local value) (local data) (field (local item) (name content)) (local end) (local mode)) (field (local nested) (name html)) (text "")) (local mode))
+                      (if (call std::i64-equal (local mode) (i64 1)) (text "\n") (text "")) (text ""))))))))))))
+        (record structural (field html (call std::text-join (local out) (text ""))) (field next (local at)))))))
+
+  )
+
+  (function create list-group (visibility public) (parameter create value (type Text)) (parameter create data (type Bytes)) (parameter create at (type I64)) (parameter create depth (type I64)) (parameter create mode (type I64)) (returns MarkdownBlock) (effect pure)
+    (body (let (binding item (call mdlists::item (local value) (local data) (local at)))
+      (in (let (binding result (call mdlists::list-items (local value) (local data) (local at) (field (local item) (name indent)) (field (local item) (name kind)) (local depth) (local mode) (i64 128) (list Text)))
+        (in (record structural (field html
+          (if (call std::i64-equal (local mode) (i64 1)) (field (local result) (name html))
+            (if (call std::text-equal (field (local item) (name kind)) (text "ol"))
+              (call std::text-join (list Text (text "<ol start=\"") (field (local item) (name start)) (text "\">") (field (local result) (name html)) (text "</ol>")) (text ""))
+              (call mdinline::tag (text "ul") (field (local result) (name html)) (local mode)))))
+          (field next (field (local result) (name next)))))))))
+
+  )
+
+
+)
